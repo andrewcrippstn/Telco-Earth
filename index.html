@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telco Earth</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+
+    :root {
+        --sage: #4d7c0f; --sage-hi: #65a30d;
+        --sage-soft: rgba(77, 124, 15, 0.1);
+        --sage-soft-hi: rgba(77, 124, 15, 0.16);
+        --sage-border: rgba(77, 124, 15, 0.24);
+        --paper: #ffffff; --paper-soft: #fafaf7; --paper-2: #f5f5f0; --paper-3: #edede8;
+        --ink: #1f261a; --ink-1: #3f4038; --ink-2: #6d7167; --ink-3: #9a9d92;
+        --border: rgba(0, 0, 0, 0.07); --border-hi: rgba(0, 0, 0, 0.1);
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+    body { background: var(--paper); color: var(--ink); display: flex; flex-direction: column; }
+
+    .header {
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px 20px; background: var(--paper);
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0; z-index: 100; height: 56px;
+    }
+
+    .brand {
+        display: flex; align-items: center; gap: 10px;
+        font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.05rem;
+        color: var(--ink); padding-right: 14px; border-right: 1px solid var(--border);
+    }
+
+    .brand-mark {
+        width: 30px; height: 30px; border-radius: 8px;
+        background: linear-gradient(135deg, var(--sage), #365314);
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 0.78rem;
+        box-shadow: 0 2px 8px rgba(77, 124, 15, 0.25);
+    }
+
+    .header-spacer { flex: 1; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+
+    .h-select {
+        background: var(--paper-soft); border: 1px solid var(--border);
+        color: var(--ink); padding: 7px 12px; border-radius: 7px;
+        font-size: 0.78rem; font-weight: 500; cursor: pointer;
+        outline: none; font-family: inherit; transition: all 0.15s ease;
+    }
+    .h-select:hover { border-color: var(--border-hi); }
+    .h-select:focus { border-color: var(--sage); box-shadow: 0 0 0 3px var(--sage-soft); }
+    .h-select option, .h-select optgroup { background: white; color: var(--ink); }
+
+    .h-icon {
+        width: 34px; height: 34px; border-radius: 8px;
+        background: transparent; border: 1px solid transparent;
+        color: var(--ink-2); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.82rem; transition: all 0.15s ease;
+    }
+    .h-icon:hover { background: var(--paper-2); color: var(--ink); }
+
+    .workspace { flex: 1; display: flex; overflow: hidden; }
+
+    .rail {
+        width: 58px; background: var(--paper); border-right: 1px solid var(--border);
+        display: flex; flex-direction: column; align-items: center;
+        padding: 12px 0; gap: 4px; flex-shrink: 0; z-index: 20;
+    }
+
+    .rail-btn {
+        width: 42px; height: 42px; border-radius: 9px;
+        background: transparent; border: 1px solid transparent;
+        color: var(--ink-3); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.92rem; transition: all 0.18s ease; position: relative;
+    }
+    .rail-btn:hover { background: var(--paper-2); color: var(--ink-1); }
+    .rail-btn.active { background: var(--sage-soft); color: var(--sage); border-color: var(--sage-border); }
+    .rail-btn.active::before {
+        content: ''; position: absolute; left: -13px; top: 50%;
+        transform: translateY(-50%); width: 3px; height: 22px;
+        background: var(--sage); border-radius: 0 3px 3px 0;
+    }
+    .rail-spacer { flex: 1; }
+
+    .subrail {
+        width: 0; overflow: hidden; display: flex; flex-direction: column;
+        flex-shrink: 0; transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        background: var(--paper-soft); border-right: 1px solid var(--border); z-index: 15;
+    }
+    .subrail.open { width: 288px; }
+    .subrail-inner { width: 288px; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+    .subrail-header { padding: 20px 20px 12px; flex-shrink: 0; }
+    .subrail-title {
+        font-family: 'Fraunces', serif; font-size: 0.95rem; font-weight: 600;
+        color: var(--ink); display: flex; align-items: center;
+        justify-content: space-between; margin-bottom: 12px;
+    }
+    .subrail-title .subrail-count {
+        font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem;
+        color: var(--ink-3); font-weight: 500;
+    }
+    .subrail-actions { display: flex; gap: 5px; }
+    .subrail-hbtn {
+        flex: 1; padding: 7px 10px; border-radius: 7px;
+        background: var(--paper); border: 1px solid var(--border);
+        cursor: pointer; font-size: 0.7rem; font-weight: 500;
+        color: var(--ink-2); display: flex; align-items: center;
+        justify-content: center; gap: 6px; transition: all 0.15s ease;
+        font-family: inherit;
+    }
+    .subrail-hbtn:hover { background: var(--paper-2); color: var(--ink); border-color: var(--border-hi); }
+    .subrail-hbtn i { font-size: 0.68rem; }
+
+    .subrail-search {
+        margin: 0 16px 12px; display: flex; align-items: center; gap: 8px;
+        padding: 8px 12px; border-radius: 8px; background: var(--paper);
+        border: 1px solid var(--border); transition: all 0.18s ease;
+    }
+    .subrail-search:focus-within { border-color: var(--sage); box-shadow: 0 0 0 3px var(--sage-soft); }
+    .subrail-search i { font-size: 0.7rem; color: var(--ink-3); }
+    .subrail-search input {
+        background: none; border: none; outline: none; flex: 1;
+        font-size: 0.78rem; font-family: inherit; color: var(--ink); min-width: 0;
+    }
+    .subrail-search input::placeholder { color: var(--ink-3); }
+
+    .subrail-body { flex: 1; overflow-y: auto; padding: 0 12px 20px; }
+
+    .folder-bulkbar {
+        margin: 0 16px 10px; padding: 10px 12px;
+        background: var(--sage-soft); border: 1px solid var(--sage-border);
+        border-radius: 8px; display: flex; align-items: center; gap: 8px;
+        font-size: 0.72rem; color: var(--sage); font-weight: 500;
+    }
+    .folder-bulkbar button {
+        padding: 5px 10px; background: white; border: 1px solid var(--sage-border);
+        border-radius: 6px; color: var(--sage); font-size: 0.68rem;
+        font-weight: 500; cursor: pointer; display: flex; align-items: center;
+        gap: 5px; transition: all 0.15s ease; font-family: inherit;
+    }
+    .folder-bulkbar button:hover { background: var(--sage); color: white; }
+
+    .tree-item-wrap { position: relative; }
+
+    .tree-item {
+        padding: 4px 8px; border-radius: 6px;
+        display: flex; align-items: center; gap: 6px;
+        cursor: pointer; font-size: 0.79rem; color: var(--ink-1);
+        transition: all 0.12s ease; margin-bottom: 0px;
+        border: 1px solid transparent; user-select: none;
+        min-height: 26px;
+    }
+    .tree-item:hover { background: var(--paper); border-color: var(--border); color: var(--ink); }
+    .tree-item.active { background: var(--sage-soft); color: var(--sage); border-color: var(--sage-border); font-weight: 500; }
+    .tree-item.dragging { opacity: 0.35; }
+    .tree-item.drop-target { border-color: var(--sage); border-style: dashed; background: var(--sage-soft); }
+
+    .tree-item-icon {
+        width: 20px; height: 20px; border-radius: 5px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.62rem; background: var(--paper-2); color: var(--ink-2); flex-shrink: 0;
+    }
+    .tree-item.active .tree-item-icon { background: var(--sage-soft-hi); color: var(--sage); }
+    .tree-item-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
+    .tree-badge {
+        font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem;
+        padding: 1px 5px; border-radius: 4px; font-weight: 500;
+        background: var(--paper-2); color: var(--ink-2); line-height: 1.4;
+    }
+    .tree-item.active .tree-badge { background: var(--sage-soft-hi); color: var(--sage); }
+    .tree-toggle {
+        font-size: 0.55rem; color: var(--ink-3);
+        width: 10px; cursor: pointer; flex-shrink: 0; text-align: center; line-height: 1;
+    }
+    .tree-children { margin-left: 14px; overflow: hidden; }
+    .tree-children.collapsed { display: none; }
+
+    .drag-line {
+        position: absolute; left: 8px; right: 8px; height: 2px;
+        background: var(--sage); border-radius: 2px; z-index: 100;
+        pointer-events: none; box-shadow: 0 0 8px var(--sage-hi); display: none;
+    }
+    .drag-line::before, .drag-line::after {
+        content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--sage); box-shadow: 0 0 4px var(--sage-hi);
+    }
+    .drag-line::before { left: -3px; }
+    .drag-line::after { right: -3px; }
+    .drag-line.show { display: block; }
+
+    .root-drop-zone {
+        padding: 4px 8px; margin: 4px 0; border-radius: 6px;
+        border: 1px dashed transparent; transition: all 0.15s ease; min-height: 22px;
+    }
+    .root-drop-zone.active { border-color: var(--sage); background: var(--sage-soft); border-style: dashed; }
+
+    .static-item {
+        padding: 11px 14px; border-radius: 9px; background: var(--paper);
+        border: 1px solid var(--border); display: flex; align-items: center;
+        gap: 12px; cursor: pointer; font-size: 0.82rem; color: var(--ink-1);
+        transition: all 0.14s ease; margin-bottom: 6px;
+    }
+    .static-item:hover {
+        background: white; border-color: var(--border-hi); color: var(--ink);
+        transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .static-item-icon {
+        width: 32px; height: 32px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; background: var(--paper-2); color: var(--ink-2);
+        flex-shrink: 0; transition: all 0.14s ease;
+    }
+    .static-item:hover .static-item-icon { background: var(--sage-soft); color: var(--sage); }
+    .static-item-body { flex: 1; }
+    .static-item-label { font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+    .static-item-desc { font-size: 0.68rem; color: var(--ink-3); }
+
+    .layer-row {
+        padding: 10px 12px; border-radius: 8px; display: flex; align-items: center;
+        gap: 10px; cursor: pointer; font-size: 0.8rem; color: var(--ink-1);
+        transition: all 0.14s ease; margin-bottom: 2px; border: 1px solid transparent;
+    }
+    .layer-row:hover { background: var(--paper); border-color: var(--border); }
+    .layer-row.active { background: var(--sage-soft); border-color: var(--sage-border); color: var(--sage); font-weight: 500; }
+    .layer-row .check-circle {
+        width: 22px; height: 22px; border-radius: 50%;
+        border: 2px solid var(--border-hi); display: flex; align-items: center;
+        justify-content: center; flex-shrink: 0; transition: all 0.15s ease;
+    }
+    .layer-row.active .check-circle { border-color: var(--sage); background: var(--sage); color: white; }
+    .layer-row .check-circle i { font-size: 0.55rem; opacity: 0; }
+    .layer-row.active .check-circle i { opacity: 1; }
+
+    .toggle-row {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 14px; border-radius: 9px;
+        background: var(--paper); border: 1px solid var(--border);
+        margin-bottom: 6px; cursor: pointer; transition: all 0.15s ease; user-select: none;
+    }
+    .toggle-row:hover { border-color: var(--border-hi); }
+    .toggle-row.active { background: var(--sage-soft); border-color: var(--sage-border); }
+
+    .toggle-switch {
+        width: 34px; height: 20px; border-radius: 10px;
+        background: var(--paper-3); border: 1px solid var(--border-hi);
+        position: relative; flex-shrink: 0; transition: all 0.2s ease;
+    }
+    .toggle-switch::after {
+        content: ''; position: absolute; top: 2px; left: 2px;
+        width: 14px; height: 14px; border-radius: 50%; background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15); transition: all 0.2s ease;
+    }
+    .toggle-row.active .toggle-switch { background: var(--sage); border-color: var(--sage); }
+    .toggle-row.active .toggle-switch::after { left: 16px; }
+
+    .toggle-label { flex: 1; }
+    .toggle-label-main { font-size: 0.82rem; color: var(--ink); font-weight: 500; }
+    .toggle-label-sub { font-size: 0.68rem; color: var(--ink-3); margin-top: 2px; }
+
+    .scheme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+    .scheme-card {
+        border: 2px solid var(--border); border-radius: 10px; padding: 8px;
+        cursor: pointer; background: var(--paper); transition: all 0.15s ease;
+    }
+    .scheme-card:hover { border-color: var(--border-hi); transform: translateY(-1px); }
+    .scheme-card.active { border-color: var(--sage); background: var(--sage-soft); }
+    .scheme-preview {
+        height: 22px; border-radius: 5px; margin-bottom: 6px;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    }
+    .scheme-name { font-size: 0.72rem; font-weight: 500; color: var(--ink); text-align: center; }
+
+    .tile-row {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 10px; border-radius: 8px;
+        background: var(--paper); border: 1px solid var(--border);
+        margin-bottom: 4px; cursor: pointer; transition: all 0.15s ease;
+    }
+    .tile-row:hover { border-color: var(--border-hi); background: white; }
+    .tile-row.active { background: var(--sage-soft); border-color: var(--sage-border); }
+    .tile-check {
+        width: 20px; height: 20px; border-radius: 5px;
+        border: 2px solid var(--border-hi);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; transition: all 0.15s ease;
+    }
+    .tile-check i { font-size: 0.55rem; opacity: 0; color: white; }
+    .tile-row.active .tile-check { background: var(--sage); border-color: var(--sage); }
+    .tile-row.active .tile-check i { opacity: 1; }
+    .tile-info { flex: 1; min-width: 0; }
+    .tile-info-name { font-weight: 500; color: var(--ink); font-size: 0.78rem; }
+    .tile-row.active .tile-info-name { color: var(--sage); }
+    .tile-info-meta { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--ink-3); margin-top: 1px; }
+    .tile-zoom {
+        width: 26px; height: 26px; border-radius: 6px;
+        background: transparent; border: none; color: var(--ink-3);
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        font-size: 0.7rem; transition: all 0.15s ease;
+    }
+    .tile-zoom:hover { background: var(--paper-2); color: var(--ink); }
+
+    .map-area { flex: 1; position: relative; overflow: hidden; background: var(--paper); }
+    #map { position: absolute; inset: 0; z-index: 1; }
+
+    .leaflet-control-zoom a {
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: var(--ink-1) !important; border: 1px solid var(--border-hi) !important;
+        width: 34px !important; height: 34px !important;
+        line-height: 32px !important; font-size: 1.1rem !important;
+        border-radius: 8px !important; margin-bottom: 5px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    .leaflet-control-zoom a:hover { background: white !important; border-color: var(--sage-border) !important; color: var(--sage) !important; }
+    .leaflet-control-attribution {
+        background: rgba(255, 255, 255, 0.9) !important;
+        color: var(--ink-3) !important; border-radius: 8px 0 0 0 !important;
+        padding: 4px 10px !important; font-size: 10px !important;
+        border-top: 1px solid var(--border); border-left: 1px solid var(--border);
+    }
+    .leaflet-control-attribution a { color: var(--sage) !important; }
+    .leaflet-bar { border: none !important; box-shadow: none !important; }
+    .leaflet-marker-icon, .leaflet-interactive { cursor: pointer; }
+
+    .map-tools {
+        position: absolute; top: 16px; left: 16px; display: flex; gap: 4px;
+        z-index: 500; background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(20px); padding: 5px; border-radius: 12px;
+        border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+    .map-tool {
+        padding: 8px 13px; border-radius: 8px; background: transparent;
+        border: 1px solid transparent; color: var(--ink-1); font-size: 0.75rem;
+        font-weight: 500; cursor: pointer; display: flex; align-items: center;
+        gap: 6px; transition: all 0.15s ease; font-family: inherit; white-space: nowrap;
+    }
+    .map-tool:hover { background: var(--paper-2); color: var(--ink); }
+    .map-tool.active { background: var(--sage); color: white; box-shadow: 0 2px 8px rgba(77, 124, 15, 0.3); }
+    .map-tool i { font-size: 0.72rem; }
+
+    .elev-card {
+        position: absolute; bottom: 20px; right: 20px; width: 240px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(20px); border: 1px solid var(--border);
+        border-radius: 12px; padding: 16px 18px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); z-index: 500;
+        transition: all 0.2s ease;
+    }
+    .elev-card.hidden { display: none; }
+    .elev-label {
+        font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+        text-transform: uppercase; letter-spacing: 0.14em; font-weight: 500;
+        color: var(--ink-3); margin-bottom: 10px;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .elev-value {
+        font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 500;
+        letter-spacing: -0.02em; color: var(--ink); display: flex;
+        align-items: baseline; gap: 5px; line-height: 1; margin-bottom: 10px;
+    }
+    .elev-value small { font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500; color: var(--ink-3); }
+    .elev-coords {
+        display: flex; justify-content: space-between;
+        font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem;
+        color: var(--ink-2); padding-top: 10px; border-top: 1px solid var(--border);
+    }
+    .elev-hint { font-size: 0.65rem; color: var(--ink-3); margin-top: 8px; font-style: italic; }
+
+    .terrain-status {
+        padding: 6px 12px; border-radius: 100px;
+        background: var(--paper-soft); border: 1px solid var(--border);
+        font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+        color: var(--ink-2); white-space: nowrap;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .terrain-status.loaded { background: var(--sage-soft); border-color: var(--sage-border); color: var(--sage); }
+
+    .editing-shape { filter: drop-shadow(0 0 6px var(--sage)); }
+    .vertex-marker {
+        width: 14px !important; height: 14px !important;
+        margin-left: -7px !important; margin-top: -7px !important;
+        background: white; border: 2px solid var(--sage);
+        border-radius: 50%; cursor: move; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+    .midpoint-marker {
+        width: 12px !important; height: 12px !important;
+        margin-left: -6px !important; margin-top: -6px !important;
+        background: white; border: 2px dashed var(--sage);
+        border-radius: 50%; cursor: move; opacity: 0.9;
+    }
+    .leaflet-div-icon { background: transparent !important; border: none !important; }
+    .hgt-heat-canvas { image-rendering: auto; }
+
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(31, 38, 26, 0.25);
+        backdrop-filter: blur(6px); display: none; align-items: center;
+        justify-content: center; z-index: 6000;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+        background: var(--paper); border: 1px solid var(--border-hi);
+        border-radius: 16px; padding: 26px; width: 420px; max-width: 90vw;
+        box-shadow: 0 25px 60px rgba(31, 38, 26, 0.18);
+        max-height: 90vh; overflow-y: auto;
+    }
+    .modal h3 {
+        font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 600;
+        margin-bottom: 18px; display: flex; align-items: center; gap: 10px; color: var(--ink);
+    }
+    .modal h3 i { color: var(--sage); font-size: 0.95rem; }
+    .modal label {
+        display: block; font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em;
+        color: var(--ink-3); font-weight: 500; margin-bottom: 6px;
+    }
+    .modal input, .modal textarea, .modal select {
+        width: 100%; background: var(--paper-soft);
+        border: 1px solid var(--border); border-radius: 9px;
+        padding: 10px 14px; color: var(--ink); font-size: 0.88rem;
+        margin-bottom: 14px; outline: none; font-family: inherit;
+        resize: vertical; transition: all 0.15s ease;
+    }
+    .modal input:focus, .modal textarea:focus, .modal select:focus {
+        border-color: var(--sage); background: white; box-shadow: 0 0 0 3px var(--sage-soft);
+    }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
+
+    .btn {
+        padding: 9px 18px; border-radius: 9px; font-size: 0.83rem;
+        font-weight: 500; cursor: pointer; border: 1px solid transparent;
+        transition: all 0.15s ease; font-family: inherit;
+    }
+    .btn-primary { background: var(--sage); color: white; box-shadow: 0 2px 8px rgba(77, 124, 15, 0.25); }
+    .btn-primary:hover { background: var(--sage-hi); }
+    .btn-secondary { background: var(--paper); color: var(--ink-1); border-color: var(--border-hi); }
+    .btn-secondary:hover { background: var(--paper-2); color: var(--ink); }
+
+    .icon-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+    .icon-choice {
+        aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+        background: var(--paper-soft); border: 2px solid var(--border);
+        border-radius: 10px; cursor: pointer; transition: all 0.15s ease;
+        color: var(--ink-2); font-size: 1.1rem;
+    }
+    .icon-choice:hover { background: var(--paper-2); border-color: var(--border-hi); color: var(--ink); }
+    .icon-choice.selected { background: var(--sage-soft); border-color: var(--sage); color: var(--sage); }
+
+    .toast {
+        position: fixed; bottom: 26px; left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: var(--ink); color: white; padding: 12px 22px;
+        border-radius: 100px; font-size: 0.82rem; font-weight: 500;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25); z-index: 5000;
+        opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast i { color: var(--sage-hi); margin-right: 6px; }
+
+    .pm-edit-panel {
+        position: fixed; top: 74px; right: 20px;
+        background: var(--paper); border: 1px solid var(--border-hi);
+        border-radius: 14px; padding: 16px; z-index: 5500;
+        box-shadow: 0 12px 32px rgba(31, 38, 26, 0.12); width: 260px;
+    }
+    .pm-edit-header {
+        font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem;
+        text-transform: uppercase; letter-spacing: 0.12em;
+        color: var(--ink-3); font-weight: 500; margin-bottom: 10px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .pm-edit-header button {
+        background: transparent; border: none; color: var(--ink-3);
+        cursor: pointer; font-size: 0.85rem; padding: 2px 6px; border-radius: 5px;
+    }
+    .pm-edit-header button:hover { background: var(--paper-2); color: var(--ink); }
+    .pm-edit-input {
+        width: 100%; background: var(--paper-soft);
+        border: 1px solid var(--border); border-radius: 8px;
+        padding: 8px 10px; color: var(--ink); font-size: 0.82rem;
+        outline: none; margin-bottom: 10px; font-family: inherit;
+    }
+    .pm-edit-input:focus { border-color: var(--sage); background: white; box-shadow: 0 0 0 3px var(--sage-soft); }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(77, 124, 15, 0.15); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(77, 124, 15, 0.3); }
+
+    @media (max-width: 900px) {
+        .header { padding: 8px 12px; }
+        .brand span { display: none; }
+        .subrail.open { width: 240px; }
+        .subrail-inner { width: 240px; }
+        .elev-card { width: 200px; padding: 12px 14px; }
+        .elev-value { font-size: 1.6rem; }
+    }
+</style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="brand">
+            <div class="brand-mark"><i class="fas fa-tower-broadcast"></i></div>
+            <span>Telco Earth</span>
+        </div>
+        <div class="header-spacer"></div>
+        <div class="header-right">
+            <select class="h-select" id="provider-select" title="Map provider">
+                <optgroup label="Satellite & Imagery">
+                    <option value="nasa-blue-marble" selected>NASA Blue Marble</option>
+                    <option value="nasa-night">NASA Night</option>
+                    <option value="esri-sat">Esri Satellite</option>
+                    <option value="usgs-imagery">USGS Imagery</option>
+                </optgroup>
+                <optgroup label="Standard maps">
+                    <option value="osm">OpenStreetMap</option>
+                    <option value="osm-hot">OSM Humanitarian</option>
+                    <option value="osm-cycle">CyclOSM</option>
+                    <option value="opentopo">OpenTopoMap</option>
+                </optgroup>
+                <optgroup label="Terrain">
+                    <option value="esri-topo">Esri World Topo</option>
+                    <option value="usgs-topo">USGS Topo</option>
+                </optgroup>
+            </select>
+            <button class="h-icon" id="cache-btn" title="Tile cache"><i class="fas fa-database"></i></button>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="rail">
+            <button class="rail-btn active" data-subrail="places" title="Places"><i class="fas fa-map-location-dot"></i></button>
+            <button class="rail-btn" data-subrail="draw" title="Draw"><i class="fas fa-pen-ruler"></i></button>
+            <button class="rail-btn" data-subrail="terrain" title="Terrain (HGT)"><i class="fas fa-mountain"></i></button>
+            <button class="rail-btn" data-subrail="layers" title="Layers"><i class="fas fa-layer-group"></i></button>
+            <div class="rail-spacer"></div>
+            <button class="rail-btn" data-subrail="settings" title="Settings"><i class="fas fa-sliders"></i></button>
+        </div>
+
+        <div class="subrail open" id="subrail">
+            <div class="subrail-inner">
+                <div class="subrail-header" id="subrail-header">
+                    <div class="subrail-title">
+                        <span id="subrail-title">Places</span>
+                        <span class="subrail-count" id="subrail-count"></span>
+                    </div>
+                    <div class="subrail-actions" id="subrail-actions"></div>
+                </div>
+                <div class="subrail-search" id="subrail-search">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="sb-search" placeholder="Search…">
+                </div>
+                <div class="folder-bulkbar" id="folder-bulkbar" style="display:none;"></div>
+                <div class="subrail-body" id="subrail-body"></div>
+            </div>
+        </div>
+
+        <div class="map-area">
+            <div id="map"></div>
+            <div class="map-tools">
+                <button class="map-tool" id="tool-placemark"><i class="fas fa-map-pin"></i> Placemark</button>
+                <button class="map-tool" id="tool-path"><i class="fas fa-route"></i> Path</button>
+                <button class="map-tool" id="tool-polygon"><i class="fas fa-draw-polygon"></i> Polygon</button>
+                <button class="map-tool" id="tool-measure"><i class="fas fa-ruler"></i> Measure</button>
+                <button class="map-tool" id="tool-measure-area"><i class="fas fa-vector-square"></i> Area</button>
+            </div>
+            <div class="elev-card hidden" id="elev-card">
+                <div class="elev-label"><i class="fas fa-mountain"></i> Elevation</div>
+                <div class="elev-value" id="elev-value">— <small>m</small></div>
+                <div class="elev-coords">
+                    <span id="coord-lat">lat —</span>
+                    <span id="coord-lng">lng —</span>
+                </div>
+                <div class="elev-hint" id="elev-hint">Click map to sample</div>
+            </div>
+            <div style="position: absolute; top: 16px; right: 16px; z-index: 500;">
+                <div class="terrain-status" id="terrain-status">
+                    <i class="fas fa-circle" style="font-size: 0.5rem; color: var(--ink-3);"></i>
+                    No terrain loaded
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" accept=".hgt,.HGT" multiple style="display:none">
+    <input type="file" id="kml-input" accept=".kml,.kmz" multiple style="display:none">
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h3 id="modal-title"><i class="fas fa-map-pin"></i> Add placemark</h3>
+            <div id="modal-body"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn btn-primary" id="modal-ok">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            const fileInput = document.getElementById('file-input');
+            const kmlInput = document.getElementById('kml-input');
+
+            // ==================== HEATMAP COLOUR SCHEMES ====================
+            const HEATMAP_SCHEMES = {
+                'topographic': {
+                    name: 'Topographic',
+                    color: (t) => {
+                        if (t < 0.15) return [235, 230, 210, 200];
+                        if (t < 0.32) { const u = (t - 0.15) / 0.17; return [240 - u*20, 220 - u*30, 180 - u*60, 205]; }
+                        if (t < 0.5) { const u = (t - 0.32) / 0.18; return [220 - u*130, 190 - u*10, 120 - u*80, 210]; }
+                        if (t < 0.7) { const u = (t - 0.5) / 0.2; return [90 - u*50, 180 - u*40, 40 - u*20, 215]; }
+                        if (t < 0.85) { const u = (t - 0.7) / 0.15; return [40 + u*140, 140 - u*70, 20 + u*20, 220]; }
+                        const u = (t - 0.85) / 0.15; return [180 + u*60, 70 - u*40, 40 - u*20, 230];
+                    }
+                },
+                'terrain': {
+                    name: 'Terrain',
+                    color: (t) => {
+                        if (t < 0.25) { const u = t / 0.25; return [34 + u*80, 100 + u*80, 40 + u*30, 200]; }
+                        if (t < 0.5) { const u = (t - 0.25) / 0.25; return [114 + u*90, 180 + u*60, 70 - u*20, 210]; }
+                        if (t < 0.75) { const u = (t - 0.5) / 0.25; return [204 + u*30, 240 - u*80, 50 - u*10, 215]; }
+                        const u = (t - 0.75) / 0.25; return [234 - u*30, 160 - u*90, 40 - u*20, 220];
+                    }
+                },
+                'sunset': {
+                    name: 'Sunset',
+                    color: (t) => {
+                        if (t < 0.25) { const u = t / 0.25; return [40 + u*40, 10 + u*20, 80 - u*30, 210]; }
+                        if (t < 0.5) { const u = (t - 0.25) / 0.25; return [80 + u*120, 30 + u*20, 50 + u*30, 215]; }
+                        if (t < 0.75) { const u = (t - 0.5) / 0.25; return [200 + u*40, 50 + u*80, 80 - u*40, 220]; }
+                        const u = (t - 0.75) / 0.25; return [240 + u*15, 130 + u*100, 40 + u*80, 230];
+                    }
+                },
+                'glacier': {
+                    name: 'Glacier',
+                    color: (t) => {
+                        if (t < 0.33) { const u = t / 0.33; return [10, 30 + u*60, 90 + u*60, 205]; }
+                        if (t < 0.66) { const u = (t - 0.33) / 0.33; return [10 + u*40, 90 + u*130, 150 + u*70, 215]; }
+                        const u = (t - 0.66) / 0.34; return [50 + u*205, 220 + u*35, 220 + u*35, 225];
+                    }
+                }
+            };
+            let currentSchemeKey = 'topographic';
+
+            // ==================== TOAST ====================
+            const toast = document.getElementById('toast');
+            let toastTimer;
+            function showToast(msg, icon) {
+                toast.innerHTML = (icon ? `<i class="fas ${icon}"></i>` : '') + msg;
+                toast.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+            }
+
+            function escapeHtml(s) {
+                return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            }
+            function escapeXml(s) {
+                return String(s).replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
+            }
+
+            // ==================== ICON PRESETS ====================
+            const ICON_PRESETS = {
+                'red-pin': { name: 'Red pin', color: '#ef4444', fa: 'fa-map-pin' },
+                'blue-pin': { name: 'Blue pin', color: '#3b82f6', fa: 'fa-map-pin' },
+                'green-pin': { name: 'Green pin', color: '#4d7c0f', fa: 'fa-map-pin' },
+                'orange-pin': { name: 'Orange pin', color: '#f59e0b', fa: 'fa-map-pin' },
+                'purple-pin': { name: 'Purple pin', color: '#8b5cf6', fa: 'fa-map-pin' },
+                'star': { name: 'Star', color: '#fbbf24', fa: 'fa-star' },
+                'flag': { name: 'Flag', color: '#ef4444', fa: 'fa-flag' },
+                'tower': { name: 'Tower', color: '#4d7c0f', fa: 'fa-tower-cell' },
+                'camera': { name: 'Camera', color: '#8b5cf6', fa: 'fa-camera' },
+                'info': { name: 'Info', color: '#3b82f6', fa: 'fa-circle-info' },
+                'heart': { name: 'Heart', color: '#ec4899', fa: 'fa-heart' },
+                'circle': { name: 'Circle', color: '#4d7c0f', fa: 'fa-circle' },
+                'square': { name: 'Square', color: '#f59e0b', fa: 'fa-square' },
+                'triangle': { name: 'Triangle', color: '#ef4444', fa: 'fa-play' },
+                'mountain': { name: 'Mountain', color: '#65a30d', fa: 'fa-mountain' }
+            };
+
+            function makeLeafletIcon(presetKey) {
+                const p = ICON_PRESETS[presetKey] || ICON_PRESETS['green-pin'];
+                return L.divIcon({
+                    className: '',
+                    html: `<div style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:${p.color};font-size:22px;text-shadow:0 2px 4px rgba(0,0,0,0.25);"><i class="fas ${p.fa}"></i></div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15],
+                    popupAnchor: [0, -12]
+                });
+            }
+
+            // ==================== TILE CACHE ====================
+            const tileCache = new Map();
+            const TILE_CACHE_MAX = 1200;
+            let cacheHits = 0, cacheMisses = 0;
+
+            function touchCache(key, entry) {
+                if (tileCache.has(key)) tileCache.delete(key);
+                tileCache.set(key, entry);
+                while (tileCache.size > TILE_CACHE_MAX) {
+                    const oldest = tileCache.keys().next().value;
+                    const old = tileCache.get(oldest);
+                    if (old && old.url) URL.revokeObjectURL(old.url);
+                    tileCache.delete(oldest);
+                }
+            }
+
+            const CachedTileLayer = L.TileLayer.extend({
+                createTile: function(coords, done) {
+                    const tile = document.createElement('img');
+                    tile.alt = '';
+                    const url = this.getTileUrl(coords);
+                    const cached = tileCache.get(url);
+                    if (cached && cached.url) {
+                        tile.src = cached.url;
+                        cacheHits++;
+                        setTimeout(() => done(null, tile), 0);
+                        return tile;
+                    }
+                    cacheMisses++;
+                    tile.crossOrigin = 'anonymous';
+                    tile.onload = () => {
+                        fetch(url, { mode: 'cors' })
+                            .then(r => r.blob())
+                            .then(blob => {
+                                const objUrl = URL.createObjectURL(blob);
+                                touchCache(url, { blob, url: objUrl, ts: Date.now() });
+                            })
+                            .catch(() => {});
+                        done(null, tile);
+                    };
+                    tile.onerror = (e) => done(e, tile);
+                    tile.src = url;
+                    return tile;
+                }
+            });
+
+            function cachedTileLayer(url, options) { return new CachedTileLayer(url, options); }
+
+            // ==================== MAP ====================
+            const map = L.map('map', {
+                center: [46.5, 8.0], zoom: 6,
+                zoomControl: true, attributionControl: true,
+                minZoom: 2, maxZoom: 19,
+                worldCopyJump: true, doubleClickZoom: false
+            });
+            map.zoomControl.setPosition('bottomleft');
+
+            const providers = {
+                'nasa-blue-marble': cachedTileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', { attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 }),
+                'nasa-night': cachedTileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', { attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 }),
+                'esri-sat': cachedTileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri', maxZoom: 19 }),
+                'usgs-imagery': cachedTileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', { attribution: 'USGS', maxZoom: 19 }),
+                'osm': cachedTileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM', maxZoom: 19 }),
+                'osm-hot': cachedTileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { attribution: 'OSM HOT', maxZoom: 19, subdomains: 'abc' }),
+                'osm-cycle': cachedTileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', { attribution: 'CyclOSM', maxZoom: 20, subdomains: 'abc' }),
+                'opentopo': cachedTileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution: 'OpenTopoMap', maxZoom: 17 }),
+                'esri-topo': cachedTileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri', maxZoom: 19 }),
+                'usgs-topo': cachedTileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', { attribution: 'USGS', maxZoom: 19 })
+            };
+
+            let currentLayer = providers['nasa-blue-marble'].addTo(map);
+            let currentProviderKey = 'nasa-blue-marble';
+
+            document.getElementById('provider-select').addEventListener('change', (e) => {
+                const val = e.target.value;
+                if (!providers[val]) return;
+                if (currentLayer) map.removeLayer(currentLayer);
+                currentLayer = providers[val].addTo(map);
+                currentProviderKey = val;
+                showToast('Map: ' + e.target.options[e.target.selectedIndex].text, 'fa-map');
+            });
+
+            // ==================== TREE DATA ====================
+            let treeNodes = [];
+            let selectedNodeId = null;
+            let editingNodeId = null;
+            let nextId = 1;
+            function genId() { return 'node-' + (nextId++); }
+
+            function findNode(id, nodes = treeNodes) {
+                for (const n of nodes) {
+                    if (n.id === id) return n;
+                    if (n.children) { const f = findNode(id, n.children); if (f) return f; }
+                }
+                return null;
+            }
+            function findParent(id, nodes = treeNodes, parent = null) {
+                for (const n of nodes) {
+                    if (n.id === id) return { parent, list: nodes };
+                    if (n.children) { const f = findParent(id, n.children, n); if (f) return f; }
+                }
+                return null;
+            }
+            function removeNode(id) {
+                const loc = findParent(id);
+                if (!loc) return null;
+                const idx = loc.list.findIndex(n => n.id === id);
+                if (idx >= 0) return loc.list.splice(idx, 1)[0];
+                return null;
+            }
+            function findNodeByName(name, nodes = treeNodes) {
+                for (const n of nodes) {
+                    if (n.name === name) return n;
+                    if (n.children) { const f = findNodeByName(name, n.children); if (f) return f; }
+                }
+                return null;
+            }
+
+            function createNode(props) {
+                return Object.assign({
+                    id: genId(), name: 'Untitled', type: 'folder',
+                    visible: true, expanded: true, children: [],
+                    layer: null, meta: {}
+                }, props);
+            }
+
+            function addNodeToTree(node, parentFolder = null) {
+                if (parentFolder) {
+                    if (!parentFolder.children) parentFolder.children = [];
+                    if (!parentFolder.expanded) parentFolder.expanded = true;
+                    parentFolder.children.push(node);
+                } else {
+                    treeNodes.push(node);
+                }
+                renderTree();
+            }
+
+            function deleteNode(node) {
+                if (editingNodeId === node.id) stopEditing();
+                if (node.children) node.children.slice().forEach(deleteNode);
+                if (node.layer && map.hasLayer(node.layer)) map.removeLayer(node.layer);
+                if (node.layer && drawnItems.hasLayer(node.layer)) drawnItems.removeLayer(node.layer);
+                if (node.type === 'terrain' && node.meta && node.meta.key) {
+                    visibleTiles.delete(node.meta.key);
+                    terrainStore.delete(node.meta.key);
+                    redrawTerrainOverlays();
+                    updateTerrainVisibility();
+                }
+                removeNode(node.id);
+                if (selectedNodeId === node.id) { selectedNodeId = null; }
+                renderTree();
+                showToast('Deleted: ' + node.name, 'fa-trash');
+            }
+
+            // ==================== RENDER ====================
+            const subrailBody = document.getElementById('subrail-body');
+            const subrailTitle = document.getElementById('subrail-title');
+            const subrailCount = document.getElementById('subrail-count');
+            const subrailActions = document.getElementById('subrail-actions');
+            const subrailSearch = document.getElementById('subrail-search');
+            const folderBulkbar = document.getElementById('folder-bulkbar');
+
+            const TYPE_ICONS = {
+                folder: 'fa-folder', placemark: 'fa-map-pin',
+                path: 'fa-route', polygon: 'fa-draw-polygon',
+                measure: 'fa-ruler', 'measure-area': 'fa-vector-square',
+                terrain: 'fa-mountain', kml: 'fa-file-code'
+            };
+
+            const SECTIONS = {
+                places: { title: 'Places', showSearch: true, showActions: true, actions: ['folder', 'edit', 'importKML'] },
+                draw: { title: 'Draw tools', showSearch: false, showActions: false },
+                terrain: { title: 'Terrain (HGT)', showSearch: false, showActions: false },
+                layers: { title: 'Layers', showSearch: false, showActions: false },
+                settings: { title: 'Settings', showSearch: false, showActions: false }
+            };
+
+            let activeSection = 'places';
+
+            function renderTree() {
+                updateSubrailChrome();
+                if (activeSection === 'places') renderPlacesSection();
+                else renderStaticSection(activeSection);
+            }
+
+            function updateSubrailChrome() {
+                const cfg = SECTIONS[activeSection];
+                subrailTitle.textContent = cfg.title;
+
+                if (activeSection === 'places') {
+                    let count = 0;
+                    (function countAll(nodes) {
+                        for (const n of nodes) {
+                            if (n.name === 'Terrain (HGT)' || n.type === 'terrain') continue;
+                            count++;
+                            if (n.children) countAll(n.children);
+                        }
+                    })(treeNodes);
+                    subrailCount.textContent = count;
+                } else {
+                    subrailCount.textContent = '';
+                }
+
+                subrailActions.innerHTML = '';
+                if (cfg.showActions && cfg.actions) {
+                    cfg.actions.forEach(a => {
+                        const btn = document.createElement('button');
+                        btn.className = 'subrail-hbtn';
+                        if (a === 'folder') {
+                            btn.innerHTML = '<i class="fas fa-folder-plus"></i> Folder';
+                            btn.addEventListener('click', promptNewFolder);
+                        } else if (a === 'edit') {
+                            btn.innerHTML = '<i class="fas fa-pen"></i> Edit';
+                            btn.addEventListener('click', editSelected);
+                        } else if (a === 'importKML') {
+                            btn.innerHTML = '<i class="fas fa-file-import"></i> KML';
+                            btn.addEventListener('click', () => kmlInput.click());
+                        }
+                        subrailActions.appendChild(btn);
+                    });
+                }
+
+                subrailSearch.style.display = cfg.showSearch ? '' : 'none';
+                folderBulkbar.style.display = 'none';
+            }
+
+            function renderPlacesSection() {
+                function filterPlaces(nodes) {
+                    return nodes.filter(n => {
+                        if (n.name === 'Terrain (HGT)' || n.type === 'terrain') return false;
+                        if (n.children) n.children = filterPlaces(n.children);
+                        return true;
+                    });
+                }
+                const placesNodes = filterPlaces(treeNodes.slice());
+
+                if (placesNodes.length === 0) {
+                    subrailBody.innerHTML = `
+                        <div style="padding: 40px 20px; text-align: center;">
+                            <div style="width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 14px; background: var(--sage-soft); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-map-location-dot" style="color: var(--sage); font-size: 1.3rem;"></i>
+                            </div>
+                            <div style="font-family: 'Fraunces', serif; font-weight: 600; font-size: 0.95rem; color: var(--ink); margin-bottom: 6px;">Nothing here yet</div>
+                            <div style="font-size: 0.76rem; color: var(--ink-3); line-height: 1.5;">Draw on the map or import a KML file to get started.</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                subrailBody.innerHTML = '';
+                const rootZone = document.createElement('div');
+                rootZone.className = 'root-drop-zone';
+                rootZone.id = 'root-drop-zone';
+                rootZone.innerHTML = '<div style="font-family: \'IBM Plex Mono\', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); font-weight: 500; padding: 2px 4px;">Root</div>';
+                setupRootDropTarget(rootZone);
+                subrailBody.appendChild(rootZone);
+
+                placesNodes.forEach(n => subrailBody.appendChild(buildTreeItem(n, 0)));
+
+                if (selectedNodeId) {
+                    const sel = findNode(selectedNodeId);
+                    if (sel && sel.type === 'folder') showFolderBulkbar(sel);
+                }
+            }
+
+            function setupRootDropTarget(el) {
+                el.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    el.classList.add('active');
+                });
+                el.addEventListener('dragleave', () => el.classList.remove('active'));
+                el.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    el.classList.remove('active');
+                    const draggedId = e.dataTransfer.getData('text/plain');
+                    if (!draggedId) return;
+                    const dragged = findNode(draggedId);
+                    if (!dragged) return;
+                    const loc = findParent(draggedId);
+                    if (loc && loc.parent === null) { showToast('Already at root'); return; }
+                    removeNode(draggedId);
+                    treeNodes.push(dragged);
+                    renderTree();
+                    showToast(`Moved "${dragged.name}" to root`, 'fa-arrows-up-down-left-right');
+                });
+            }
+
+            function showFolderBulkbar(folder) {
+                folderBulkbar.style.display = 'flex';
+                folderBulkbar.innerHTML = `
+                    <i class="fas fa-folder-open"></i>
+                    <span style="flex: 1;">Bulk "${escapeHtml(folder.name)}"</span>
+                    <button id="bulk-icon-btn"><i class="fas fa-icons"></i> Icon</button>
+                    <button id="bulk-color-btn"><i class="fas fa-palette"></i> Color</button>
+                `;
+                document.getElementById('bulk-icon-btn').addEventListener('click', () => bulkChangeIcons(folder));
+                document.getElementById('bulk-color-btn').addEventListener('click', () => bulkChangeColor(folder));
+            }
+
+            let dragLineEl = null;
+            let currentDropTarget = null;
+
+            function ensureDragLine() {
+                if (!dragLineEl) {
+                    dragLineEl = document.createElement('div');
+                    dragLineEl.className = 'drag-line';
+                    document.body.appendChild(dragLineEl);
+                }
+                return dragLineEl;
+            }
+            function hideDragLine() {
+                if (dragLineEl) dragLineEl.classList.remove('show');
+                if (currentDropTarget) {
+                    document.querySelectorAll('.tree-item.drop-target').forEach(el => el.classList.remove('drop-target'));
+                    const rz = document.getElementById('root-drop-zone');
+                    if (rz) rz.classList.remove('active');
+                    currentDropTarget = null;
+                }
+            }
+            function showDragLine(x, y, width) {
+                const line = ensureDragLine();
+                line.style.left = x + 'px';
+                line.style.top = y + 'px';
+                line.style.width = width + 'px';
+                line.classList.add('show');
+            }
+
+            function buildTreeItem(node, depth) {
+                const wrap = document.createElement('div');
+                wrap.className = 'tree-item-wrap';
+
+                const row = document.createElement('div');
+                row.className = 'tree-item';
+                if (selectedNodeId === node.id) row.classList.add('active');
+                row.dataset.nodeId = node.id;
+                row.draggable = true;
+
+                const hasChildren = node.children && node.children.length > 0;
+
+                if (hasChildren) {
+                    const toggle = document.createElement('i');
+                    toggle.className = 'fas fa-chevron-' + (node.expanded ? 'down' : 'right') + ' tree-toggle';
+                    toggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        node.expanded = !node.expanded;
+                        renderTree();
+                    });
+                    row.appendChild(toggle);
+                } else {
+                    const spacer = document.createElement('span');
+                    spacer.style.cssText = 'width: 10px; display: inline-block; flex-shrink: 0;';
+                    row.appendChild(spacer);
+                }
+
+                const icon = document.createElement('div');
+                icon.className = 'tree-item-icon';
+                const iconFa = (node.type === 'placemark' && node.meta.iconPreset && ICON_PRESETS[node.meta.iconPreset])
+                    ? ICON_PRESETS[node.meta.iconPreset].fa : (TYPE_ICONS[node.type] || 'fa-circle');
+                const iconColor = (node.type === 'placemark' && node.meta.iconPreset && ICON_PRESETS[node.meta.iconPreset])
+                    ? ICON_PRESETS[node.meta.iconPreset].color : '';
+                icon.innerHTML = `<i class="fas ${iconFa}"${iconColor ? ` style="color:${iconColor}"` : ''}></i>`;
+                row.appendChild(icon);
+
+                const name = document.createElement('div');
+                name.className = 'tree-item-label';
+                name.textContent = node.name;
+                row.appendChild(name);
+
+                if (node.children && node.children.length > 0 && node.type === 'folder') {
+                    const badge = document.createElement('div');
+                    badge.className = 'tree-badge';
+                    badge.textContent = node.children.length;
+                    row.appendChild(badge);
+                }
+
+                row.addEventListener('click', (e) => { e.stopPropagation(); selectNode(node); });
+
+                row.addEventListener('dragstart', (e) => {
+                    e.stopPropagation();
+                    e.dataTransfer.setData('text/plain', node.id);
+                    e.dataTransfer.effectAllowed = 'move';
+                    row.classList.add('dragging');
+                });
+                row.addEventListener('dragend', () => {
+                    row.classList.remove('dragging');
+                    hideDragLine();
+                });
+
+                row.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const draggedId = e.dataTransfer.getData('text/plain') || getDraggingId();
+                    if (!draggedId || draggedId === node.id) return;
+                    const dragged = findNode(draggedId);
+                    if (!dragged) return;
+                    function isDescendant(anc, desc) {
+                        if (!anc.children) return false;
+                        for (const c of anc.children) {
+                            if (c.id === desc.id) return true;
+                            if (isDescendant(c, desc)) return true;
+                        }
+                        return false;
+                    }
+                    if (isDescendant(dragged, node)) { e.dataTransfer.dropEffect = 'none'; return; }
+                    const rect = row.getBoundingClientRect();
+                    const relY = (e.clientY - rect.top) / rect.height;
+                    const canContain = (node.type === 'folder' || node.type === 'kml');
+                    let zone;
+                    if (canContain && relY > 0.25 && relY < 0.75) zone = 'inside';
+                    else if (relY < 0.5) zone = 'before';
+                    else zone = 'after';
+
+                    document.querySelectorAll('.tree-item.drop-target').forEach(el => el.classList.remove('drop-target'));
+                    hideDragLine();
+
+                    if (zone === 'inside') {
+                        row.classList.add('drop-target');
+                        currentDropTarget = { type: 'inside', node };
+                    } else {
+                        const lineY = zone === 'before' ? rect.top : rect.bottom;
+                        const bodyRect = subrailBody.getBoundingClientRect();
+                        showDragLine(bodyRect.left + 8, lineY, bodyRect.width - 16);
+                        currentDropTarget = { type: zone, node };
+                    }
+                    e.dataTransfer.dropEffect = 'move';
+                });
+
+                row.addEventListener('dragleave', (e) => {
+                    if (e.relatedTarget && row.contains(e.relatedTarget)) return;
+                    row.classList.remove('drop-target');
+                });
+
+                row.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    row.classList.remove('drop-target');
+                    hideDragLine();
+                    const draggedId = e.dataTransfer.getData('text/plain') || getDraggingId();
+                    if (!draggedId || draggedId === node.id) return;
+                    const dragged = findNode(draggedId);
+                    if (!dragged) return;
+                    function isDescendant(anc, desc) {
+                        if (!anc.children) return false;
+                        for (const c of anc.children) {
+                            if (c.id === desc.id) return true;
+                            if (isDescendant(c, desc)) return true;
+                        }
+                        return false;
+                    }
+                    if (isDescendant(dragged, node)) { showToast('Cannot drop folder into itself'); return; }
+
+                    const target = currentDropTarget;
+                    if (!target) return;
+
+                    if (target.type === 'inside') {
+                        removeNode(draggedId);
+                        if (!node.children) node.children = [];
+                        node.children.push(dragged);
+                        node.expanded = true;
+                        renderTree();
+                        showToast(`Moved "${dragged.name}" into ${node.name}`, 'fa-arrows-up-down-left-right');
+                    } else {
+                        const loc = findParent(node.id);
+                        if (!loc) { showToast('Cannot move here'); return; }
+                        removeNode(draggedId);
+                        const idx = loc.list.findIndex(n => n.id === node.id);
+                        const insertAt = target.type === 'before' ? idx : idx + 1;
+                        loc.list.splice(insertAt, 0, dragged);
+                        renderTree();
+                        showToast(`Moved "${dragged.name}"`, 'fa-arrows-up-down-left-right');
+                    }
+                });
+
+                wrap.appendChild(row);
+
+                if (hasChildren && node.expanded) {
+                    const kids = document.createElement('div');
+                    kids.className = 'tree-children';
+                    node.children.forEach(c => kids.appendChild(buildTreeItem(c, depth + 1)));
+                    wrap.appendChild(kids);
+                }
+                return wrap;
+            }
+
+            let _draggingId = null;
+            function getDraggingId() { return _draggingId; }
+            document.addEventListener('dragstart', (e) => {
+                const item = e.target.closest && e.target.closest('.tree-item');
+                if (item && item.dataset.nodeId) _draggingId = item.dataset.nodeId;
+            });
+            document.addEventListener('dragend', () => {
+                _draggingId = null;
+                hideDragLine();
+            });
+
+            function renderStaticSection(section) {
+                if (section === 'draw') {
+                    const items = [
+                        { icon: 'fa-map-pin', label: 'Add placemark', desc: 'Click map to place a marker', action: () => beginDraw('placemark') },
+                        { icon: 'fa-route', label: 'Add path', desc: 'Multi-point line', action: () => beginDraw('path') },
+                        { icon: 'fa-draw-polygon', label: 'Add polygon', desc: 'Closed area', action: () => beginDraw('polygon') },
+                        { icon: 'fa-ruler', label: 'Measure distance', desc: 'Two-point measure', action: () => beginDraw('measure') },
+                        { icon: 'fa-vector-square', label: 'Measure area', desc: 'Polygon area', action: () => beginDraw('measure-area') },
+                        { icon: 'fa-eraser', label: 'Clear all drawings', desc: 'Remove all objects', action: () => clearAllDrawings() }
+                    ];
+                    subrailBody.innerHTML = items.map((it, i) => `
+                        <div class="static-item" data-action="${i}">
+                            <div class="static-item-icon"><i class="fas ${it.icon}"></i></div>
+                            <div class="static-item-body">
+                                <div class="static-item-label">${it.label}</div>
+                                <div class="static-item-desc">${it.desc}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                    subrailBody.querySelectorAll('.static-item').forEach((el, i) => {
+                        el.addEventListener('click', () => items[i].action());
+                    });
+                } else if (section === 'terrain') {
+                    const topItems = [
+                        { icon: 'fa-upload', label: 'Upload HGT files', desc: 'SRTM .hgt format', action: () => fileInput.click() },
+                        { icon: 'fa-download', label: 'Download HGT', desc: 'Viewfinder Panoramas', action: () => window.open('https://viewfinderpanoramas.org/Coverage%20map%20viewfinderpanoramas_org3.htm', '_blank') }
+                    ];
+                    subrailBody.innerHTML = topItems.map((it, i) => `
+                        <div class="static-item" data-action="${i}">
+                            <div class="static-item-icon"><i class="fas ${it.icon}"></i></div>
+                            <div class="static-item-body">
+                                <div class="static-item-label">${it.label}</div>
+                                <div class="static-item-desc">${it.desc}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                    subrailBody.querySelectorAll('.static-item').forEach((el, i) => {
+                        el.addEventListener('click', () => topItems[i].action());
+                    });
+
+                    const toggle = document.createElement('div');
+                    toggle.className = 'toggle-row' + (showAllHeatmaps ? ' active' : '');
+                    toggle.innerHTML = `
+                        <div class="toggle-switch"></div>
+                        <div class="toggle-label">
+                            <div class="toggle-label-main">Show all heatmaps</div>
+                            <div class="toggle-label-sub">${showAllHeatmaps ? 'All loaded tiles visible' : 'Only selected tiles visible'}</div>
+                        </div>
+                    `;
+                    toggle.addEventListener('click', () => {
+                        showAllHeatmaps = !showAllHeatmaps;
+                        if (showAllHeatmaps) {
+                            terrainStore.forEach((_t, k) => visibleTiles.add(k));
+                            showToast('Showing all heatmaps', 'fa-eye');
+                        } else {
+                            visibleTiles.clear();
+                            showToast('Heatmaps hidden', 'fa-eye-slash');
+                        }
+                        redrawTerrainOverlays();
+                        renderStaticSection('terrain');
+                    });
+                    subrailBody.appendChild(toggle);
+
+                    const heading = document.createElement('div');
+                    heading.style.cssText = 'font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); font-weight: 500; padding: 16px 4px 8px;';
+                    heading.textContent = 'Colour scheme';
+                    subrailBody.appendChild(heading);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'scheme-grid';
+                    Object.keys(HEATMAP_SCHEMES).forEach(key => {
+                        const s = HEATMAP_SCHEMES[key];
+                        const stops = [];
+                        for (let i = 0; i <= 10; i++) {
+                            const t = i / 10;
+                            const c = s.color(t);
+                            stops.push(`rgba(${c[0]|0},${c[1]|0},${c[2]|0},1) ${(t*100).toFixed(0)}%`);
+                        }
+                        const card = document.createElement('div');
+                        card.className = 'scheme-card' + (currentSchemeKey === key ? ' active' : '');
+                        card.innerHTML = `
+                            <div class="scheme-preview" style="background: linear-gradient(90deg, ${stops.join(', ')});"></div>
+                            <div class="scheme-name">${s.name}</div>
+                        `;
+                        card.addEventListener('click', () => {
+                            currentSchemeKey = key;
+                            heatmapCache.clear();
+                            redrawTerrainOverlays();
+                            renderStaticSection('terrain');
+                            showToast('Colour scheme: ' + s.name, 'fa-palette');
+                        });
+                        grid.appendChild(card);
+                    });
+                    subrailBody.appendChild(grid);
+
+                    if (terrainStore.size > 0) {
+                        const heading2 = document.createElement('div');
+                        heading2.style.cssText = 'font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); font-weight: 500; padding: 16px 4px 8px;';
+                        heading2.textContent = 'Loaded tiles · ' + terrainStore.size;
+                        subrailBody.appendChild(heading2);
+
+                        terrainStore.forEach((tile, key) => {
+                            const isVisible = visibleTiles.has(key);
+                            const row = document.createElement('div');
+                            row.className = 'tile-row' + (isVisible ? ' active' : '');
+                            row.innerHTML = `
+                                <div class="tile-check"><i class="fas fa-check"></i></div>
+                                <div class="tile-info">
+                                    <div class="tile-info-name">${escapeHtml(key)}</div>
+                                    <div class="tile-info-meta">${tile.width}×${tile.height}</div>
+                                </div>
+                                <button class="tile-zoom" title="Zoom to tile"><i class="fas fa-crosshairs"></i></button>
+                            `;
+                            row.addEventListener('click', (e) => {
+                                if (e.target.closest('.tile-zoom')) return;
+                                toggleTileVisibility(key);
+                                renderStaticSection('terrain');
+                            });
+                            row.querySelector('.tile-zoom').addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const sw = parseKey(key);
+                                map.flyToBounds([[sw.lat, sw.lng], [sw.lat + 1, sw.lng + 1]], { duration: 1.2 });
+                            });
+                            subrailBody.appendChild(row);
+                        });
+                    }
+                } else if (section === 'layers') {
+                    const layerGroups = [
+                        { title: 'Satellite & Imagery', items: [
+                            { id: 'nasa-blue-marble', label: 'NASA Blue Marble', icon: 'fa-globe' },
+                            { id: 'nasa-night', label: 'NASA Black Marble', icon: 'fa-moon' },
+                            { id: 'esri-sat', label: 'Esri Satellite', icon: 'fa-satellite' },
+                            { id: 'usgs-imagery', label: 'USGS Imagery', icon: 'fa-satellite-dish' }
+                        ]},
+                        { title: 'Standard maps', items: [
+                            { id: 'osm', label: 'OpenStreetMap', icon: 'fa-map' },
+                            { id: 'osm-hot', label: 'OSM Humanitarian', icon: 'fa-hand-holding-heart' },
+                            { id: 'osm-cycle', label: 'CyclOSM', icon: 'fa-bicycle' },
+                            { id: 'opentopo', label: 'OpenTopoMap', icon: 'fa-mountain' }
+                        ]},
+                        { title: 'Terrain', items: [
+                            { id: 'esri-topo', label: 'Esri World Topo', icon: 'fa-layer-group' },
+                            { id: 'usgs-topo', label: 'USGS Topo', icon: 'fa-layer-group' }
+                        ]}
+                    ];
+                    subrailBody.innerHTML = '';
+                    layerGroups.forEach(group => {
+                        const heading = document.createElement('div');
+                        heading.style.cssText = 'font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); font-weight: 500; padding: 14px 4px 8px;';
+                        heading.textContent = group.title;
+                        subrailBody.appendChild(heading);
+
+                        group.items.forEach(item => {
+                            const row = document.createElement('div');
+                            row.className = 'layer-row' + (currentProviderKey === item.id ? ' active' : '');
+                            row.innerHTML = `
+                                <div class="check-circle"><i class="fas fa-check"></i></div>
+                                <div class="tree-item-icon" style="width:22px;height:22px;border-radius:6px;"><i class="fas ${item.icon}" style="font-size:0.65rem;"></i></div>
+                                <div style="flex:1;font-weight:500;">${item.label}</div>
+                            `;
+                            row.addEventListener('click', () => {
+                                if (currentLayer) map.removeLayer(currentLayer);
+                                currentLayer = providers[item.id].addTo(map);
+                                currentProviderKey = item.id;
+                                document.getElementById('provider-select').value = item.id;
+                                renderStaticSection('layers');
+                                showToast('Map: ' + item.label, 'fa-map');
+                            });
+                            subrailBody.appendChild(row);
+                        });
+                    });
+                } else if (section === 'settings') {
+                    const items = [
+                        { icon: 'fa-database', label: 'Tile cache stats', desc: `${tileCache.size} tiles · ${cacheHits} hits`, action: () => showToast(`Cache: ${tileCache.size} tiles · ${cacheHits} hits`, 'fa-database') },
+                        { icon: 'fa-trash', label: 'Clear tile cache', desc: 'Free memory', action: () => {
+                            tileCache.forEach(e => e.url && URL.revokeObjectURL(e.url));
+                            tileCache.clear();
+                            cacheHits = 0; cacheMisses = 0;
+                            showToast('Tile cache cleared', 'fa-trash');
+                        }},
+                        { icon: 'fa-location-dot', label: 'Go to my location', desc: 'GPS / network location', action: () => locateMe() },
+                        { icon: 'fa-file-export', label: 'Export as KML', desc: 'Download all places', action: () => exportKML() }
+                    ];
+                    subrailBody.innerHTML = items.map((it, i) => `
+                        <div class="static-item" data-action="${i}">
+                            <div class="static-item-icon"><i class="fas ${it.icon}"></i></div>
+                            <div class="static-item-body">
+                                <div class="static-item-label">${it.label}</div>
+                                <div class="static-item-desc">${it.desc}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                    subrailBody.querySelectorAll('.static-item').forEach((el, i) => {
+                        el.addEventListener('click', () => items[i].action());
+                    });
+                }
+            }
+
+            function editSelected() {
+                if (editingNodeId) { stopEditing(); return; }
+                if (!selectedNodeId) { showToast('Select an item first', 'fa-info-circle'); return; }
+                const node = findNode(selectedNodeId);
+                if (!node) return;
+                if (node.type === 'folder') promptEditFolder(node);
+                else if (['placemark','path','polygon','measure','measure-area'].includes(node.type)) startEditing(node);
+                else showToast('This item cannot be edited', 'fa-info-circle');
+            }
+
+            function selectNode(node) {
+                selectedNodeId = node.id;
+                renderTree();
+                if (node.layer && node.layer.openPopup) {
+                    try { node.layer.openPopup(); } catch(e){}
+                }
+            }
+
+            // ==================== RAIL ====================
+            const railBtns = document.querySelectorAll('.rail-btn[data-subrail]');
+            const subrail = document.getElementById('subrail');
+
+            railBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const key = btn.dataset.subrail;
+                    const isOpen = subrail.classList.contains('open');
+                    const isSame = activeSection === key;
+                    railBtns.forEach(b => b.classList.toggle('active', b === btn));
+                    if (isOpen && isSame) {
+                        subrail.classList.remove('open');
+                        btn.classList.remove('active');
+                    } else {
+                        activeSection = key;
+                        subrail.classList.add('open');
+                        renderTree();
+                    }
+                });
+            });
+
+            document.getElementById('sb-search').addEventListener('input', (e) => {
+                const q = e.target.value.toLowerCase();
+                subrailBody.querySelectorAll('.tree-item').forEach(el => {
+                    const label = el.querySelector('.tree-item-label');
+                    if (!label) return;
+                    el.parentElement.style.display = label.textContent.toLowerCase().includes(q) ? '' : 'none';
+                });
+            });
+
+            document.getElementById('cache-btn').addEventListener('click', () => {
+                showToast(`Cache: ${tileCache.size} tiles · ${cacheHits} hits / ${cacheMisses} misses`, 'fa-database');
+            });
+
+            // ==================== FOLDER EDIT ====================
+            async function promptNewFolder() {
+                const result = await openModal('<i class="fas fa-folder-plus"></i> New folder',
+                    `<label>Folder name</label>
+                     <input type="text" data-field="name" value="New Folder" placeholder="Folder name…">`);
+                if (!result) return;
+                const name = (result.name || 'New Folder').trim();
+                addNodeToTree(createNode({ type: 'folder', name, expanded: true, children: [] }));
+                showToast(`Folder created: ${name}`, 'fa-folder-plus');
+            }
+
+            async function promptEditFolder(folder) {
+                const result = await openModal('<i class="fas fa-folder"></i> Edit folder',
+                    `<label>Folder name</label>
+                     <input type="text" data-field="name" value="${escapeHtml(folder.name)}" placeholder="Folder name…">`);
+                if (!result) return;
+                folder.name = (result.name || folder.name).trim();
+                renderTree();
+                showToast(`Renamed to "${folder.name}"`, 'fa-check');
+            }
+
+            async function bulkChangeIcons(folder) {
+                const placemarks = [];
+                (function collect(n) {
+                    if (n.type === 'placemark') placemarks.push(n);
+                    if (n.children) n.children.forEach(collect);
+                })(folder);
+                if (!placemarks.length) { showToast('No placemarks in folder', 'fa-info-circle'); return; }
+                const result = await openModal(
+                    `<i class="fas fa-icons"></i> Change icons (${placemarks.length})`,
+                    `<div class="icon-grid" id="icon-grid">
+                        ${Object.keys(ICON_PRESETS).map(k => {
+                            const p = ICON_PRESETS[k];
+                            return `<div class="icon-choice" data-icon="${k}"><i class="fas ${p.fa}" style="color:${p.color};"></i></div>`;
+                        }).join('')}
+                     </div>`);
+                if (!result || !result.iconPreset) return;
+                placemarks.forEach(pm => {
+                    pm.meta.iconPreset = result.iconPreset;
+                    if (pm.layer && pm.layer.setIcon) pm.layer.setIcon(makeLeafletIcon(result.iconPreset));
+                });
+                renderTree();
+                showToast(`Updated ${placemarks.length} placemark(s)`, 'fa-check');
+            }
+
+            async function bulkChangeColor(folder) {
+                const items = [];
+                (function collect(n) {
+                    if (['placemark','path','polygon'].includes(n.type)) items.push(n);
+                    if (n.children) n.children.forEach(collect);
+                })(folder);
+                if (!items.length) { showToast('No items to recolor', 'fa-info-circle'); return; }
+                const COLORS = [
+                    { name: 'Sage', hex: '#4d7c0f' }, { name: 'Forest', hex: '#166534' },
+                    { name: 'Ocean', hex: '#1e40af' }, { name: 'Sky', hex: '#0284c7' },
+                    { name: 'Sunset', hex: '#ea580c' }, { name: 'Ruby', hex: '#dc2626' },
+                    { name: 'Amber', hex: '#d97706' }, { name: 'Violet', hex: '#7c3aed' }
+                ];
+                const result = await openModal('<i class="fas fa-palette"></i> Change color',
+                    `<label>Pick a color</label>
+                     <div class="icon-grid" style="grid-template-columns:repeat(4,1fr);" id="color-grid">
+                        ${COLORS.map(c => `<div class="icon-choice" data-color="${c.hex}" title="${c.name}"><i class="fas fa-circle" style="color:${c.hex};"></i></div>`).join('')}
+                     </div>`);
+                if (!result || !result.color) return;
+                items.forEach(item => {
+                    if (item.type === 'placemark' && item.layer && item.layer.setIcon) {
+                        const preset = item.meta.iconPreset || 'green-pin';
+                        const p = ICON_PRESETS[preset];
+                        if (p) {
+                            const newKey = 'custom-' + result.color.replace('#','') + '-' + preset;
+                            ICON_PRESETS[newKey] = { name: p.name, color: result.color, fa: p.fa };
+                            item.meta.iconPreset = newKey;
+                            item.layer.setIcon(makeLeafletIcon(newKey));
+                        }
+                    } else if (item.layer && item.layer.setStyle) {
+                        item.layer.setStyle({ color: result.color });
+                    }
+                });
+                renderTree();
+                showToast(`Updated ${items.length} items`, 'fa-check');
+            }
+
+            // ==================== DRAWING ====================
+            const drawnItems = new L.FeatureGroup().addTo(map);
+            let drawState = null;
+
+            function clearDrawModeUI() {
+                document.querySelectorAll('.map-tool').forEach(el => el.classList.remove('active'));
+            }
+            function cancelActiveDraw() {
+                if (drawState) {
+                    if (drawState.tempLayer) map.removeLayer(drawState.tempLayer);
+                    drawState = null;
+                }
+                clearDrawModeUI();
+                map.getContainer().style.cursor = '';
+            }
+
+            function beginDraw(type) {
+                cancelActiveDraw();
+                stopEditing();
+                drawState = { type, points: [], tempLayer: null, lastClickTime: 0 };
+                clearDrawModeUI();
+                const btn = document.getElementById(
+                    type === 'placemark' ? 'tool-placemark' :
+                    type === 'path' ? 'tool-path' :
+                    type === 'polygon' ? 'tool-polygon' :
+                    type === 'measure' ? 'tool-measure' :
+                    type === 'measure-area' ? 'tool-measure-area' : ''
+                );
+                if (btn) btn.classList.add('active');
+                map.getContainer().style.cursor = 'crosshair';
+                if (type === 'placemark') showToast('Click on the map to place a marker', 'fa-map-pin');
+                else if (type === 'path' || type === 'measure') showToast('Click points · double-click to finish', 'fa-route');
+                else if (type === 'polygon' || type === 'measure-area') showToast('Click points · double-click to close', 'fa-draw-polygon');
+            }
+
+            function updateTempPreview(latlng) {
+                if (!drawState) return;
+                if (drawState.tempLayer) { map.removeLayer(drawState.tempLayer); drawState.tempLayer = null; }
+                if (drawState.type === 'path' || drawState.type === 'measure') {
+                    const pts = drawState.points.concat([latlng]);
+                    if (pts.length >= 2) {
+                        const color = drawState.type === 'measure' ? '#f59e0b' : '#4d7c0f';
+                        const dash = drawState.type === 'measure' ? '6,4' : null;
+                        drawState.tempLayer = L.polyline(pts, { color, weight: 3, dashArray: dash || undefined, opacity: 0.75 }).addTo(map);
+                    }
+                } else if (drawState.type === 'polygon' || drawState.type === 'measure-area') {
+                    const pts = drawState.points.concat([latlng]);
+                    const color = drawState.type === 'measure-area' ? '#f59e0b' : '#4d7c0f';
+                    const dash = drawState.type === 'measure-area' ? '6,4' : null;
+                    if (pts.length >= 3) {
+                        drawState.tempLayer = L.polygon(pts, { color, weight: 2, fillOpacity: 0.12, dashArray: dash || undefined, opacity: 0.75 }).addTo(map);
+                    } else if (pts.length >= 2) {
+                        drawState.tempLayer = L.polyline(pts, { color, weight: 2, dashArray: '4,4', opacity: 0.75 }).addTo(map);
+                    }
+                }
+            }
+
+            async function finishPathOrPolygon() {
+                if (!drawState) return;
+                const pts = drawState.points;
+                const type = drawState.type;
+                if (drawState.tempLayer) { map.removeLayer(drawState.tempLayer); drawState.tempLayer = null; }
+                if (pts.length < 2) {
+                    showToast('Not enough points', 'fa-info-circle');
+                    drawState = null; clearDrawModeUI();
+                    map.getContainer().style.cursor = '';
+                    return;
+                }
+                const latlngs = pts.slice();
+                drawState = null; clearDrawModeUI();
+                map.getContainer().style.cursor = '';
+
+                if (type === 'path' || type === 'measure') {
+                    const d = pathDistance(latlngs);
+                    const isMeasure = (type === 'measure');
+                    const color = isMeasure ? '#f59e0b' : '#4d7c0f';
+                    const dash = isMeasure ? '6,4' : null;
+                    const line = L.polyline(latlngs, { color, weight: 3, dashArray: dash || undefined });
+                    drawnItems.addLayer(line);
+                    if (isMeasure) {
+                        const distStr = formatDistance(d);
+                        line.bindPopup(`Distance: <b>${distStr}</b>`).openPopup();
+                        addNodeToTree(createNode({ type: 'measure', name: `Distance: ${distStr}`, layer: line, meta: { distance: d, points: latlngs.map(p => [p.lat, p.lng]) } }));
+                        showToast('Measured: ' + distStr, 'fa-ruler');
+                    } else {
+                        const result = await openModal('<i class="fas fa-route"></i> Save path',
+                            `<label>Name</label><input type="text" data-field="name" value="Path" placeholder="Path name…">
+                             <div style="font-size:0.78rem;color:var(--ink-2);">Length: ${formatDistance(d)}</div>`);
+                        if (!result) { drawnItems.removeLayer(line); return; }
+                        const name = (result.name || 'Path').trim();
+                        line.bindPopup(`<b>${escapeHtml(name)}</b><br>Length: ${formatDistance(d)}`);
+                        addNodeToTree(createNode({ type: 'path', name, layer: line, meta: { distance: d, points: latlngs.map(p => [p.lat, p.lng]) } }));
+                        showToast(`Path: ${name}`, 'fa-route');
+                    }
+                } else if (type === 'polygon' || type === 'measure-area') {
+                    if (pts.length < 3) { showToast('Need 3+ points', 'fa-info-circle'); return; }
+                    const isMeasure = (type === 'measure-area');
+                    const color = isMeasure ? '#f59e0b' : '#4d7c0f';
+                    const dash = isMeasure ? '6,4' : null;
+                    const poly = L.polygon(latlngs, { color, weight: 2, fillOpacity: isMeasure ? 0.18 : 0.22, dashArray: dash || undefined });
+                    drawnItems.addLayer(poly);
+                    if (isMeasure) {
+                        const a = polygonArea(latlngs);
+                        const areaStr = formatArea(a);
+                        poly.bindPopup(`Area: <b>${areaStr}</b>`).openPopup();
+                        addNodeToTree(createNode({ type: 'measure-area', name: `Area: ${areaStr}`, layer: poly, meta: { area: a, points: latlngs.map(p => [p.lat, p.lng]) } }));
+                        showToast('Area: ' + areaStr, 'fa-vector-square');
+                    } else {
+                        const result = await openModal('<i class="fas fa-draw-polygon"></i> Save polygon',
+                            `<label>Name</label><input type="text" data-field="name" value="Polygon" placeholder="Polygon name…">`);
+                        if (!result) { drawnItems.removeLayer(poly); return; }
+                        const name = (result.name || 'Polygon').trim();
+                        poly.bindPopup(`<b>${escapeHtml(name)}</b>`);
+                        addNodeToTree(createNode({ type: 'polygon', name, layer: poly, meta: { points: latlngs.map(p => [p.lat, p.lng]) } }));
+                        showToast(`Polygon: ${name}`, 'fa-draw-polygon');
+                    }
+                }
+            }
+
+            map.on('click', async (e) => {
+                updateTerrainDisplay(e.latlng.lat, e.latlng.lng);
+                if (!drawState) return;
+
+                const now = Date.now();
+                const isDoubleClick = (now - (drawState.lastClickTime || 0)) < 350;
+                drawState.lastClickTime = now;
+
+                if (drawState.type === 'placemark') {
+                    const latlng = e.latlng;
+                    const result = await openModal('<i class="fas fa-map-pin"></i> Add placemark',
+                        `<label>Name</label>
+                         <input type="text" data-field="name" placeholder="Enter a name…" value="Placemark">
+                         <label>Description</label>
+                         <textarea data-field="desc" rows="2" placeholder="Optional description…"></textarea>
+                         <label>Icon</label>
+                         <div class="icon-grid" id="icon-grid">
+                            ${Object.keys(ICON_PRESETS).map(k => {
+                                const p = ICON_PRESETS[k];
+                                return `<div class="icon-choice" data-icon="${k}"><i class="fas ${p.fa}" style="color:${p.color};"></i></div>`;
+                            }).join('')}
+                         </div>`);
+                    drawState = null; clearDrawModeUI();
+                    map.getContainer().style.cursor = '';
+                    if (!result) return;
+                    const name = (result.name || 'Placemark').trim();
+                    const desc = (result.desc || '').trim();
+                    const iconPreset = result.iconPreset || 'green-pin';
+                    const marker = L.marker(latlng, { icon: makeLeafletIcon(iconPreset) });
+                    marker.bindPopup(`<b>${escapeHtml(name)}</b>${desc ? '<br>' + escapeHtml(desc) : ''}`);
+                    drawnItems.addLayer(marker);
+                    addNodeToTree(createNode({ type: 'placemark', name, layer: marker, meta: { desc, lat: latlng.lat, lng: latlng.lng, iconPreset } }));
+                    marker.openPopup();
+                    showToast(`Placemark: ${name}`, 'fa-map-pin');
+                    return;
+                }
+
+                if (isDoubleClick && (drawState.type === 'path' || drawState.type === 'polygon' ||
+                    drawState.type === 'measure' || drawState.type === 'measure-area')) return;
+
+                drawState.points.push(e.latlng);
+                updateTempPreview(e.latlng);
+            });
+
+            map.on('mousemove', (e) => {
+                map._lastMouseLatLng = e.latlng;
+                updateTerrainDisplay(e.latlng.lat, e.latlng.lng);
+                if (drawState && drawState.type !== 'placemark') updateTempPreview(e.latlng);
+            });
+
+            map.on('dblclick', (e) => {
+                if (!drawState) return;
+                if (drawState.type === 'path' || drawState.type === 'polygon' ||
+                    drawState.type === 'measure' || drawState.type === 'measure-area') {
+                    L.DomEvent.preventDefault(e);
+                    L.DomEvent.stopPropagation(e);
+                    finishPathOrPolygon();
+                }
+            });
+
+            map.on('contextmenu', (e) => {
+                if (drawState) { L.DomEvent.preventDefault(e); showToast('Drawing cancelled', 'fa-times'); cancelActiveDraw(); }
+            });
+
+            document.getElementById('tool-placemark').addEventListener('click', () => beginDraw('placemark'));
+            document.getElementById('tool-path').addEventListener('click', () => beginDraw('path'));
+            document.getElementById('tool-polygon').addEventListener('click', () => beginDraw('polygon'));
+            document.getElementById('tool-measure').addEventListener('click', () => beginDraw('measure'));
+            document.getElementById('tool-measure-area').addEventListener('click', () => beginDraw('measure-area'));
+
+            // ==================== EDITING ====================
+            let activeEditState = null;
+
+            function startEditing(node) {
+                if (!node || !node.layer) return;
+                cancelActiveDraw();
+                stopEditing();
+                editingNodeId = node.id;
+                selectedNodeId = node.id;
+                renderTree();
+                activeEditState = { node, vertexMarkers: [], midMarkers: [] };
+
+                if (node.type === 'placemark') startPlacemarkEditing(node);
+                else {
+                    node.layer.getElement() && node.layer.getElement().classList.add('editing-shape');
+                    attachVertexEditing(node.layer, node, node.type === 'polygon' || node.type === 'measure-area');
+                    showToast('Drag vertices · blue midpoints add/reshape', 'fa-pen');
+                }
+            }
+
+            function startPlacemarkEditing(node) {
+                const marker = node.layer;
+                if (marker.dragging) marker.dragging.enable();
+                if (marker.getElement()) marker.getElement().style.filter = 'drop-shadow(0 0 8px var(--sage))';
+                marker.on('dragend', onPlacemarkDragEnd);
+                showPlacemarkEditPanel(node);
+                showToast(`Editing "${node.name}" — drag to move`, 'fa-map-pin');
+            }
+
+            function onPlacemarkDragEnd(e) {
+                const marker = e.target;
+                const node = findNodeByLayer(marker);
+                if (!node) return;
+                const ll = marker.getLatLng();
+                node.meta.lat = ll.lat;
+                node.meta.lng = ll.lng;
+            }
+
+            function showPlacemarkEditPanel(node) {
+                let panel = document.getElementById('pm-edit-panel');
+                if (panel) panel.remove();
+                panel = document.createElement('div');
+                panel.id = 'pm-edit-panel';
+                panel.className = 'pm-edit-panel';
+                panel.innerHTML = `
+                    <div class="pm-edit-header">
+                        <span>Placemark</span>
+                        <button id="pm-edit-close"><i class="fas fa-times"></i></button>
+                    </div>
+                    <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--ink-3);font-weight:500;margin-bottom:5px;">Name</label>
+                    <input type="text" id="pm-edit-name" class="pm-edit-input" value="${escapeHtml(node.name)}">
+                    <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--ink-3);font-weight:500;margin-bottom:5px;">Icon</label>
+                    <div class="icon-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:10px;">
+                        ${Object.keys(ICON_PRESETS).map(k => {
+                            const p = ICON_PRESETS[k];
+                            const sel = (node.meta.iconPreset === k) ? 'selected' : '';
+                            return `<div class="icon-choice ${sel}" data-icon="${k}"><i class="fas ${p.fa}" style="color:${p.color};"></i></div>`;
+                        }).join('')}
+                    </div>
+                    <button class="btn btn-primary" id="pm-edit-done" style="width:100%;">Done</button>
+                `;
+                document.body.appendChild(panel);
+
+                panel.querySelectorAll('.icon-choice').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const preset = el.dataset.icon;
+                        node.meta.iconPreset = preset;
+                        node.layer.setIcon(makeLeafletIcon(preset));
+                        panel.querySelectorAll('.icon-choice').forEach(x => x.classList.remove('selected'));
+                        el.classList.add('selected');
+                        renderTree();
+                    });
+                });
+                document.getElementById('pm-edit-name').addEventListener('input', (e) => {
+                    node.name = e.target.value;
+                    renderTree();
+                });
+                document.getElementById('pm-edit-close').addEventListener('click', stopEditing);
+                document.getElementById('pm-edit-done').addEventListener('click', () => { stopEditing(); showToast('Updated', 'fa-check'); });
+            }
+
+            function attachVertexEditing(layer, node, isPolygon) {
+                const latlngs = isPolygon ? layer.getLatLngs()[0] : layer.getLatLngs();
+                latlngs.forEach((ll, i) => {
+                    const marker = L.marker(ll, {
+                        draggable: true,
+                        icon: L.divIcon({ className: 'vertex-marker', iconSize: [14, 14] }),
+                        zIndexOffset: 1000
+                    }).addTo(map);
+                    marker.on('drag', (e) => {
+                        const newLatLng = e.target.getLatLng();
+                        const arr = isPolygon ? layer.getLatLngs()[0] : layer.getLatLngs();
+                        arr[i] = newLatLng;
+                        if (isPolygon) layer.setLatLngs([arr]);
+                        else layer.setLatLngs(arr);
+                        updateMidpoints(layer, node, isPolygon);
+                    });
+                    marker.on('dragend', () => updateShapeMeta(layer, node));
+                    marker.on('contextmenu', (e) => {
+                        L.DomEvent.preventDefault(e);
+                        L.DomEvent.stopPropagation(e);
+                        const arr = isPolygon ? layer.getLatLngs()[0] : layer.getLatLngs();
+                        if (isPolygon && arr.length <= 3) { showToast('Min 3 vertices'); return; }
+                        if (!isPolygon && arr.length <= 2) { showToast('Min 2 vertices'); return; }
+                        arr.splice(i, 1);
+                        if (isPolygon) layer.setLatLngs([arr]);
+                        else layer.setLatLngs(arr);
+                        refreshEditMarkers(node);
+                        updateShapeMeta(layer, node);
+                        showToast('Vertex removed', 'fa-eraser');
+                    });
+                    activeEditState.vertexMarkers.push(marker);
+                });
+                updateMidpoints(layer, node, isPolygon);
+            }
+
+            function updateMidpoints(layer, node, isPolygon) {
+                activeEditState.midMarkers.forEach(m => map.removeLayer(m));
+                activeEditState.midMarkers = [];
+                const arr = isPolygon ? layer.getLatLngs()[0] : layer.getLatLngs();
+                const count = arr.length;
+                const maxMid = isPolygon ? count : count - 1;
+                for (let i = 0; i < maxMid; i++) {
+                    const a = arr[i];
+                    const b = arr[(i + 1) % count];
+                    if (!a || !b) continue;
+                    const midLat = (a.lat + b.lat) / 2;
+                    const midLng = (a.lng + b.lng) / 2;
+                    const midMarker = L.marker([midLat, midLng], {
+                        draggable: true,
+                        icon: L.divIcon({ className: 'midpoint-marker', iconSize: [12, 12] }),
+                        zIndexOffset: 900
+                    }).addTo(map);
+                    let insertedIndex = null;
+                    let inserted = false;
+                    midMarker.on('dragstart', () => {
+                        if (inserted) return;
+                        const arr2 = isPolygon ? layer.getLatLngs()[0] : layer.getLatLngs();
+                        insertedIndex = i + 1;
+                        arr2.splice(insertedIndex, 0, midMarker.getLatLng());
+                        if (isPolygon) layer.setLatLngs([arr2]);
+                        else layer.setLatLngs(arr2);
+                        inserted = true;
+                    });
+                    midMarker.on('drag', (e) => {
+                        if (insertedIndex === null) return;
+                        const newLL = e.target.getLatLng();
+                        const arr2 = isPolygon ? layer.getLatLngs()[0] : layer.getLatLngs();
+                        arr2[insertedIndex] = newLL;
+                        if (isPolygon) layer.setLatLngs([arr2]);
+                        else layer.setLatLngs(arr2);
+                    });
+                    midMarker.on('dragend', () => {
+                        if (insertedIndex !== null) { refreshEditMarkers(node); updateShapeMeta(layer, node); }
+                    });
+                    midMarker.on('click', (e) => {
+                        L.DomEvent.preventDefault(e);
+                        L.DomEvent.stopPropagation(e);
+                        if (inserted) return;
+                        const arr2 = isPolygon ? layer.getLatLngs()[0] : layer.getLatLngs();
+                        arr2.splice(i + 1, 0, L.latLng(midLat, midLng));
+                        if (isPolygon) layer.setLatLngs([arr2]);
+                        else layer.setLatLngs(arr2);
+                        refreshEditMarkers(node);
+                        updateShapeMeta(layer, node);
+                        showToast('Vertex added', 'fa-plus');
+                    });
+                    activeEditState.midMarkers.push(midMarker);
+                }
+            }
+
+            function refreshEditMarkers(node) {
+                activeEditState.vertexMarkers.forEach(m => map.removeLayer(m));
+                activeEditState.midMarkers.forEach(m => map.removeLayer(m));
+                activeEditState.vertexMarkers = [];
+                activeEditState.midMarkers = [];
+                const isPolygon = (node.type === 'polygon' || node.type === 'measure-area');
+                attachVertexEditing(node.layer, node, isPolygon);
+            }
+
+            function updateShapeMeta(layer, node) {
+                if (node.type === 'path' || node.type === 'measure') {
+                    const latlngs = layer.getLatLngs();
+                    const d = pathDistance(latlngs);
+                    node.meta.distance = d;
+                    node.meta.points = latlngs.map(p => [p.lat, p.lng]);
+                    if (node.type === 'measure') {
+                        node.name = `Distance: ${formatDistance(d)}`;
+                        layer.setPopupContent(`Distance: <b>${formatDistance(d)}</b>`);
+                    } else {
+                        layer.setPopupContent(`<b>${escapeHtml(node.name)}</b><br>Length: ${formatDistance(d)}`);
+                    }
+                } else if (node.type === 'polygon' || node.type === 'measure-area') {
+                    const latlngs = layer.getLatLngs()[0];
+                    const a = polygonArea(latlngs);
+                    node.meta.area = a;
+                    node.meta.points = latlngs.map(p => [p.lat, p.lng]);
+                    if (node.type === 'measure-area') {
+                        node.name = `Area: ${formatArea(a)}`;
+                        layer.setPopupContent(`Area: <b>${formatArea(a)}</b>`);
+                    } else {
+                        layer.setPopupContent(`<b>${escapeHtml(node.name)}</b><br>Area: ${formatArea(a)}`);
+                    }
+                }
+                renderTree();
+            }
+
+            function stopEditing() {
+                const panel = document.getElementById('pm-edit-panel');
+                if (panel) panel.remove();
+                if (activeEditState) {
+                    activeEditState.vertexMarkers.forEach(m => map.removeLayer(m));
+                    activeEditState.midMarkers.forEach(m => map.removeLayer(m));
+                    const layer = activeEditState.node.layer;
+                    if (layer && layer.getElement()) {
+                        layer.getElement().classList.remove('editing-shape');
+                        layer.getElement().style.filter = '';
+                    }
+                    if (activeEditState.node.type === 'placemark' && layer.dragging) {
+                        layer.off('dragend', onPlacemarkDragEnd);
+                    }
+                    activeEditState = null;
+                }
+                if (editingNodeId) { editingNodeId = null; renderTree(); }
+            }
+
+            function findNodeByLayer(layer, nodes = treeNodes) {
+                for (const n of nodes) {
+                    if (n.layer === layer) return n;
+                    if (n.children) { const f = findNodeByLayer(layer, n.children); if (f) return f; }
+                }
+                return null;
+            }
+
+            function clearAllDrawings() {
+                if (!confirm('Clear all drawings?')) return;
+                cancelActiveDraw(); stopEditing();
+                drawnItems.clearLayers();
+                const removeTypes = ['placemark','path','polygon','measure','measure-area'];
+                function filterNodes(nodes) {
+                    return nodes.filter(n => {
+                        if (removeTypes.includes(n.type)) return false;
+                        if (n.children) n.children = filterNodes(n.children);
+                        return true;
+                    });
+                }
+                treeNodes = filterNodes(treeNodes);
+                selectedNodeId = null;
+                renderTree();
+                showToast('All drawings cleared', 'fa-eraser');
+            }
+
+            // ==================== DISTANCE / AREA ====================
+            function haversine(a, b) {
+                const R = 6371000;
+                const φ1 = a.lat * Math.PI / 180, φ2 = b.lat * Math.PI / 180;
+                const Δφ = (b.lat - a.lat) * Math.PI / 180;
+                const Δλ = (b.lng - a.lng) * Math.PI / 180;
+                const s = Math.sin(Δφ/2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) ** 2;
+                return 2 * R * Math.asin(Math.sqrt(s));
+            }
+            function pathDistance(latlngs) {
+                let total = 0;
+                for (let i = 1; i < latlngs.length; i++) total += haversine(latlngs[i-1], latlngs[i]);
+                return total;
+            }
+            function polygonArea(latlngs) {
+                if (latlngs.length < 3) return 0;
+                const R = 6371000;
+                let area = 0;
+                for (let i = 0; i < latlngs.length; i++) {
+                    const p1 = latlngs[i], p2 = latlngs[(i + 1) % latlngs.length];
+                    area += (p2.lng - p1.lng) * Math.PI / 180 * (2 + Math.sin(p1.lat * Math.PI / 180) + Math.sin(p2.lat * Math.PI / 180));
+                }
+                return Math.abs(area * R * R / 2);
+            }
+            function formatDistance(m) {
+                if (m < 1000) return `${m.toFixed(1)} m`;
+                return `${(m / 1000).toFixed(3)} km`;
+            }
+            function formatArea(m2) {
+                if (m2 < 1e6) return `${m2.toFixed(0)} m²`;
+                if (m2 < 1e10) return `${(m2 / 1e6).toFixed(3)} km²`;
+                return `${(m2 / 1e6).toExponential(2)} km²`;
+            }
+
+            // ==================== MODAL ====================
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            let modalResolver = null;
+            let modalSelectedIcon = 'green-pin';
+
+            function openModal(title, bodyHtml) {
+                modalTitle.innerHTML = title;
+                modalBody.innerHTML = bodyHtml;
+                modalOverlay.classList.add('open');
+                modalSelectedIcon = 'green-pin';
+
+                const iconGrid = modalBody.querySelector('#icon-grid');
+                if (iconGrid) {
+                    const choices = iconGrid.querySelectorAll('.icon-choice');
+                    const defaultChoice = Array.from(choices).find(c => c.dataset.icon === 'green-pin') || choices[0];
+                    if (defaultChoice) defaultChoice.classList.add('selected');
+                    choices.forEach(el => {
+                        el.addEventListener('click', () => {
+                            choices.forEach(x => x.classList.remove('selected'));
+                            el.classList.add('selected');
+                            modalSelectedIcon = el.dataset.icon;
+                        });
+                    });
+                }
+
+                const colorGrid = modalBody.querySelector('#color-grid');
+                let selectedColor = null;
+                if (colorGrid) {
+                    const choices = colorGrid.querySelectorAll('.icon-choice');
+                    if (choices[0]) choices[0].classList.add('selected');
+                    selectedColor = choices[0] ? choices[0].dataset.color : null;
+                    choices.forEach(el => {
+                        el.addEventListener('click', () => {
+                            choices.forEach(x => x.classList.remove('selected'));
+                            el.classList.add('selected');
+                            selectedColor = el.dataset.color;
+                        });
+                    });
+                }
+
+                const firstInput = modalBody.querySelector('input, textarea, select');
+                if (firstInput) setTimeout(() => { firstInput.focus(); firstInput.select(); }, 100);
+                return new Promise(resolve => {
+                    modalResolver = (fields) => {
+                        if (fields) {
+                            fields.iconPreset = modalSelectedIcon;
+                            fields.color = selectedColor;
+                        }
+                        resolve(fields);
+                    };
+                });
+            }
+
+            document.getElementById('modal-cancel').addEventListener('click', () => {
+                modalOverlay.classList.remove('open');
+                if (modalResolver) modalResolver(null);
+                modalResolver = null;
+            });
+            document.getElementById('modal-ok').addEventListener('click', () => {
+                modalOverlay.classList.remove('open');
+                if (modalResolver) {
+                    const fields = {};
+                    modalBody.querySelectorAll('input, textarea, select').forEach(el => {
+                        fields[el.dataset.field || el.id || el.name] = el.value;
+                    });
+                    modalResolver(fields);
+                }
+                modalResolver = null;
+            });
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) document.getElementById('modal-cancel').click();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('open')) document.getElementById('modal-cancel').click();
+                if (e.key === 'Enter' && modalOverlay.classList.contains('open')) {
+                    const active = document.activeElement;
+                    if (active && active.tagName !== 'TEXTAREA') document.getElementById('modal-ok').click();
+                }
+            });
+
+            // ==================== KML IMPORT ====================
+            kmlInput.addEventListener('change', async (e) => {
+                const files = e.target.files;
+                if (!files || !files.length) return;
+                for (const file of files) {
+                    try {
+                        const text = await file.text();
+                        await importKML(text, file.name);
+                    } catch (err) {
+                        console.error(err);
+                        showToast(`KML error: ${file.name}`, 'fa-exclamation-circle');
+                    }
+                }
+                kmlInput.value = '';
+            });
+
+            async function importKML(text, filename) {
+                const parser = new DOMParser();
+                let doc;
+                try { doc = parser.parseFromString(text, 'text/xml'); }
+                catch (err) { showToast('Invalid KML', 'fa-exclamation-circle'); return; }
+                if (doc.querySelector('parsererror')) { showToast('KML parse error', 'fa-exclamation-circle'); return; }
+                if (!doc.querySelector('kml')) { showToast('Not a KML file', 'fa-exclamation-circle'); return; }
+
+                const placemarks = doc.querySelectorAll('Placemark');
+                if (!placemarks.length) { showToast('No placemarks', 'fa-info-circle'); return; }
+
+                const folderName = filename.replace(/\.(kml|kmz)$/i, '');
+                const kmlFolder = createNode({ type: 'folder', name: folderName, expanded: true, children: [] });
+                let count = 0;
+
+                placemarks.forEach((pm, idx) => {
+                    const nameEl = pm.querySelector('name');
+                    const descEl = pm.querySelector('description');
+                    const name = nameEl ? nameEl.textContent.trim() : `Placemark ${idx + 1}`;
+                    const desc = descEl ? descEl.textContent.trim() : '';
+
+                    const point = pm.querySelector('Point coordinates');
+                    if (point) {
+                        const coords = parseKMLCoords(point.textContent);
+                        if (coords.length) {
+                            const [lng, lat] = coords[0];
+                            const marker = L.marker([lat, lng], { icon: makeLeafletIcon('green-pin') });
+                            marker.bindPopup(`<b>${escapeHtml(name)}</b>`);
+                            drawnItems.addLayer(marker);
+                            kmlFolder.children.push(createNode({ type: 'placemark', name, layer: marker, meta: { desc, lat, lng, kml: true, iconPreset: 'green-pin' } }));
+                            count++;
+                        }
+                    }
+                    const lineEl = pm.querySelector('LineString coordinates');
+                    if (lineEl) {
+                        const coords = parseKMLCoords(lineEl.textContent);
+                        if (coords.length >= 2) {
+                            const latlngs = coords.map(c => [c[1], c[0]]);
+                            const line = L.polyline(latlngs, { color: '#4d7c0f', weight: 3 });
+                            line.bindPopup(`<b>${escapeHtml(name)}</b>`);
+                            drawnItems.addLayer(line);
+                            kmlFolder.children.push(createNode({ type: 'path', name, layer: line, meta: { desc, points: latlngs, kml: true } }));
+                            count++;
+                        }
+                    }
+                    const polyEl = pm.querySelector('Polygon outerBoundaryIs LinearRing coordinates');
+                    if (polyEl) {
+                        const coords = parseKMLCoords(polyEl.textContent);
+                        if (coords.length >= 3) {
+                            const latlngs = coords.map(c => [c[1], c[0]]);
+                            const poly = L.polygon(latlngs, { color: '#4d7c0f', weight: 2, fillOpacity: 0.15 });
+                            poly.bindPopup(`<b>${escapeHtml(name)}</b>`);
+                            drawnItems.addLayer(poly);
+                            kmlFolder.children.push(createNode({ type: 'polygon', name, layer: poly, meta: { desc, points: latlngs, kml: true } }));
+                            count++;
+                        }
+                    }
+                });
+
+                if (count > 0) {
+                    addNodeToTree(kmlFolder);
+                    const bounds = L.latLngBounds([]);
+                    kmlFolder.children.forEach(c => {
+                        if (c.layer) {
+                            if (c.layer.getBounds) { try { bounds.extend(c.layer.getBounds()); } catch(e){} }
+                            else if (c.layer.getLatLng) bounds.extend(c.layer.getLatLng());
+                        }
+                    });
+                    if (bounds.isValid()) map.flyToBounds(bounds, { padding: [40,40], duration: 1.2 });
+                    showToast(`Imported ${count} items`, 'fa-file-import');
+                } else {
+                    showToast('No importable geometries', 'fa-info-circle');
+                }
+            }
+
+            function parseKMLCoords(text) {
+                if (!text) return [];
+                return text.trim().split(/\s+/).map(p => p.split(',').map(parseFloat))
+                    .filter(b => b.length >= 2 && !isNaN(b[0]) && !isNaN(b[1]));
+            }
+
+            // ==================== EXPORT KML ====================
+            function exportKML() {
+                const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<kml xmlns="http://www.opengis.net/kml/2.2">', '<Document>'];
+                lines.push(`<name>Telco Earth Export</name>`);
+                function writeNode(node, indent) {
+                    const pad = '  '.repeat(indent);
+                    if (node.type === 'folder') {
+                        lines.push(`${pad}<Folder><name>${escapeXml(node.name)}</name>`);
+                        if (node.children) node.children.forEach(c => writeNode(c, indent + 1));
+                        lines.push(`${pad}</Folder>`);
+                    } else if (node.type === 'placemark' && node.layer && node.layer.getLatLng) {
+                        const ll = node.layer.getLatLng();
+                        lines.push(`${pad}<Placemark><name>${escapeXml(node.name)}</name>`);
+                        if (node.meta && node.meta.desc) lines.push(`${pad}  <description>${escapeXml(node.meta.desc)}</description>`);
+                        lines.push(`${pad}  <Point><coordinates>${ll.lng},${ll.lat},0</coordinates></Point>`);
+                        lines.push(`${pad}</Placemark>`);
+                    } else if ((node.type === 'path' || node.type === 'measure') && node.layer && node.layer.getLatLngs) {
+                        const lls = node.layer.getLatLngs();
+                        lines.push(`${pad}<Placemark><name>${escapeXml(node.name)}</name>`);
+                        lines.push(`${pad}  <LineString><coordinates>`);
+                        lls.forEach(ll => lines.push(`${pad}    ${ll.lng},${ll.lat},0`));
+                        lines.push(`${pad}  </coordinates></LineString></Placemark>`);
+                    } else if ((node.type === 'polygon' || node.type === 'measure-area') && node.layer && node.layer.getLatLngs) {
+                        const rings = node.layer.getLatLngs();
+                        const outer = Array.isArray(rings[0]) ? rings[0] : rings;
+                        lines.push(`${pad}<Placemark><name>${escapeXml(node.name)}</name>`);
+                        lines.push(`${pad}  <Polygon><outerBoundaryIs><LinearRing><coordinates>`);
+                        outer.forEach(ll => lines.push(`${pad}    ${ll.lng},${ll.lat},0`));
+                        lines.push(`${pad}  </coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`);
+                    }
+                }
+                treeNodes.forEach(n => writeNode(n, 1));
+                lines.push('</Document>', '</kml>');
+                const blob = new Blob([lines.join('\n')], { type: 'application/vnd.google-earth.kml+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'telco-earth-export.kml';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 3000);
+                showToast('KML exported', 'fa-file-export');
+            }
+
+            // ==================== HGT TERRAIN ====================
+            const terrainStore = new Map();
+            const visibleTiles = new Set();
+            const heatmapCache = new Map();
+            let showAllHeatmaps = false;
+
+            const elevCard = document.getElementById('elev-card');
+            const elevValue = document.getElementById('elev-value');
+            const coordLat = document.getElementById('coord-lat');
+            const coordLng = document.getElementById('coord-lng');
+            const elevHint = document.getElementById('elev-hint');
+            const terrainStatusEl = document.getElementById('terrain-status');
+
+            function parseHgtArrayBuffer(arrayBuffer) {
+                const byteLength = arrayBuffer.byteLength;
+                const totalSamples = byteLength / 2;
+                const dim = Math.round(Math.sqrt(totalSamples));
+                if (dim * dim * 2 !== byteLength) throw new Error(`Bad HGT size: ${byteLength}`);
+                const width = dim, height = dim;
+                const data = new Int16Array(totalSamples);
+                const view = new DataView(arrayBuffer);
+                for (let i = 0; i < totalSamples; i++) data[i] = view.getInt16(i * 2, false);
+                return { data, width, height };
+            }
+            function getKeyFromFilename(name) {
+                const base = name.replace(/\.[^/.]+$/, '').toUpperCase();
+                return base.match(/^([NS])(\d{2})([EW])(\d{3})$/) ? base : null;
+            }
+            function parseKey(key) {
+                const latSign = key[0] === 'N' ? 1 : -1;
+                const latVal = parseInt(key.substring(1, 3), 10) * latSign;
+                const lngSign = key[3] === 'E' ? 1 : -1;
+                const lngVal = parseInt(key.substring(4, 7), 10) * lngSign;
+                return { lat: latVal, lng: lngVal };
+            }
+            function getElevationFromTile(tile, lat, lng) {
+                const { data, width, height } = tile;
+                const { lat: swLat, lng: swLng } = parseKey(tile.key);
+                let fLat = lat - swLat, fLng = lng - swLng;
+                if (fLat < 0 || fLat > 1 || fLng < 0 || fLng > 1) return null;
+                const row = Math.round((1 - fLat) * (height - 1));
+                const col = Math.round(fLng * (width - 1));
+                if (row < 0 || row >= height || col < 0 || col >= width) return null;
+                const v = data[row * width + col];
+                if (v === -32768 || v < -1000 || v > 9000) return null;
+                return v;
+            }
+            function getElevation(lat, lng) {
+                if (terrainStore.size === 0) return null;
+                let normLng = lng;
+                while (normLng < -180) normLng += 360;
+                while (normLng > 180) normLng -= 360;
+                const tileLat = Math.floor(lat);
+                const tileLng = Math.floor(normLng);
+                const latKeyChar = tileLat >= 0 ? 'N' : 'S';
+                const lngKeyChar = tileLng >= 0 ? 'E' : 'W';
+                const latVal = Math.abs(tileLat).toString().padStart(2, '0');
+                const lngVal = Math.abs(tileLng).toString().padStart(3, '0');
+                const key = `${latKeyChar}${latVal}${lngKeyChar}${lngVal}`;
+                if (terrainStore.has(key)) return getElevationFromTile(terrainStore.get(key), lat, normLng);
+                return null;
+            }
+            function updateTerrainDisplay(lat, lng) {
+                if (terrainStore.size === 0) return;
+                coordLat.textContent = `lat ${lat.toFixed(5)}°`;
+                coordLng.textContent = `lng ${lng.toFixed(5)}°`;
+                const elev = getElevation(lat, lng);
+                if (elev === null || isNaN(elev)) {
+                    elevValue.innerHTML = `— <small>m</small>`;
+                    elevHint.textContent = 'No data for this location';
+                } else {
+                    elevValue.innerHTML = `${Math.round(elev)} <small>m</small>`;
+                    elevHint.textContent = `${terrainStore.size} tile(s) loaded`;
+                }
+            }
+            function updateTerrainVisibility() {
+                if (terrainStore.size > 0) {
+                    elevCard.classList.remove('hidden');
+                    terrainStatusEl.classList.add('loaded');
+                    terrainStatusEl.innerHTML = `<i class="fas fa-circle" style="font-size: 0.5rem;"></i> ${terrainStore.size} tile(s)`;
+                } else {
+                    elevCard.classList.add('hidden');
+                    terrainStatusEl.classList.remove('loaded');
+                    terrainStatusEl.innerHTML = `<i class="fas fa-circle" style="font-size: 0.5rem; color: var(--ink-3);"></i> No terrain loaded`;
+                }
+            }
+
+            fileInput.addEventListener('change', async (event) => {
+                const files = event.target.files;
+                if (!files || files.length === 0) return;
+                let loaded = 0, failed = 0;
+                const loadedKeys = [];
+                for (const file of files) {
+                    const key = getKeyFromFilename(file.name);
+                    if (!key) { failed++; continue; }
+                    try {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const parsed = parseHgtArrayBuffer(arrayBuffer);
+                        terrainStore.set(key, { data: parsed.data, width: parsed.width, height: parsed.height, key });
+                        loaded++; loadedKeys.push(key);
+                    } catch (err) { failed++; console.error(err); }
+                }
+                if (loaded > 0) {
+                    let terrainFolder = findNodeByName('Terrain (HGT)');
+                    if (!terrainFolder) {
+                        terrainFolder = createNode({ type: 'folder', name: 'Terrain (HGT)', expanded: true, children: [] });
+                        addNodeToTree(terrainFolder);
+                    }
+                    loadedKeys.forEach(k => {
+                        const existing = terrainFolder.children.find(c => c.meta && c.meta.key === k);
+                        if (!existing) terrainFolder.children.push(createNode({ type: 'terrain', name: k, layer: null, meta: { key: k } }));
+                    });
+                    loadedKeys.forEach(k => visibleTiles.add(k));
+                    updateTerrainVisibility();
+                    redrawTerrainOverlays();
+                    if (activeSection === 'terrain') renderStaticSection('terrain');
+                    else renderTree();
+                    showToast(`${loaded} HGT tile(s) loaded`, 'fa-mountain');
+                } else {
+                    showToast('No valid HGT files', 'fa-exclamation-circle');
+                }
+                const c = map._lastMouseLatLng || map.getCenter();
+                updateTerrainDisplay(c.lat, c.lng);
+                fileInput.value = '';
+            });
+
+            map.on('move', () => {
+                if (!map._lastMouseLatLng) {
+                    const c = map.getCenter();
+                    updateTerrainDisplay(c.lat, c.lng);
+                }
+            });
+
+            function toggleTileVisibility(key) {
+                if (visibleTiles.has(key)) visibleTiles.delete(key);
+                else visibleTiles.add(key);
+                if (showAllHeatmaps) showAllHeatmaps = false;
+                redrawTerrainOverlays();
+            }
+
+            // === Terrain overlay rendering ===
+            // Use L.FeatureGroup so overlays sit on top of the base tile layer
+            const terrainOverlayGroup = L.featureGroup().addTo(map);
+            // Bring to front so it's always above tile layers
+            terrainOverlayGroup.bringToFront && terrainOverlayGroup.bringToFront();
+
+            function redrawTerrainOverlays() {
+                terrainOverlayGroup.clearLayers();
+                if (visibleTiles.size === 0) return;
+                visibleTiles.forEach(key => {
+                    const tile = terrainStore.get(key);
+                    if (!tile) return;
+                    const layers = buildTerrainOverlayLayers(tile);
+                    layers.forEach(l => terrainOverlayGroup.addLayer(l));
+                });
+                // Ensure drawn features stay on top
+                if (drawnItems && drawnItems.bringToFront) drawnItems.bringToFront();
+            }
+
+            function computeTileStats(tile) {
+                if (tile._stats) return tile._stats;
+                const data = tile.data;
+                let minV = 32767, maxV = -32768;
+                const step = (tile.width >= 3600) ? 8 : (tile.width >= 1200 ? 4 : 1);
+                for (let i = 0; i < data.length; i += step) {
+                    const v = data[i];
+                    if (v > 0 && v < 9000) { if (v < minV) minV = v; if (v > maxV) maxV = v; }
+                }
+                if (minV > maxV) { minV = 0; maxV = 0; }
+                tile._stats = { min: minV, max: maxV };
+                return tile._stats;
+            }
+
+            // Build a full-tile heatmap canvas (always renders the WHOLE tile at native-ish resolution)
+            // so the overlay covers the tile no matter what zoom we're at.
+            function buildHeatmapCanvasForTile(tile) {
+                // Resolution: 1024×1024 for good zoom detail without huge memory
+                const SIZE = 1024;
+                const canvas = document.createElement('canvas');
+                canvas.width = SIZE;
+                canvas.height = SIZE;
+                const ctx = canvas.getContext('2d');
+                const data = tile.data;
+                const w = tile.width, h = tile.height;
+                const stats = computeTileStats(tile);
+                const minV = stats.min, maxV = stats.max;
+                const range = Math.max(1, maxV - minV);
+                const scheme = HEATMAP_SCHEMES[currentSchemeKey];
+
+                const img = ctx.createImageData(SIZE, SIZE);
+                const px = img.data;
+
+                for (let y = 0; y < SIZE; y++) {
+                    const srcY = Math.floor((y / SIZE) * (h - 1));
+                    for (let x = 0; x < SIZE; x++) {
+                        const srcX = Math.floor((x / SIZE) * (w - 1));
+                        const v = data[srcY * w + srcX];
+                        const idx = (y * SIZE + x) * 4;
+                        // Transparent for void AND zero/negative elevation
+                        if (v === -32768 || v <= 0 || v > 9000) {
+                            px[idx + 3] = 0;
+                            continue;
+                        }
+                        const t = (v - minV) / range;
+                        const c = scheme.color(t);
+                        px[idx] = c[0];
+                        px[idx+1] = c[1];
+                        px[idx+2] = c[2];
+                        px[idx+3] = c[3] !== undefined ? c[3] : 210;
+                    }
+                }
+                ctx.putImageData(img, 0, 0);
+                return canvas;
+            }
+
+            function getOrCreateHeatmap(tile) {
+                const cacheKey = tile.key + '|' + currentSchemeKey;
+                if (heatmapCache.has(cacheKey)) return heatmapCache.get(cacheKey);
+                const canvas = buildHeatmapCanvasForTile(tile);
+                const stats = computeTileStats(tile);
+                const entry = { canvas, min: stats.min, max: stats.max };
+                heatmapCache.set(cacheKey, entry);
+                return entry;
+            }
+
+            function buildTerrainOverlayLayers(tile) {
+                const key = tile.key;
+                const sw = parseKey(key);
+                const tileBounds = [[sw.lat, sw.lng], [sw.lat + 1, sw.lng + 1]];
+
+                const heat = getOrCreateHeatmap(tile);
+                const dataURL = heat.canvas.toDataURL('image/png');
+
+                const overlay = L.imageOverlay(dataURL, tileBounds, {
+                    opacity: 0.85,
+                    interactive: false,
+                    className: 'hgt-heat-canvas',
+                    zIndex: 400
+                });
+
+                const rect = L.rectangle(tileBounds, {
+                    color: '#4d7c0f', weight: 2, fill: false,
+                    dashArray: '5,4', interactive: true
+                });
+                rect.bindTooltip(
+                    `<b>${escapeHtml(key)}</b><br>Elev: ${heat.min}–${heat.max} m`,
+                    { sticky: true, direction: 'top' }
+                );
+
+                return [overlay, rect];
+            }
+
+            // Legacy helpers kept for compatibility
+            function showTerrainOverlayForNode(node) {
+                if (!node) return 0;
+                function collect(n, acc) {
+                    if (n.type === 'terrain' && n.meta && n.meta.key) acc.push(n);
+                    if (n.children) n.children.forEach(c => collect(c, acc));
+                }
+                const list = [];
+                if (node.type === 'terrain') list.push(node);
+                else if (node.type === 'folder') collect(node, list);
+                list.forEach(t => visibleTiles.add(t.meta.key));
+                redrawTerrainOverlays();
+                return list.length;
+            }
+            function hideTerrainOverlay() {
+                visibleTiles.clear();
+                terrainOverlayGroup.clearLayers();
+            }
+
+            // ==================== GEOLOCATION ====================
+            function locateMe() {
+                if (!navigator.geolocation) { showToast('Geolocation not supported', 'fa-info-circle'); return; }
+                showToast('Locating…', 'fa-location-dot');
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const { latitude, longitude, accuracy } = pos.coords;
+                        map.flyTo([latitude, longitude], 13, { duration: 1.5 });
+                        L.circleMarker([latitude, longitude], { radius: 8, color: '#4d7c0f', fillColor: '#65a30d', fillOpacity: 0.9, weight: 2 })
+                            .addTo(map).bindPopup(`You are here<br>±${Math.round(accuracy)} m`).openPopup();
+                        showToast('Located', 'fa-location-dot');
+                    },
+                    () => showToast('Location error', 'fa-exclamation-circle'),
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.key === 'l' || e.key === 'L') && !e.target.matches('input, textarea')) locateMe();
+            });
+
+            // ==================== INITIAL ====================
+            renderTree();
+            updateTerrainVisibility();
+            setTimeout(() => showToast('Telco Earth ready', 'fa-tower-broadcast'), 700);
+        })();
+    </script>
+</body>
+</html>
