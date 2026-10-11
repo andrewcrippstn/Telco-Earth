@@ -29,13 +29,11 @@
         border-bottom: 1px solid var(--border);
         flex-shrink: 0; z-index: 100; height: 56px;
     }
-
     .brand {
         display: flex; align-items: center; gap: 10px;
         font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.05rem;
         color: var(--ink); padding-right: 14px; border-right: 1px solid var(--border);
     }
-
     .brand-mark {
         width: 30px; height: 30px; border-radius: 8px;
         background: linear-gradient(135deg, var(--sage), #365314);
@@ -43,10 +41,8 @@
         color: white; font-size: 0.78rem;
         box-shadow: 0 2px 8px rgba(77, 124, 15, 0.25);
     }
-
     .header-spacer { flex: 1; }
     .header-right { display: flex; align-items: center; gap: 8px; }
-
     .h-select {
         background: var(--paper-soft); border: 1px solid var(--border);
         color: var(--ink); padding: 7px 12px; border-radius: 7px;
@@ -56,7 +52,6 @@
     .h-select:hover { border-color: var(--border-hi); }
     .h-select:focus { border-color: var(--sage); box-shadow: 0 0 0 3px var(--sage-soft); }
     .h-select option, .h-select optgroup { background: white; color: var(--ink); }
-
     .h-icon {
         width: 34px; height: 34px; border-radius: 8px;
         background: transparent; border: 1px solid transparent;
@@ -73,7 +68,6 @@
         display: flex; flex-direction: column; align-items: center;
         padding: 12px 0; gap: 4px; flex-shrink: 0; z-index: 20;
     }
-
     .rail-btn {
         width: 42px; height: 42px; border-radius: 9px;
         background: transparent; border: 1px solid transparent;
@@ -149,7 +143,6 @@
     .folder-bulkbar button:hover { background: var(--sage); color: white; }
 
     .tree-item-wrap { position: relative; }
-
     .tree-item {
         padding: 4px 8px; border-radius: 6px;
         display: flex; align-items: center; gap: 6px;
@@ -849,6 +842,7 @@
                 if (node.type === 'terrain' && node.meta && node.meta.key) {
                     visibleTiles.delete(node.meta.key);
                     terrainStore.delete(node.meta.key);
+                    syncShowAllState();
                     redrawTerrainOverlays();
                     updateTerrainVisibility();
                 }
@@ -1240,24 +1234,34 @@
                         el.addEventListener('click', () => topItems[i].action());
                     });
 
+                    // ---- Show all heatmaps toggle (reflects current derived state) ----
                     const toggle = document.createElement('div');
                     toggle.className = 'toggle-row' + (showAllHeatmaps ? ' active' : '');
+                    const subText = terrainStore.size === 0
+                        ? 'No tiles loaded'
+                        : (showAllHeatmaps
+                            ? `All ${terrainStore.size} tile${terrainStore.size > 1 ? 's' : ''} visible`
+                            : `${visibleTiles.size} of ${terrainStore.size} visible`);
                     toggle.innerHTML = `
                         <div class="toggle-switch"></div>
                         <div class="toggle-label">
                             <div class="toggle-label-main">Show all heatmaps</div>
-                            <div class="toggle-label-sub">${showAllHeatmaps ? 'All loaded tiles visible' : 'Only selected tiles visible'}</div>
+                            <div class="toggle-label-sub">${subText}</div>
                         </div>
                     `;
                     toggle.addEventListener('click', () => {
-                        showAllHeatmaps = !showAllHeatmaps;
+                        if (terrainStore.size === 0) {
+                            showToast('No HGT tiles loaded yet', 'fa-info-circle');
+                            return;
+                        }
                         if (showAllHeatmaps) {
-                            terrainStore.forEach((_t, k) => visibleTiles.add(k));
-                            showToast('Showing all heatmaps', 'fa-eye');
-                        } else {
                             visibleTiles.clear();
                             showToast('Heatmaps hidden', 'fa-eye-slash');
+                        } else {
+                            terrainStore.forEach((_t, k) => visibleTiles.add(k));
+                            showToast('Showing all heatmaps', 'fa-eye');
                         }
+                        syncShowAllState();
                         redrawTerrainOverlays();
                         renderStaticSection('terrain');
                     });
@@ -2235,7 +2239,13 @@
             const terrainStore = new Map();
             const visibleTiles = new Set();
             const heatmapCache = new Map();
+            // Derived state: true when every loaded tile is visible
             let showAllHeatmaps = false;
+
+            // Keeps showAllHeatmaps in sync with the actual visible set
+            function syncShowAllState() {
+                showAllHeatmaps = (terrainStore.size > 0 && visibleTiles.size === terrainStore.size);
+            }
 
             const elevCard = document.getElementById('elev-card');
             const elevValue = document.getElementById('elev-value');
@@ -2342,8 +2352,11 @@
                     loadedKeys.forEach(k => {
                         const existing = terrainFolder.children.find(c => c.meta && c.meta.key === k);
                         if (!existing) terrainFolder.children.push(createNode({ type: 'terrain', name: k, layer: null, meta: { key: k } }));
+                        // Auto-show newly loaded tile
+                        visibleTiles.add(k);
                     });
-                    loadedKeys.forEach(k => visibleTiles.add(k));
+                    // Now derive state — all tiles visible, so toggle should read ON
+                    syncShowAllState();
                     updateTerrainVisibility();
                     redrawTerrainOverlays();
                     if (activeSection === 'terrain') renderStaticSection('terrain');
@@ -2367,15 +2380,13 @@
             function toggleTileVisibility(key) {
                 if (visibleTiles.has(key)) visibleTiles.delete(key);
                 else visibleTiles.add(key);
-                if (showAllHeatmaps) showAllHeatmaps = false;
+                // Re-derive showAllHeatmaps from the actual visible set
+                syncShowAllState();
                 redrawTerrainOverlays();
             }
 
             // === Terrain overlay rendering ===
-            // Use L.FeatureGroup so overlays sit on top of the base tile layer
             const terrainOverlayGroup = L.featureGroup().addTo(map);
-            // Bring to front so it's always above tile layers
-            terrainOverlayGroup.bringToFront && terrainOverlayGroup.bringToFront();
 
             function redrawTerrainOverlays() {
                 terrainOverlayGroup.clearLayers();
@@ -2386,7 +2397,6 @@
                     const layers = buildTerrainOverlayLayers(tile);
                     layers.forEach(l => terrainOverlayGroup.addLayer(l));
                 });
-                // Ensure drawn features stay on top
                 if (drawnItems && drawnItems.bringToFront) drawnItems.bringToFront();
             }
 
@@ -2404,10 +2414,7 @@
                 return tile._stats;
             }
 
-            // Build a full-tile heatmap canvas (always renders the WHOLE tile at native-ish resolution)
-            // so the overlay covers the tile no matter what zoom we're at.
             function buildHeatmapCanvasForTile(tile) {
-                // Resolution: 1024×1024 for good zoom detail without huge memory
                 const SIZE = 1024;
                 const canvas = document.createElement('canvas');
                 canvas.width = SIZE;
@@ -2481,25 +2488,6 @@
                 );
 
                 return [overlay, rect];
-            }
-
-            // Legacy helpers kept for compatibility
-            function showTerrainOverlayForNode(node) {
-                if (!node) return 0;
-                function collect(n, acc) {
-                    if (n.type === 'terrain' && n.meta && n.meta.key) acc.push(n);
-                    if (n.children) n.children.forEach(c => collect(c, acc));
-                }
-                const list = [];
-                if (node.type === 'terrain') list.push(node);
-                else if (node.type === 'folder') collect(node, list);
-                list.forEach(t => visibleTiles.add(t.meta.key));
-                redrawTerrainOverlays();
-                return list.length;
-            }
-            function hideTerrainOverlay() {
-                visibleTiles.clear();
-                terrainOverlayGroup.clearLayers();
             }
 
             // ==================== GEOLOCATION ====================
