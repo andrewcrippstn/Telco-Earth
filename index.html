@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-
     :root {
         --sage: #4d7c0f; --sage-hi: #65a30d;
         --sage-soft: rgba(77, 124, 15, 0.1);
@@ -19,7 +18,6 @@
         --ink: #1f261a; --ink-1: #3f4038; --ink-2: #6d7167; --ink-3: #9a9d92;
         --border: rgba(0, 0, 0, 0.07); --border-hi: rgba(0, 0, 0, 0.1);
     }
-
     html, body { height: 100%; overflow: hidden; }
     body { background: var(--paper); color: var(--ink); display: flex; flex-direction: column; }
 
@@ -509,20 +507,28 @@
         <div class="header-right">
             <select class="h-select" id="provider-select" title="Map provider">
                 <optgroup label="Satellite & Imagery">
-                    <option value="nasa-blue-marble" selected>NASA Blue Marble</option>
+                    <option value="nasa-blue-marble">NASA Blue Marble</option>
                     <option value="nasa-night">NASA Night</option>
-                    <option value="esri-sat">Esri Satellite</option>
+                    <option value="satellite" selected>Esri World Imagery</option>
                     <option value="usgs-imagery">USGS Imagery</option>
                 </optgroup>
                 <optgroup label="Standard maps">
                     <option value="osm">OpenStreetMap</option>
                     <option value="osm-hot">OSM Humanitarian</option>
                     <option value="osm-cycle">CyclOSM</option>
-                    <option value="opentopo">OpenTopoMap</option>
+                    <option value="street">Esri Street Map</option>
                 </optgroup>
                 <optgroup label="Terrain">
-                    <option value="esri-topo">Esri World Topo</option>
+                    <option value="opentopo">OpenTopoMap</option>
+                    <option value="topo">Esri World Topo</option>
                     <option value="usgs-topo">USGS Topo</option>
+                </optgroup>
+                <optgroup label="Minimal / Clean">
+                    <option value="light-gray">Light Gray</option>
+                    <option value="dark-gray">Dark Gray</option>
+                </optgroup>
+                <optgroup label="Artistic">
+                    <option value="natgeo">National Geographic</option>
                 </optgroup>
             </select>
             <button class="h-icon" id="cache-btn" title="Tile cache"><i class="fas fa-database"></i></button>
@@ -754,29 +760,123 @@
             });
             map.zoomControl.setPosition('bottomleft');
 
-            const providers = {
-                'nasa-blue-marble': cachedTileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', { attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 }),
-                'nasa-night': cachedTileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', { attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 }),
-                'esri-sat': cachedTileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri', maxZoom: 19 }),
-                'usgs-imagery': cachedTileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', { attribution: 'USGS', maxZoom: 19 }),
-                'osm': cachedTileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM', maxZoom: 19 }),
-                'osm-hot': cachedTileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { attribution: 'OSM HOT', maxZoom: 19, subdomains: 'abc' }),
-                'osm-cycle': cachedTileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', { attribution: 'CyclOSM', maxZoom: 20, subdomains: 'abc' }),
-                'opentopo': cachedTileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution: 'OpenTopoMap', maxZoom: 17 }),
-                'esri-topo': cachedTileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri', maxZoom: 19 }),
-                'usgs-topo': cachedTileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', { attribution: 'USGS', maxZoom: 19 })
+            // ==================== PROVIDERS ====================
+            // Each provider has a unique URL. No duplicates.
+            // Categorized by group so they appear correctly in both the
+            // header dropdown and the Layers rail tab.
+            const PROVIDERS = {
+                // ---------- Satellite & Imagery ----------
+                'nasa-blue-marble': {
+                    name: 'NASA Blue Marble', group: 'Satellite & Imagery', icon: 'fa-globe',
+                    url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg',
+                    attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8
+                },
+                'nasa-night': {
+                    name: 'NASA Night', group: 'Satellite & Imagery', icon: 'fa-moon',
+                    url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg',
+                    attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8
+                },
+                'satellite': {
+                    name: 'Esri World Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite-dish',
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    attribution: '© Esri', maxZoom: 19
+                },
+                'usgs-imagery': {
+                    name: 'USGS Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite',
+                    url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
+                    attribution: 'USGS', maxZoom: 19
+                },
+
+                // ---------- Standard maps ----------
+                'osm': {
+                    name: 'OpenStreetMap', group: 'Standard maps', icon: 'fa-map',
+                    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    attribution: '© OpenStreetMap', maxZoom: 19, subdomains: 'abc'
+                },
+                'osm-hot': {
+                    name: 'OSM Humanitarian', group: 'Standard maps', icon: 'fa-hand-holding-heart',
+                    url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+                    attribution: '© OSM HOT', maxZoom: 19, subdomains: 'abc'
+                },
+                'osm-cycle': {
+                    name: 'CyclOSM', group: 'Standard maps', icon: 'fa-bicycle',
+                    url: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
+                    attribution: '© CyclOSM', maxZoom: 20, subdomains: 'abc'
+                },
+                'street': {
+                    name: 'Esri Street Map', group: 'Standard maps', icon: 'fa-road',
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+                    attribution: '© Esri', maxZoom: 19
+                },
+
+                // ---------- Terrain (all topo maps together) ----------
+                'opentopo': {
+                    name: 'OpenTopoMap', group: 'Terrain', icon: 'fa-mountain',
+                    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+                    attribution: '© OpenTopoMap', maxZoom: 17
+                },
+                'topo': {
+                    name: 'Esri World Topo', group: 'Terrain', icon: 'fa-mountain-sun',
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+                    attribution: '© Esri', maxZoom: 19
+                },
+                'usgs-topo': {
+                    name: 'USGS Topo', group: 'Terrain', icon: 'fa-layer-group',
+                    url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
+                    attribution: 'USGS', maxZoom: 19
+                },
+
+                // ---------- Minimal / Clean ----------
+                'light-gray': {
+                    name: 'Light Gray', group: 'Minimal / Clean', icon: 'fa-square',
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+                    attribution: '© Esri', maxZoom: 19
+                },
+                'dark-gray': {
+                    name: 'Dark Gray', group: 'Minimal / Clean', icon: 'fa-square-full',
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+                    attribution: '© Esri', maxZoom: 19
+                },
+
+                // ---------- Artistic ----------
+                'natgeo': {
+                    name: 'National Geographic', group: 'Artistic', icon: 'fa-compass',
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
+                    attribution: '© Esri, National Geographic', maxZoom: 19
+                }
             };
 
-            let currentLayer = providers['nasa-blue-marble'].addTo(map);
-            let currentProviderKey = 'nasa-blue-marble';
+            let currentLayer = null;
+            let currentProviderKey = 'satellite';
+
+            function makeTileLayer(key) {
+                const p = PROVIDERS[key];
+                if (!p) return null;
+                const opts = {
+                    attribution: p.attribution,
+                    maxZoom: p.maxZoom
+                };
+                if (p.maxNativeZoom) opts.maxNativeZoom = p.maxNativeZoom;
+                if (p.subdomains) opts.subdomains = p.subdomains;
+                return cachedTileLayer(p.url, opts);
+            }
+
+            function switchProvider(key) {
+                if (!PROVIDERS[key]) return;
+                if (currentLayer) map.removeLayer(currentLayer);
+                currentLayer = makeTileLayer(key);
+                currentLayer.addTo(map);
+                currentProviderKey = key;
+                const sel = document.getElementById('provider-select');
+                if (sel) sel.value = key;
+                showToast('Map: ' + PROVIDERS[key].name, 'fa-map');
+            }
+
+            currentLayer = makeTileLayer(currentProviderKey);
+            currentLayer.addTo(map);
 
             document.getElementById('provider-select').addEventListener('change', (e) => {
-                const val = e.target.value;
-                if (!providers[val]) return;
-                if (currentLayer) map.removeLayer(currentLayer);
-                currentLayer = providers[val].addTo(map);
-                currentProviderKey = val;
-                showToast('Map: ' + e.target.options[e.target.selectedIndex].text, 'fa-map');
+                switchProvider(e.target.value);
             });
 
             // ==================== TREE DATA ====================
@@ -1234,7 +1334,6 @@
                         el.addEventListener('click', () => topItems[i].action());
                     });
 
-                    // ---- Show all heatmaps toggle (reflects current derived state) ----
                     const toggle = document.createElement('div');
                     toggle.className = 'toggle-row' + (showAllHeatmaps ? ' active' : '');
                     const subText = terrainStore.size === 0
@@ -1331,46 +1430,36 @@
                         });
                     }
                 } else if (section === 'layers') {
-                    const layerGroups = [
-                        { title: 'Satellite & Imagery', items: [
-                            { id: 'nasa-blue-marble', label: 'NASA Blue Marble', icon: 'fa-globe' },
-                            { id: 'nasa-night', label: 'NASA Black Marble', icon: 'fa-moon' },
-                            { id: 'esri-sat', label: 'Esri Satellite', icon: 'fa-satellite' },
-                            { id: 'usgs-imagery', label: 'USGS Imagery', icon: 'fa-satellite-dish' }
-                        ]},
-                        { title: 'Standard maps', items: [
-                            { id: 'osm', label: 'OpenStreetMap', icon: 'fa-map' },
-                            { id: 'osm-hot', label: 'OSM Humanitarian', icon: 'fa-hand-holding-heart' },
-                            { id: 'osm-cycle', label: 'CyclOSM', icon: 'fa-bicycle' },
-                            { id: 'opentopo', label: 'OpenTopoMap', icon: 'fa-mountain' }
-                        ]},
-                        { title: 'Terrain', items: [
-                            { id: 'esri-topo', label: 'Esri World Topo', icon: 'fa-layer-group' },
-                            { id: 'usgs-topo', label: 'USGS Topo', icon: 'fa-layer-group' }
-                        ]}
-                    ];
+                    // Group providers by their `group` property, in the order they first appear
+                    const groups = {};
+                    const groupOrder = [];
+                    Object.keys(PROVIDERS).forEach(key => {
+                        const p = PROVIDERS[key];
+                        if (!groups[p.group]) {
+                            groups[p.group] = [];
+                            groupOrder.push(p.group);
+                        }
+                        groups[p.group].push({ key, ...p });
+                    });
+
                     subrailBody.innerHTML = '';
-                    layerGroups.forEach(group => {
+                    groupOrder.forEach(groupName => {
                         const heading = document.createElement('div');
                         heading.style.cssText = 'font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); font-weight: 500; padding: 14px 4px 8px;';
-                        heading.textContent = group.title;
+                        heading.textContent = groupName;
                         subrailBody.appendChild(heading);
 
-                        group.items.forEach(item => {
+                        groups[groupName].forEach(item => {
                             const row = document.createElement('div');
-                            row.className = 'layer-row' + (currentProviderKey === item.id ? ' active' : '');
+                            row.className = 'layer-row' + (currentProviderKey === item.key ? ' active' : '');
                             row.innerHTML = `
                                 <div class="check-circle"><i class="fas fa-check"></i></div>
                                 <div class="tree-item-icon" style="width:22px;height:22px;border-radius:6px;"><i class="fas ${item.icon}" style="font-size:0.65rem;"></i></div>
-                                <div style="flex:1;font-weight:500;">${item.label}</div>
+                                <div style="flex:1;font-weight:500;">${item.name}</div>
                             `;
                             row.addEventListener('click', () => {
-                                if (currentLayer) map.removeLayer(currentLayer);
-                                currentLayer = providers[item.id].addTo(map);
-                                currentProviderKey = item.id;
-                                document.getElementById('provider-select').value = item.id;
+                                switchProvider(item.key);
                                 renderStaticSection('layers');
-                                showToast('Map: ' + item.label, 'fa-map');
                             });
                             subrailBody.appendChild(row);
                         });
@@ -2239,10 +2328,8 @@
             const terrainStore = new Map();
             const visibleTiles = new Set();
             const heatmapCache = new Map();
-            // Derived state: true when every loaded tile is visible
             let showAllHeatmaps = false;
 
-            // Keeps showAllHeatmaps in sync with the actual visible set
             function syncShowAllState() {
                 showAllHeatmaps = (terrainStore.size > 0 && visibleTiles.size === terrainStore.size);
             }
@@ -2352,10 +2439,8 @@
                     loadedKeys.forEach(k => {
                         const existing = terrainFolder.children.find(c => c.meta && c.meta.key === k);
                         if (!existing) terrainFolder.children.push(createNode({ type: 'terrain', name: k, layer: null, meta: { key: k } }));
-                        // Auto-show newly loaded tile
                         visibleTiles.add(k);
                     });
-                    // Now derive state — all tiles visible, so toggle should read ON
                     syncShowAllState();
                     updateTerrainVisibility();
                     redrawTerrainOverlays();
@@ -2380,12 +2465,10 @@
             function toggleTileVisibility(key) {
                 if (visibleTiles.has(key)) visibleTiles.delete(key);
                 else visibleTiles.add(key);
-                // Re-derive showAllHeatmaps from the actual visible set
                 syncShowAllState();
                 redrawTerrainOverlays();
             }
 
-            // === Terrain overlay rendering ===
             const terrainOverlayGroup = L.featureGroup().addTo(map);
 
             function redrawTerrainOverlays() {
@@ -2436,7 +2519,6 @@
                         const srcX = Math.floor((x / SIZE) * (w - 1));
                         const v = data[srcY * w + srcX];
                         const idx = (y * SIZE + x) * 4;
-                        // Transparent for void AND zero/negative elevation
                         if (v === -32768 || v <= 0 || v > 9000) {
                             px[idx + 3] = 0;
                             continue;
