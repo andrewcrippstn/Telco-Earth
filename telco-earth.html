@@ -59,6 +59,16 @@
     .panel-tab .tab-count { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; padding: 0 4px; border-radius: 6px; background: var(--paper-2); color: var(--ink-3); line-height: 1.4; font-weight: 500; }
     .panel-tab.active .tab-count { background: var(--sage-soft-hi); color: var(--sage); }
 
+    .search-box { display: none; align-items: center; gap: 6px; padding: 6px 10px; background: var(--paper); border: 1px solid var(--border); border-radius: 7px; margin-bottom: 8px; transition: all 0.15s ease; }
+    .search-box.show { display: flex; }
+    .search-box:focus-within { border-color: var(--sage); box-shadow: 0 0 0 3px var(--sage-soft); }
+    .search-box > i.fa-magnifying-glass { color: var(--ink-3); font-size: 0.72rem; flex-shrink: 0; }
+    .search-box input { flex: 1; border: none; background: transparent; outline: none; font-size: 0.78rem; color: var(--ink); font-family: inherit; min-width: 0; padding: 0; }
+    .search-box input::placeholder { color: var(--ink-3); }
+    .search-clear { width: 18px; height: 18px; border-radius: 4px; border: none; background: transparent; color: var(--ink-3); cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 0.6rem; flex-shrink: 0; padding: 0; }
+    .search-clear.show { display: flex; }
+    .search-clear:hover { background: var(--paper-2); color: var(--ink); }
+
     .breadcrumb { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; padding: 6px 8px; border-radius: 7px; background: var(--paper); border: 1px solid var(--border); margin-bottom: 8px; font-size: 0.72rem; min-height: 30px; transition: all 0.15s ease; }
     .breadcrumb.drag-hover { border-color: var(--sage); background: var(--sage-soft); }
     .breadcrumb-back { width: 22px; height: 22px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: var(--ink-2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0; }
@@ -259,16 +269,21 @@
     .detail-close { width: 32px; height: 32px; border-radius: 8px; background: transparent; border: 1px solid transparent; color: var(--ink-2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
     .detail-close:hover { background: var(--paper-2); color: var(--ink); }
 
-    .import-type-bar { display: flex; gap: 6px; padding: 0 24px 16px; flex-shrink: 0; }
-    .import-type-opt { flex: 1; padding: 12px 10px; border-radius: 10px; border: 2px solid var(--border); background: var(--paper); cursor: pointer; text-align: center; transition: all 0.15s ease; }
+    .import-type-bar { display: flex; gap: 6px; padding: 0 24px 12px; flex-shrink: 0; }
+    .import-type-opt { flex: 1; padding: 10px 8px; border-radius: 10px; border: 2px solid var(--border); background: var(--paper); cursor: pointer; text-align: center; transition: all 0.15s ease; }
     .import-type-opt:hover { border-color: var(--sage-border); }
     .import-type-opt.active { border-color: var(--sage); background: var(--sage-soft); }
-    .import-type-opt i { font-size: 1.2rem; color: var(--sage); display: block; margin-bottom: 6px; }
-    .import-type-opt-label { font-size: 0.78rem; font-weight: 600; color: var(--ink); }
-    .import-type-opt-desc { font-size: 0.65rem; color: var(--ink-3); margin-top: 2px; }
+    .import-type-opt i { font-size: 1.05rem; color: var(--sage); display: block; margin-bottom: 5px; }
+    .import-type-opt-label { font-size: 0.74rem; font-weight: 600; color: var(--ink); }
+    .import-type-opt-desc { font-size: 0.6rem; color: var(--ink-3); margin-top: 2px; line-height: 1.3; }
 
-    .sheet-body { flex: 1; overflow-y: auto; padding: 0 24px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .sheet-col { display: flex; flex-direction: column; gap: 16px; }
+    .import-format-hint { background: var(--paper-soft); border: 1px solid var(--border); border-left: 3px solid var(--sage); border-radius: 8px; padding: 10px 14px; margin: 0 24px 14px; flex-shrink: 0; }
+    .import-format-hint-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); font-weight: 600; margin-bottom: 6px; }
+    .import-format-hint-columns { font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; color: var(--ink); background: var(--paper); padding: 8px 12px; border-radius: 5px; border: 1px solid var(--border); margin-bottom: 6px; overflow-x: auto; white-space: pre; display: block; }
+    .import-format-hint-note { font-size: 0.72rem; color: var(--ink-2); line-height: 1.5; }
+
+    .sheet-body { flex: 1; overflow-y: auto; padding: 0 24px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; min-height: 0; }
+    .sheet-col { display: flex; flex-direction: column; gap: 16px; min-height: 0; }
     .sheet-panel { background: var(--paper-soft); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
     .sheet-panel-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); font-weight: 600; margin-bottom: 12px; }
     .sheet-paste { width: 100%; min-height: 180px; padding: 12px; background: var(--paper); border: 1.5px dashed var(--border-hi); border-radius: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--ink); resize: vertical; outline: none; line-height: 1.6; }
@@ -426,6 +441,11 @@
                         <span class="subrail-count" id="subrail-count"></span>
                     </div>
                     <div id="panel-tabs" class="panel-tabs"></div>
+                    <div class="search-box" id="places-search-box">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <input type="text" id="places-search-input" placeholder="Search all places…" autocomplete="off">
+                        <button class="search-clear" id="places-search-clear" title="Clear"><i class="fas fa-times"></i></button>
+                    </div>
                     <div id="breadcrumb" class="breadcrumb"></div>
                 </div>
                 <div class="subrail-body" id="subrail-body"></div>
@@ -805,6 +825,7 @@
             let selectedNodeId = null;
             let multiSelection = new Set();
             let currentFolderId = null;
+            let placesSearchQuery = '';
             let nextId = 1;
             function genId() { return 'node-' + Date.now() + '-' + (nextId++); }
             function findNode(id, nodes = treeNodes) {
@@ -911,7 +932,6 @@
                 layer.on('click', () => focusNodeInTree(node));
             }
 
-            // Attach drag handlers to a layer so it can be edited while its panel is open
             function attachLayerDrag(node, layer) {
                 if (!layer) return;
                 if (node.type === 'placemark' && layer.dragging) {
@@ -920,7 +940,6 @@
                         const ll = layer.getLatLng();
                         node.meta.lat = ll.lat;
                         node.meta.lng = ll.lng;
-                        // Reflect in open panel
                         if (editorState && editorState.node === node) {
                             const latEl = editorBody.querySelector('#ed-lat');
                             const lngEl = editorBody.querySelector('#ed-lng');
@@ -928,13 +947,9 @@
                             if (lngEl) lngEl.value = ll.lng.toFixed(6);
                         }
                     });
-                    layer.on('dragend', async () => {
-                        await persistTree();
-                    });
+                    layer.on('dragend', async () => { await persistTree(); });
                 } else if (['path','measure','polygon','measure-area'].includes(node.type) && layer) {
-                    // Let the user drag the whole line/polygon by grabbing it
                     layer.on('mousedown', (ev) => {
-                        // Only when its panel is open — otherwise defer to map drag
                         if (!editorState || editorState.node !== node) return;
                         L.DomEvent.stopPropagation(ev);
                         const start = ev.latlng;
@@ -956,17 +971,11 @@
                         map.on('mousemove', onMove);
                         map.on('mouseup', onUp);
                     });
-                } else if (node.type === 'los' && layer) {
-                    // Make the LOS center draggable via a small transparent marker
-                    // (created when the editor opens, removed when it closes)
-                    // Handled dynamically in openEditorPanel.
                 }
             }
 
-            // Ensure a specific layer can be dragged while editing; returns a cleanup fn
             function enableEditingDragForNode(node) {
                 const cleanups = [];
-
                 if (node.type === 'placemark' && node.layer && node.layer.dragging) {
                     node.layer.dragging.enable();
                     const onDrag = () => {
@@ -985,18 +994,12 @@
                     node.layer.on('dragend', onDragEnd);
                     cleanups.push(() => {
                         if (node.layer && node.layer.dragging) node.layer.dragging.disable();
-                        if (node.layer) {
-                            node.layer.off('drag', onDrag);
-                            node.layer.off('dragend', onDragEnd);
-                        }
+                        if (node.layer) { node.layer.off('drag', onDrag); node.layer.off('dragend', onDragEnd); }
                     });
                 } else if (['path','measure','polygon','measure-area'].includes(node.type) && node.layer) {
-                    // Drag the shape's body to translate it
                     let dragging = false;
                     let start = null;
                     const onDown = (ev) => {
-                        // Don't hijack vertex marker drags
-                        if (ev.originalEvent && ev.originalEvent._vertexDrag) return;
                         L.DomEvent.stopPropagation(ev);
                         dragging = true;
                         start = L.latLng(ev.latlng.lat, ev.latlng.lng);
@@ -1025,7 +1028,6 @@
                         map.off('mouseup', onUp);
                     });
                 } else if (node.type === 'los') {
-                    // Add a small draggable center marker while the panel is open
                     const centerMarker = L.marker([node.meta.lat, node.meta.lng], {
                         icon: L.divIcon({
                             className: '',
@@ -1039,7 +1041,6 @@
                         const ll = centerMarker.getLatLng();
                         node.meta.lat = ll.lat;
                         node.meta.lng = ll.lng;
-                        // Rebuild in real time
                         rebuildLOSLayer(node);
                         if (editorState && editorState.node === node && editorState.activeTab === 'properties') {
                             const latEl = editorBody.querySelector('#ed-lat');
@@ -1051,11 +1052,8 @@
                     const onDragEnd = async () => { await persistTree(); };
                     centerMarker.on('drag', onDrag);
                     centerMarker.on('dragend', onDragEnd);
-                    cleanups.push(() => {
-                        map.removeLayer(centerMarker);
-                    });
+                    cleanups.push(() => { map.removeLayer(centerMarker); });
                 }
-
                 return () => cleanups.forEach(fn => { try { fn(); } catch(e){} });
             }
 
@@ -1106,6 +1104,9 @@
             const subrail = document.getElementById('subrail');
             const breadcrumbEl = document.getElementById('breadcrumb');
             const panelTabsEl = document.getElementById('panel-tabs');
+            const searchBoxEl = document.getElementById('places-search-box');
+            const searchInputEl = document.getElementById('places-search-input');
+            const searchClearEl = document.getElementById('places-search-clear');
 
             const TYPE_ICONS = {
                 folder: 'fa-folder', placemark: 'fa-map-pin',
@@ -1121,6 +1122,10 @@
 
             let activeSection = 'places';
             let placesTab = 'places';
+
+            function inPlacesSearch() {
+                return activeSection === 'places' && placesTab === 'places' && placesSearchQuery.trim().length > 0;
+            }
 
             function renderTree() {
                 updateSubrailChrome();
@@ -1154,7 +1159,14 @@
                     panelTabsEl.style.display = 'none';
                 }
 
+                const searchMode = inPlacesSearch();
                 if (activeSection === 'places' && placesTab === 'places') {
+                    searchBoxEl.classList.add('show');
+                } else {
+                    searchBoxEl.classList.remove('show');
+                }
+
+                if (activeSection === 'places' && placesTab === 'places' && !searchMode) {
                     const folder = currentFolderId ? findNode(currentFolderId) : null;
                     const nodes = folder ? (folder.children || []) : treeNodes;
                     let count = 0;
@@ -1168,14 +1180,17 @@
                     subrailCount.textContent = count;
                 } else if (activeSection === 'places' && placesTab === 'archive') {
                     subrailCount.textContent = archivedNodes.length;
-                } else subrailCount.textContent = '';
+                } else {
+                    subrailCount.textContent = '';
+                }
 
-                breadcrumbEl.style.display = (activeSection === 'places' && placesTab === 'places') ? '' : 'none';
-                if (activeSection === 'places' && placesTab === 'places') renderBreadcrumb();
+                const showCrumb = (activeSection === 'places' && placesTab === 'places' && !searchMode);
+                breadcrumbEl.style.display = showCrumb ? '' : 'none';
+                if (showCrumb) renderBreadcrumb();
 
                 subrailFooter.innerHTML = '';
-                subrailFooter.style.display = (activeSection === 'places' && placesTab === 'places') ? '' : 'none';
-                if (activeSection === 'places' && placesTab === 'places') {
+                subrailFooter.style.display = showCrumb ? '' : 'none';
+                if (showCrumb) {
                     if (multiSelection.size > 0) {
                         const countLabel = document.createElement('div');
                         countLabel.style.cssText = 'flex:1;padding:9px 12px;border-radius:8px;background:var(--sage-soft-hi);color:var(--sage);font-size:0.75rem;font-weight:600;display:flex;align-items:center;gap:6px;';
@@ -1351,6 +1366,7 @@
 
             function renderPlacesSection() {
                 if (placesTab === 'archive') { renderArchiveSection(); return; }
+                if (inPlacesSearch()) { renderSearchResults(); return; }
 
                 const folder = currentFolderId ? findNode(currentFolderId) : null;
                 const nodes = (folder ? (folder.children || []) : treeNodes).filter(n => {
@@ -1381,6 +1397,169 @@
                 nodes.forEach(n => subrailBody.appendChild(buildFxRow(n)));
             }
 
+            // ==================== SEARCH ====================
+            function renderSearchResults() {
+                subrailBody.innerHTML = '';
+                subrailBody.oncontextmenu = null;
+                const q = placesSearchQuery.trim().toLowerCase();
+                if (!q) return;
+                const matches = [];
+                (function walk(nodes, parents) {
+                    for (const n of nodes) {
+                        const isTerrain = (n.name === 'Terrain (HGT)' || n.type === 'terrain');
+                        if (!isTerrain) {
+                            const matchesName = n.name.toLowerCase().includes(q);
+                            const matchesDesc = n.meta && n.meta.desc && String(n.meta.desc).toLowerCase().includes(q);
+                            if (matchesName || matchesDesc) matches.push({ node: n, parents });
+                        }
+                        if (n.children) walk(n.children, parents.concat(n));
+                    }
+                })(treeNodes, []);
+
+                if (matches.length === 0) {
+                    subrailBody.innerHTML = `
+                        <div class="fx-empty">
+                            <div style="width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 14px; background: var(--paper-2); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-magnifying-glass" style="color: var(--ink-3); font-size: 1.3rem;"></i>
+                            </div>
+                            <div style="font-family: 'Fraunces', serif; font-weight: 600; font-size: 0.95rem; color: var(--ink); margin-bottom: 6px;">No matches</div>
+                            <div>No places match "${escapeHtml(placesSearchQuery)}".</div>
+                        </div>`;
+                    return;
+                }
+
+                const header = document.createElement('div');
+                header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:4px 4px 10px;font-family:"IBM Plex Mono",monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--ink-3);font-weight:500;';
+                header.innerHTML = `<span>${matches.length} result${matches.length !== 1 ? 's' : ''}</span>`;
+                subrailBody.appendChild(header);
+
+                matches.forEach(({ node, parents }) => subrailBody.appendChild(buildSearchResultRow(node, parents)));
+            }
+
+            function buildSearchResultRow(node, parents) {
+                const row = document.createElement('div');
+                row.className = 'fx-row';
+                if (selectedNodeId === node.id) row.classList.add('active');
+                if (multiSelection.has(node.id)) row.classList.add('multi-selected');
+                if (node.visible === false) row.classList.add('hidden-item');
+                row.dataset.nodeId = node.id;
+
+                const icon = document.createElement('div');
+                icon.className = 'fx-icon';
+                let iconFa, iconColor;
+                if (node.type === 'folder' || node.type === 'kml') {
+                    iconFa = 'fa-folder'; iconColor = node.meta && node.meta.color ? node.meta.color : '';
+                } else if (node.type === 'placemark') {
+                    iconFa = node.meta.icon || DEFAULT_ICON;
+                    iconColor = node.meta.color || '#4d7c0f';
+                } else if (node.type === 'los') {
+                    iconFa = 'fa-satellite-dish'; iconColor = node.meta.color || '#ea580c';
+                } else {
+                    iconFa = TYPE_ICONS[node.type] || 'fa-circle';
+                    iconColor = node.meta && node.meta.color ? node.meta.color : '';
+                }
+                icon.innerHTML = `<i class="fas ${iconFa}"${iconColor ? ` style="color:${iconColor}"` : ''}></i>`;
+                row.appendChild(icon);
+
+                const label = document.createElement('div');
+                label.className = 'fx-label';
+                label.style.cssText = 'display:flex;flex-direction:column;gap:1px;overflow:hidden;';
+                const nameDiv = document.createElement('div');
+                nameDiv.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+                nameDiv.textContent = node.name;
+                label.appendChild(nameDiv);
+                const pathDiv = document.createElement('div');
+                pathDiv.style.cssText = 'font-family:"IBM Plex Mono",monospace;font-size:0.56rem;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+                pathDiv.textContent = 'Root' + (parents.length ? ' / ' + parents.map(p => p.name).join(' / ') : '');
+                label.appendChild(pathDiv);
+                row.appendChild(label);
+
+                const vis = document.createElement('div');
+                vis.className = 'fx-vis';
+                vis.title = node.visible === false ? 'Show' : 'Hide';
+                vis.innerHTML = `<i class="fas ${node.visible === false ? 'fa-eye-slash' : 'fa-eye'}"></i>`;
+                vis.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    setNodeVisible(node, node.visible === false);
+                    renderTree();
+                    await persistTree();
+                });
+                row.appendChild(vis);
+
+                row.addEventListener('click', (e) => {
+                    if (e.target.closest('.fx-vis')) return;
+                    e.stopPropagation();
+
+                    // Ctrl/Cmd → multi-select from search results
+                    if (e.ctrlKey || e.metaKey) {
+                        // If a single active node exists and isn't in multi, fold it in first
+                        if (selectedNodeId && selectedNodeId !== node.id && !multiSelection.has(selectedNodeId)) {
+                            if (findNode(selectedNodeId)) multiSelection.add(selectedNodeId);
+                        }
+                        if (multiSelection.has(node.id)) multiSelection.delete(node.id);
+                        else multiSelection.add(node.id);
+
+                        // If we're back to exactly one item, treat it as a single selection
+                        if (multiSelection.size === 1) {
+                            selectedNodeId = multiSelection.values().next().value;
+                            multiSelection.clear();
+                        } else {
+                            selectedNodeId = node.id;
+                        }
+                        renderTree();
+                        return;
+                    }
+
+                    // Plain click → clear search, navigate, open editor for non-folders
+                    placesSearchQuery = '';
+                    if (searchInputEl) searchInputEl.value = '';
+                    if (searchClearEl) searchClearEl.classList.remove('show');
+
+                    if (node.type === 'folder' || node.type === 'kml') {
+                        currentFolderId = node.id;
+                        selectedNodeId = null;
+                    } else {
+                        const loc = findParent(node.id);
+                        currentFolderId = loc && loc.parent ? loc.parent.id : null;
+                        selectedNodeId = node.id;
+                    }
+                    multiSelection.clear();
+                    renderTree();
+                    if (node.type !== 'folder' && node.type !== 'kml') {
+                        if (editorState) openEditorPanel(node, editorState.activeTab);
+                        else openEditorPanel(node);
+                        setTimeout(() => zoomToNode(node), 120);
+                    }
+                });
+
+                row.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (multiSelection.size > 0 && multiSelection.has(node.id)) {
+                        showBulkContextMenu(e.clientX, e.clientY);
+                    } else {
+                        showContextMenu(e.clientX, e.clientY, node);
+                    }
+                });
+
+                return row;
+            }
+
+            searchInputEl.addEventListener('input', () => {
+                placesSearchQuery = searchInputEl.value;
+                if (placesSearchQuery.trim()) searchClearEl.classList.add('show');
+                else searchClearEl.classList.remove('show');
+                if (activeSection === 'places' && placesTab === 'places') renderTree();
+            });
+            searchClearEl.addEventListener('click', () => {
+                placesSearchQuery = '';
+                searchInputEl.value = '';
+                searchClearEl.classList.remove('show');
+                searchInputEl.focus();
+                if (activeSection === 'places' && placesTab === 'places') renderTree();
+            });
+
+            // ==================== DRAG HELPERS ====================
             let dragLineEl = null;
             let currentDropTarget = null;
             function ensureDragLine() {
@@ -1465,12 +1644,29 @@
                 row.addEventListener('click', (e) => {
                     if (e.target.closest('.fx-vis')) return;
                     e.stopPropagation();
+
+                    // ===== Ctrl / Cmd multi-select =====
                     if (e.ctrlKey || e.metaKey) {
+                        // Seed the multi-set with the currently single-selected node
+                        if (selectedNodeId && selectedNodeId !== node.id && !multiSelection.has(selectedNodeId)) {
+                            if (findNode(selectedNodeId)) multiSelection.add(selectedNodeId);
+                        }
                         if (multiSelection.has(node.id)) multiSelection.delete(node.id);
                         else multiSelection.add(node.id);
+
+                        // Collapse back to single selection when only one item remains
+                        if (multiSelection.size === 1) {
+                            selectedNodeId = multiSelection.values().next().value;
+                            multiSelection.clear();
+                        } else {
+                            selectedNodeId = node.id;
+                        }
+
                         renderTree();
                         return;
                     }
+
+                    // ===== Plain click =====
                     if (multiSelection.size > 0) multiSelection.clear();
                     selectedNodeId = node.id;
                     if (node.type === 'folder' || node.type === 'kml') {
@@ -1884,10 +2080,7 @@
                 ctxMenu.querySelectorAll('.ctx-item').forEach(el => {
                     const idx = parseInt(el.dataset.i, 10);
                     const item = items[idx];
-                    el.addEventListener('click', () => {
-                        hideContextMenu();
-                        if (item.action) item.action();
-                    });
+                    el.addEventListener('click', () => { hideContextMenu(); if (item.action) item.action(); });
                 });
             }
             function hideContextMenu() { ctxMenu.classList.remove('open'); }
@@ -1895,7 +2088,7 @@
             document.addEventListener('contextmenu', (e) => { if (e.defaultPrevented) return; if (!ctxMenu.contains(e.target)) hideContextMenu(); });
             document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideContextMenu(); });
 
-            // ==================== VISIBILITY / DELETE / ARCHIVE / ZOOM ====================
+            // ==================== VISIBILITY / DELETE / ARCHIVE ====================
             function setNodeVisible(node, visible) {
                 node.visible = visible;
                 if (node.layer) {
@@ -1959,7 +2152,6 @@
                     if (!parent.children) parent.children = [];
                     parent.children.push(node);
                 } else treeNodes.push(node);
-
                 (function rebuild(n) {
                     if (n.type === 'placemark' && n.meta.lat != null && n.meta.lng != null) {
                         const marker = L.marker([n.meta.lat, n.meta.lng], { icon: makeIconFromNode(n) });
@@ -2095,19 +2287,12 @@
                     const dx = pt.x - containerPoint.x;
                     const dy = pt.y - containerPoint.y;
                     const d = Math.sqrt(dx*dx + dy*dy);
-                    if (d < bestDist && d <= threshold) {
-                        bestDist = d;
-                        best = { latlng, node, distance: d };
-                    }
+                    if (d < bestDist && d <= threshold) { bestDist = d; best = { latlng, node, distance: d }; }
                 }
                 function walk(nodes) {
                     for (const n of nodes) {
-                        if (n.type === 'placemark' && n.visible !== false && n.meta.lat != null) {
-                            consider(L.latLng(n.meta.lat, n.meta.lng), n);
-                        }
-                        if (n.type === 'los' && n.visible !== false && n.meta.lat != null) {
-                            consider(L.latLng(n.meta.lat, n.meta.lng), n);
-                        }
+                        if (n.type === 'placemark' && n.visible !== false && n.meta.lat != null) consider(L.latLng(n.meta.lat, n.meta.lng), n);
+                        if (n.type === 'los' && n.visible !== false && n.meta.lat != null) consider(L.latLng(n.meta.lat, n.meta.lng), n);
                         if (n.children) walk(n.children);
                     }
                 }
@@ -2127,6 +2312,7 @@
             function renderStaticSection(section) {
                 subrailFooter.style.display = 'none';
                 breadcrumbEl.style.display = 'none';
+                searchBoxEl.classList.remove('show');
                 if (section === 'draw') {
                     const items = [
                         { icon: 'fa-map-pin', label: 'Add placemark', desc: 'Click map to place a marker', action: () => beginDraw('placemark') },
@@ -2162,7 +2348,6 @@
                         </div>
                     `).join('');
                     subrailBody.querySelectorAll('.static-item').forEach((el, i) => el.addEventListener('click', () => topItems[i].action()));
-
                     const toggle = document.createElement('div');
                     toggle.className = 'toggle-row' + (showAllHeatmaps ? ' active' : '');
                     const subText = terrainStore.size === 0 ? 'No tiles loaded' : (showAllHeatmaps ? `All ${terrainStore.size} tile${terrainStore.size > 1 ? 's' : ''} visible` : `${visibleTiles.size} of ${terrainStore.size} visible`);
@@ -2308,7 +2493,6 @@
                         refreshSnapZoneMode();
                         rebuildSnapZoneLayer();
                     });
-
                     const snapDistRow = document.createElement('div');
                     snapDistRow.className = 'static-item';
                     snapDistRow.style.cursor = 'default';
@@ -2594,7 +2778,6 @@
                     await saveEditorProperties({ silent: true });
                 }, 400);
             }
-
             function closeEditorPanel() {
                 if (!editorState) return;
                 clearTimeout(_livePropTimer);
@@ -2609,7 +2792,6 @@
 
             function openEditorPanel(node, startTab) {
                 if (editorState) closeEditorPanel();
-
                 const isShape = ['path','measure','polygon','measure-area'].includes(node.type);
                 const isLOS = node.type === 'los';
                 const isPlacemark = node.type === 'placemark';
@@ -2624,11 +2806,9 @@
                 const activeTab = startTab && tabs.find(t => t.key === startTab) ? startTab : 'properties';
 
                 editorState = { node, activeTab, tabs, isShape, isLOS, isPlacemark, isFolder, canEditVertices, _newIcon: null };
-
                 editorPanelTitle.childNodes[0].nodeValue = node.name + ' ';
                 editorPanelSubtitle.textContent = (node.type || 'item').toUpperCase();
 
-                // Enable dragging of the object itself while the editor is open
                 const dragCleanup = enableEditingDragForNode(node);
                 editorState.teardown = () => { dragCleanup && dragCleanup(); };
 
@@ -2636,7 +2816,6 @@
                 renderEditorBody();
                 renderEditorFooter();
                 editorPanel.classList.add('open');
-
                 setTimeout(() => zoomToNode(node), 280);
                 refreshSnapZoneMode();
             }
@@ -2644,13 +2823,35 @@
             function openBulkEditorForSelection() {
                 if (multiSelection.size === 0) return;
                 if (editorState) closeEditorPanel();
-                const ids = Array.from(multiSelection);
+
+                const initialIds = Array.from(multiSelection);
+                const resolvedIds = [];
+                const missingIds = [];
+                for (const id of initialIds) {
+                    if (findNode(id)) resolvedIds.push(id);
+                    else missingIds.push(id);
+                }
+                multiSelection = new Set(resolvedIds);
+
+                if (resolvedIds.length === 0) {
+                    showToast('Nothing to edit — selected items no longer exist', 'fa-info-circle');
+                    renderTree();
+                    return;
+                }
+                if (missingIds.length > 0) {
+                    showToast(`${missingIds.length} item(s) no longer exist and were skipped`, 'fa-info-circle');
+                    renderTree();
+                }
+
                 editorState = {
-                    isBulkSelection: true, selectionIds: ids, activeTab: 'style',
+                    isBulkSelection: true,
+                    selectionIds: resolvedIds,
+                    activeTab: 'style',
                     tabs: [{ key: 'style', icon: 'fa-palette', label: 'Style' }],
-                    _newIcon: null, _bulkSubTab: null
+                    _newIcon: null,
+                    _bulkSubTab: null
                 };
-                editorPanelTitle.childNodes[0].nodeValue = `${ids.length} items selected `;
+                editorPanelTitle.childNodes[0].nodeValue = `${resolvedIds.length} items selected `;
                 editorPanelSubtitle.textContent = 'MULTI-SELECTION';
                 renderEditorTabs();
                 renderEditorBody();
@@ -2675,7 +2876,6 @@
                     editorTabsEl.appendChild(btn);
                 });
             }
-
             function renderEditorFooter() {
                 if (!editorState) return;
                 editorFooter.innerHTML = '';
@@ -2712,7 +2912,6 @@
                     editorFooter.appendChild(delBtn);
                 }
             }
-
             function renderEditorBody() {
                 if (!editorState) return;
                 if (editorState.isBulkSelection) { renderBulkSelectionStyleTab(); return; }
@@ -2721,7 +2920,7 @@
                 else if (editorState.activeTab === 'vertices') renderVerticesTab();
             }
 
-            // ============ BULK STYLE TAB ============
+            // ============ BULK STYLE ============
             function renderBulkSelectionStyleTab() {
                 const ids = editorState.selectionIds;
                 const nodes = ids.map(id => findNode(id)).filter(Boolean);
@@ -2734,6 +2933,7 @@
                 if (types.has('los')) subTabs.push({ key: 'los', label: 'LOS', icon: 'fa-satellite-dish' });
                 if (types.has('folder') || types.has('kml')) subTabs.push({ key: 'folder', label: 'Folders', icon: 'fa-folder' });
                 if (subTabs.length > 1) subTabs.unshift({ key: 'all', label: 'All', icon: 'fa-layer-group' });
+                if (subTabs.length === 0) subTabs.push({ key: 'all', label: 'All', icon: 'fa-layer-group' });
 
                 if (!editorState._bulkSubTab || !subTabs.find(t => t.key === editorState._bulkSubTab)) {
                     editorState._bulkSubTab = subTabs[0].key;
@@ -2784,14 +2984,12 @@
                 `;
 
                 editorBody.innerHTML = `
-                    <div class="style-subtabs">
-                        ${subTabs.map(t => `
-                            <button class="style-subtab ${tab === t.key ? 'active' : ''}" data-bulksub="${t.key}">
-                                <i class="fas ${t.icon}"></i> ${t.label}
-                            </button>
-                        `).join('')}
-                    </div>
-                    <div class="editor-hint" style="margin-bottom:12px;">Applying to <strong>${ids.length}</strong> selected item(s).</div>
+                    ${subTabs.length > 1 ? `
+                        <div class="style-subtabs">
+                            ${subTabs.map(t => `<button class="style-subtab ${tab === t.key ? 'active' : ''}" data-bulksub="${t.key}"><i class="fas ${t.icon}"></i> ${t.label}</button>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="editor-hint" style="margin-bottom:12px;">Applying to <strong>${nodes.length}</strong> selected item(s).</div>
                     ${colorSection}
                     ${(tab === 'all' || tab === 'marker') ? markerSection : ''}
                     ${(tab === 'all' || tab === 'path') ? pathSection : ''}
@@ -2872,6 +3070,9 @@
                 const newRingThickness = b.ringThickness();
                 const newLineThickness = b.lineThickness();
 
+                editorState.selectionIds = editorState.selectionIds.filter(id => findNode(id));
+                multiSelection = new Set(editorState.selectionIds);
+
                 let count = 0;
                 for (const id of editorState.selectionIds) {
                     const n = findNode(id);
@@ -2906,7 +3107,7 @@
                 showToast(`Updated ${count} item(s)`, 'fa-check');
             }
 
-            // ============ PROPERTIES TAB ============
+            // ============ PROPERTIES ============
             function renderPropertiesTab() {
                 const node = editorState.node;
                 const rows = [['Type', node.type], ['Visible', node.visible === false ? 'No' : 'Yes']];
@@ -2939,7 +3140,6 @@
                         <div class="editor-hint">Drag the object on the map to reposition it — the panel updates live.</div>
                     `;
                 }
-
                 let vertAltHTML = '';
                 if (editorState.isShape && node.meta.points) {
                     vertAltHTML = `<div class="editor-section-label">Vertex altitudes</div>` + node.meta.points.map((p, i) => {
@@ -2994,7 +3194,6 @@
                     });
                 }
             }
-
             async function saveEditorProperties(opts) {
                 if (!editorState) return;
                 const node = editorState.node;
@@ -3019,7 +3218,6 @@
                         }
                     }
                 }
-
                 if (editorState.isLOS) {
                     const radiusEl = editorBody.querySelector('#los-radius');
                     const linesEl = editorBody.querySelector('#los-lines');
@@ -3047,7 +3245,7 @@
                 }
             }
 
-            // ============ STYLE TAB ============
+            // ============ STYLE ============
             function renderStyleTab() {
                 const node = editorState.node;
                 const color = node.meta.color || (editorState.isLOS ? '#ea580c' : '#4d7c0f');
@@ -3067,7 +3265,6 @@
                 if (isLOS) subTabs.push({ key: 'los', label: 'LOS', icon: 'fa-satellite-dish' });
                 if (isFolder) subTabs.push({ key: 'folder', label: 'Folder', icon: 'fa-folder' });
                 if (subTabs.length === 0) subTabs.push({ key: 'generic', label: 'Colour', icon: 'fa-palette' });
-
                 if (!editorState._styleSubTab || !subTabs.find(t => t.key === editorState._styleSubTab)) {
                     editorState._styleSubTab = subTabs[0].key;
                 }
@@ -3137,7 +3334,6 @@
                 const colorInp = editorBody.querySelector('#ed-color');
                 const hexInp = editorBody.querySelector('#ed-hex');
                 const swatchGrid = editorBody.querySelector('#ed-swatch-grid');
-
                 function setColor(c, fromInput) {
                     if (!/^#[0-9a-fA-F]{6}$/.test(c)) return;
                     if (!fromInput) colorInp.value = c;
@@ -3238,7 +3434,6 @@
                     </div>
                 `;
             }
-
             function wireFolderBulkPanel(node) {
                 let bulkFilter = 'all';
                 let bulkColor = node.meta.color || '#4d7c0f';
@@ -3246,7 +3441,6 @@
                 let bulkRingRadius = 24;
                 let bulkRingThickness = 3;
                 let bulkLineThickness = 3;
-
                 const countEl = editorBody.querySelector('#bulk-count');
                 const countInline = editorBody.querySelector('#bulk-count-inline');
                 const updateIconChk = editorBody.querySelector('#bulk-update-icon');
@@ -3361,7 +3555,6 @@
                 const colorEl = editorBody.querySelector('#ed-color');
                 const color = (hexEl && hexEl.value) || (colorEl && colorEl.value) || node.meta.color || '#4d7c0f';
                 node.meta.color = color;
-
                 if (node.type === 'placemark') {
                     if (editorState._newIcon) node.meta.icon = editorState._newIcon;
                     if (typeof editorState._ringRadius === 'number') node.meta.ringRadius = editorState._ringRadius;
@@ -3373,7 +3566,6 @@
                     if (typeof editorState._lineThickness === 'number') node.meta.lineThickness = editorState._lineThickness;
                     if (node.layer && node.layer.setStyle) node.layer.setStyle({ color, weight: node.meta.lineThickness || 3 });
                 }
-
                 if (!opts || !opts.silent) {
                     editorState._newIcon = null;
                     editorState._ringRadius = undefined;
@@ -3389,29 +3581,24 @@
                 }
             }
 
-            // ============ VERTICES TAB (drag-insert mid vertices, live midpoint updates) ============
+            // ============ VERTICES ============
             function renderVerticesTab() {
                 const node = editorState.node;
                 const isPolygon = (node.type === 'polygon' || node.type === 'measure-area');
                 const minVerts = isPolygon ? 3 : 2;
                 const color = node.meta.color || '#4d7c0f';
                 const thickness = node.meta.lineThickness || 2;
-
                 let work = node.meta.points.map(p => ({ lat: p[0], lng: p[1] }));
 
-                // Hide the real layer while we edit — a single preview remains
                 if (node.layer) {
                     if (map.hasLayer(node.layer)) map.removeLayer(node.layer);
                     if (drawnItems.hasLayer(node.layer)) drawnItems.removeLayer(node.layer);
                 }
-
                 const editorGroup = L.featureGroup().addTo(map);
                 let previewShape = null;
                 let vertexMarkers = [];
                 let midpointMarkers = [];
-
-                // Pending vertex state (click-to-drag-insert)
-                let pending = null; // { lat, lng, marker, insertIndex }
+                let pending = null;
                 let pendingTempLine = null;
 
                 function removePending() {
@@ -3420,7 +3607,6 @@
                     pending = null;
                     pendingTempLine = null;
                 }
-
                 function renderPreview() {
                     if (previewShape) { try { editorGroup.removeLayer(previewShape); } catch(e){} }
                     const latlngs = work.map(v => [v.lat, v.lng]);
@@ -3436,7 +3622,6 @@
                         previewShape.on('click', onPreviewClick);
                     }
                 }
-
                 function onPreviewClick(e) {
                     L.DomEvent.stopPropagation(e);
                     const clickLL = e.latlng;
@@ -3448,9 +3633,7 @@
                         const d = clickLL.distanceTo(mid);
                         if (d < bestDist) { bestDist = d; bestIdx = i + 1; }
                     }
-                    // Cancel any pending
                     removePending();
-                    // Create a pending vertex that follows the cursor
                     const pendingMarker = L.marker(clickLL, {
                         icon: L.divIcon({
                             className: '',
@@ -3462,7 +3645,6 @@
                     editorGroup.addLayer(pendingMarker);
                     pending = { lat: clickLL.lat, lng: clickLL.lng, marker: pendingMarker, insertIndex: bestIdx };
 
-                    // On mousemove, follow cursor; on second click, commit
                     const onMove = (ev) => {
                         if (!pending) return;
                         pending.lat = ev.latlng.lat;
@@ -3473,7 +3655,6 @@
                     const onMapClick = (ev) => {
                         if (!pending) return;
                         L.DomEvent.stopPropagation(ev);
-                        // Commit
                         work.splice(pending.insertIndex, 0, { lat: pending.lat, lng: pending.lng });
                         map.off('mousemove', onMove);
                         map.off('click', onMapClick);
@@ -3486,7 +3667,6 @@
                     };
                     map.on('mousemove', onMove);
                     map.once('click', onMapClick);
-
                     pendingMarker.on('drag', (ev) => {
                         const ll = ev.target.getLatLng();
                         pending.lat = ll.lat;
@@ -3499,11 +3679,9 @@
                         pending.lng = ll.lng;
                         redrawPendingTempLine();
                     });
-
                     redrawPendingTempLine();
                     showToast('Move to place the new vertex, then click to drop it', 'fa-mouse-pointer');
                 }
-
                 function redrawPendingTempLine() {
                     if (pendingTempLine) { try { editorGroup.removeLayer(pendingTempLine); } catch(e){} pendingTempLine = null; }
                     if (!pending) return;
@@ -3513,7 +3691,6 @@
                     editorGroup.addLayer(tmp);
                     pendingTempLine = tmp;
                 }
-
                 function renderMidpoints() {
                     midpointMarkers.forEach(m => { try { editorGroup.removeLayer(m); } catch(e){} });
                     midpointMarkers = [];
@@ -3529,8 +3706,7 @@
                                 html: `<div style="width:10px;height:10px;border-radius:50%;background:rgba(77,124,15,0.4);border:1.5px solid ${color};cursor:grab;"></div>`,
                                 iconSize: [10, 10], iconAnchor: [5, 5]
                             }),
-                            draggable: true,
-                            zIndexOffset: 900
+                            draggable: true, zIndexOffset: 900
                         });
                         midMarker.on('dragstart', () => {
                             work.splice(insertIndex, 0, { lat: midLat, lng: midLng });
@@ -3544,7 +3720,6 @@
                                 work[insertIndex].lat = ll.lat;
                                 work[insertIndex].lng = ll.lng;
                                 renderPreview();
-                                // Live-update midpoints so neighbouring handles follow
                                 updateMidpointsOnly();
                                 updateRowInputs(insertIndex);
                             }
@@ -3557,9 +3732,6 @@
                         midpointMarkers.push(midMarker);
                     }
                 }
-
-                // Faster than renderMidpoints; just repositions existing midpoint markers
-                // in-place so neighbouring handles follow a dragged vertex live.
                 function updateMidpointsOnly() {
                     let idx = 0;
                     for (let i = 0; i < work.length - 1; i++) {
@@ -3571,7 +3743,6 @@
                     }
                     if (pendingTempLine) redrawPendingTempLine();
                 }
-
                 function renderMarkers() {
                     vertexMarkers.forEach(m => { try { editorGroup.removeLayer(m); } catch(e){} });
                     vertexMarkers = [];
@@ -3596,7 +3767,7 @@
                             work[i].lat = finalLL.lat;
                             work[i].lng = finalLL.lng;
                             renderPreview();
-                            updateMidpointsOnly();  // <— key: move neighbouring midpoints LIVE
+                            updateMidpointsOnly();
                             updateRowInputs(i);
                         });
                         marker.on('dragstart', () => {
@@ -3624,7 +3795,6 @@
                     });
                     renderPreview();
                 }
-
                 function fitView() {
                     if (work.length === 0) return;
                     const ll = work.map(v => [v.lat, v.lng]);
@@ -3632,7 +3802,6 @@
                     if (ll.length === 1) map.setView(ll[0], 14);
                     else map.fitBounds(L.latLngBounds(ll), { ...pad, maxZoom: 17 });
                 }
-
                 async function commitVertices(options) {
                     const keepHidden = options && options.keepHidden;
                     if (work.length < minVerts) return;
@@ -3676,7 +3845,6 @@
                         <div style="margin-top:4px;">Drag a numbered vertex to move it — midpoints update as you drag.</div>
                     </div>
                 `;
-
                 const listEl = editorBody.querySelector('#ed-vert-list');
                 const countEl = editorBody.querySelector('#ed-vert-count');
 
@@ -3752,7 +3920,6 @@
                         r.style.background = (parseInt(r.dataset.idx, 10) === i) ? 'var(--sage-soft)' : '';
                     });
                 }
-
                 editorBody.querySelector('#ed-vert-add').addEventListener('click', async () => {
                     let lat, lng;
                     if (work.length > 0) {
@@ -3870,17 +4037,98 @@
                 const fsContent = document.getElementById('fs-modal-content');
                 let currentType = 'points';
 
+                const typeOptions = [
+                    { key: 'points', icon: 'fa-map-pin', label: 'Points', desc: 'One marker per row' },
+                    { key: 'path', icon: 'fa-route', label: 'Path', desc: 'One vertex per row' },
+                    { key: 'segments', icon: 'fa-arrows-left-right', label: 'Segments', desc: 'Two points per row' },
+                    { key: 'kml', icon: 'fa-file-code', label: 'KML / KMZ', desc: 'Points, lines, polygons' }
+                ];
+                const formatHints = {
+                    points: {
+                        columns: 'lat, lng, [name], [description]',
+                        note: 'One row per placemark. A header row is required. Latitude and Longitude columns are mandatory.'
+                    },
+                    path: {
+                        columns: 'lat, lng, [name], [description]',
+                        note: 'One row per vertex. Rows sharing the same Name are grouped into a single path (in row order). Include a header row.'
+                    },
+                    segments: {
+                        columns: 'lat1, lng1, lat2, lng2, [name], [description]',
+                        note: 'Each row is a two-point line (start → end). Two Latitude and two Longitude columns are mandatory. Include a header row.'
+                    },
+                    kml: null
+                };
+
                 function render() {
-                    const isPath = currentType === 'path';
                     const isKML = currentType === 'kml';
+                    const isSegments = currentType === 'segments';
+                    const isPath = currentType === 'path';
+                    const hint = formatHints[currentType];
+
+                    const pastePlaceholder = isSegments
+                        ? 'Paste cells from Excel — one row per line segment. Include a header row with two latitude and two longitude columns.'
+                        : isPath
+                            ? 'Paste cells from Excel — one row per vertex, ordered. Include a header row. Lat/Lon required; a Name column groups rows into separate paths (optional).'
+                            : 'Paste cells from Excel (Ctrl+V / Cmd+V) — include header row.';
+
+                    const mappingHTML = isSegments ? `
+                        <div class="sheet-panel" id="sheet-mapping-panel" style="display:none;">
+                            <div class="sheet-panel-title">02 — Map columns</div>
+                            <div class="sheet-mapping-row">
+                                <div><label>Latitude 1 (start)</label><select id="sheet-lat1"></select></div>
+                                <div><label>Longitude 1 (start)</label><select id="sheet-lon1"></select></div>
+                            </div>
+                            <div class="sheet-mapping-row">
+                                <div><label>Latitude 2 (end)</label><select id="sheet-lat2"></select></div>
+                                <div><label>Longitude 2 (end)</label><select id="sheet-lon2"></select></div>
+                            </div>
+                            <div class="sheet-mapping-row">
+                                <div><label>Name</label><select id="sheet-name"></select></div>
+                                <div><label>Description</label><select id="sheet-desc"></select></div>
+                            </div>
+                            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--ink-3);margin-top:4px;" id="sheet-count"></div>
+                        </div>
+                    ` : `
+                        <div class="sheet-panel" id="sheet-mapping-panel" style="display:none;">
+                            <div class="sheet-panel-title">02 — Map columns</div>
+                            <div class="sheet-mapping-row">
+                                <div><label>Latitude</label><select id="sheet-lat"></select></div>
+                                <div><label>Longitude</label><select id="sheet-lon"></select></div>
+                            </div>
+                            <div class="sheet-mapping-row">
+                                <div><label>Name</label><select id="sheet-name"></select></div>
+                                <div><label>Description</label><select id="sheet-desc"></select></div>
+                            </div>
+                            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--ink-3);margin-top:4px;" id="sheet-count"></div>
+                        </div>
+                    `;
+
+                    const commitLabel = isSegments ? 'Import as line segments'
+                        : isPath ? 'Import as path'
+                        : 'Import as placemarks';
+
                     fsContent.innerHTML = `
                         <div class="sheet-layout">
-                            <div class="sheet-header"><h2>Import</h2><button class="detail-close" id="import-close"><i class="fas fa-times"></i></button></div>
-                            <div class="import-type-bar">
-                                <div class="import-type-opt ${currentType === 'points' ? 'active' : ''}" data-type="points"><i class="fas fa-map-pin"></i><div class="import-type-opt-label">Points</div><div class="import-type-opt-desc">Row per placemark</div></div>
-                                <div class="import-type-opt ${currentType === 'path' ? 'active' : ''}" data-type="path"><i class="fas fa-route"></i><div class="import-type-opt-label">Path</div><div class="import-type-opt-desc">Row per vertex</div></div>
-                                <div class="import-type-opt ${currentType === 'kml' ? 'active' : ''}" data-type="kml"><i class="fas fa-file-code"></i><div class="import-type-opt-label">KML / KMZ</div><div class="import-type-opt-desc">Points, lines, polygons</div></div>
+                            <div class="sheet-header">
+                                <h2>Import</h2>
+                                <button class="detail-close" id="import-close"><i class="fas fa-times"></i></button>
                             </div>
+                            <div class="import-type-bar">
+                                ${typeOptions.map(t => `
+                                    <div class="import-type-opt ${currentType === t.key ? 'active' : ''}" data-type="${t.key}">
+                                        <i class="fas ${t.icon}"></i>
+                                        <div class="import-type-opt-label">${t.label}</div>
+                                        <div class="import-type-opt-desc">${t.desc}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            ${hint ? `
+                                <div class="import-format-hint">
+                                    <div class="import-format-hint-title">Expected data format</div>
+                                    <pre class="import-format-hint-columns">${hint.columns}</pre>
+                                    <div class="import-format-hint-note">${hint.note}</div>
+                                </div>
+                            ` : ''}
                             ${isKML ? `
                                 <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px;">
                                     <div style="text-align:center;">
@@ -3895,28 +4143,21 @@
                                     <div class="sheet-col">
                                         <div class="sheet-panel">
                                             <div class="sheet-panel-title">01 — Paste data</div>
-                                            <textarea class="sheet-paste" id="sheet-paste" placeholder="${isPath ? 'Paste cells from Excel — one row per vertex, ordered. Include a header row. Lat/Lon required; a Name column groups rows into separate paths (optional).' : 'Paste cells from Excel (Ctrl+V / Cmd+V) — include header row.'}"></textarea>
+                                            <textarea class="sheet-paste" id="sheet-paste" placeholder="${pastePlaceholder}"></textarea>
                                         </div>
-                                        <div class="sheet-panel" id="sheet-mapping-panel" style="display:none;">
-                                            <div class="sheet-panel-title">02 — Map columns</div>
-                                            <div class="sheet-mapping-row">
-                                                <div><label>Latitude</label><select id="sheet-lat"></select></div>
-                                                <div><label>Longitude</label><select id="sheet-lon"></select></div>
-                                            </div>
-                                            <div class="sheet-mapping-row">
-                                                <div><label>Name</label><select id="sheet-name"></select></div>
-                                                <div><label>Description</label><select id="sheet-desc"></select></div>
-                                            </div>
-                                            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--ink-3);margin-top:4px;" id="sheet-count"></div>
-                                        </div>
+                                        ${mappingHTML}
                                     </div>
                                     <div class="sheet-col">
                                         <div class="sheet-panel" style="flex:1;">
                                             <div class="sheet-panel-title">03 — Preview</div>
-                                            <div class="sheet-preview" id="sheet-preview"><div style="padding:20px;text-align:center;color:var(--ink-3);font-size:0.78rem;">Paste data on the left</div></div>
+                                            <div class="sheet-preview" id="sheet-preview">
+                                                <div style="padding:20px;text-align:center;color:var(--ink-3);font-size:0.78rem;">Paste data on the left</div>
+                                            </div>
                                             <div style="display:flex;gap:8px;margin-top:14px;">
                                                 <button class="btn btn-secondary" id="sheet-cancel" style="flex:1;">Cancel</button>
-                                                <button class="btn btn-primary" id="sheet-commit" style="flex:2;" disabled><i class="fas fa-upload"></i> ${isPath ? 'Import as path' : 'Import as placemarks'}</button>
+                                                <button class="btn btn-primary" id="sheet-commit" style="flex:2;" disabled>
+                                                    <i class="fas fa-upload"></i> ${commitLabel}
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -3924,9 +4165,13 @@
                             `}
                         </div>
                     `;
+
                     fsContent.querySelector('#import-close').addEventListener('click', closeImport);
                     fsContent.querySelectorAll('.import-type-opt').forEach(el => {
-                        el.addEventListener('click', () => { currentType = el.dataset.type; render(); });
+                        el.addEventListener('click', () => {
+                            currentType = el.dataset.type;
+                            render();
+                        });
                     });
                     if (isKML) {
                         fsContent.querySelector('#import-kml-pick').addEventListener('click', () => {
@@ -3934,20 +4179,24 @@
                             setTimeout(() => kmlInput.click(), 80);
                         });
                     } else {
-                        initSpreadsheetUI(isPath, targetFolderId);
+                        initSpreadsheetUI(currentType, targetFolderId);
                     }
                 }
+
                 function closeImport() {
                     fsOverlay.classList.remove('open');
                     fsContent.innerHTML = '';
                     updateMapToolsVisibility();
                 }
+
                 fsOverlay.classList.add('open');
                 updateMapToolsVisibility();
                 render();
             }
 
-            function initSpreadsheetUI(isPath, targetFolderId) {
+            function initSpreadsheetUI(importType, targetFolderId) {
+                const isSegments = importType === 'segments';
+                const isPath = importType === 'path';
                 const fsContent = document.getElementById('fs-modal-content');
                 const pasteEl = fsContent.querySelector('#sheet-paste');
                 const mappingPanel = fsContent.querySelector('#sheet-mapping-panel');
@@ -3957,7 +4206,9 @@
 
                 let headers = [];
                 let rows = [];
-                let mapping = { lat: 0, lon: 1, name: -1, desc: -1 };
+                let mapping = isSegments
+                    ? { lat1: 0, lon1: 1, lat2: 2, lon2: 3, name: -1, desc: -1 }
+                    : { lat: 0, lon: 1, name: -1, desc: -1 };
 
                 function parseDelimited(text, delim) {
                     const out = []; let row = [], cur = '', inQ = false;
@@ -3988,8 +4239,15 @@
                     const options = (selected, withNone) =>
                         (withNone ? `<option value="-1" ${selected < 0 ? 'selected' : ''}>— None —</option>` : '') +
                         headers.map((h, i) => `<option value="${i}" ${i === selected ? 'selected' : ''}>${escapeHtml(h || 'Col ' + (i+1))}${escapeHtml(sample(i))}</option>`).join('');
-                    fsContent.querySelector('#sheet-lat').innerHTML = options(mapping.lat, false);
-                    fsContent.querySelector('#sheet-lon').innerHTML = options(mapping.lon, false);
+                    if (isSegments) {
+                        fsContent.querySelector('#sheet-lat1').innerHTML = options(mapping.lat1, false);
+                        fsContent.querySelector('#sheet-lon1').innerHTML = options(mapping.lon1, false);
+                        fsContent.querySelector('#sheet-lat2').innerHTML = options(mapping.lat2, false);
+                        fsContent.querySelector('#sheet-lon2').innerHTML = options(mapping.lon2, false);
+                    } else {
+                        fsContent.querySelector('#sheet-lat').innerHTML = options(mapping.lat, false);
+                        fsContent.querySelector('#sheet-lon').innerHTML = options(mapping.lon, false);
+                    }
                     fsContent.querySelector('#sheet-name').innerHTML = options(mapping.name, true);
                     fsContent.querySelector('#sheet-desc').innerHTML = options(mapping.desc, true);
                 }
@@ -4015,26 +4273,50 @@
                     if (all.length < 2) return;
                     headers = all[0];
                     rows = all.slice(1);
-                    let lat = findCol(['latitude', 'lat']);
-                    let lon = findCol(['longitude', 'long', 'lng', 'lon'], [lat]);
-                    if (lat < 0) lat = 0;
-                    if (lon < 0) lon = Math.min(1, headers.length - 1);
-                    let name = findCol(['name', 'tag', 'title', 'label'], [lat, lon]);
-                    if (name < 0) for (let i = 0; i < headers.length; i++) if (i !== lat && i !== lon) { name = i; break; }
-                    let desc = findCol(['desc', 'detail', 'note', 'comment'], [lat, lon, name]);
-                    if (desc < 0) for (let i = 0; i < headers.length; i++) if (i !== lat && i !== lon && i !== name) { desc = i; break; }
-                    mapping = { lat, lon, name, desc };
+
+                    if (isSegments) {
+                        const latCols = [], lonCols = [];
+                        headers.forEach((h, i) => {
+                            const hl = h.toLowerCase();
+                            if (hl.includes('lat')) latCols.push(i);
+                            else if (hl.includes('lng') || hl.includes('lon')) lonCols.push(i);
+                        });
+                        mapping.lat1 = latCols[0] ?? 0;
+                        mapping.lat2 = latCols[1] ?? 2;
+                        mapping.lon1 = lonCols[0] ?? 1;
+                        mapping.lon2 = lonCols[1] ?? 3;
+                        mapping.name = findCol(['name', 'tag', 'title', 'label'], [mapping.lat1, mapping.lat2, mapping.lon1, mapping.lon2]);
+                        mapping.desc = findCol(['desc', 'detail', 'note', 'comment'], [mapping.lat1, mapping.lat2, mapping.lon1, mapping.lon2, mapping.name]);
+                    } else {
+                        let lat = findCol(['latitude', 'lat']);
+                        let lon = findCol(['longitude', 'long', 'lng', 'lon'], [lat]);
+                        if (lat < 0) lat = 0;
+                        if (lon < 0) lon = Math.min(1, headers.length - 1);
+                        let name = findCol(['name', 'tag', 'title', 'label'], [lat, lon]);
+                        if (name < 0) for (let i = 0; i < headers.length; i++) if (i !== lat && i !== lon) { name = i; break; }
+                        let desc = findCol(['desc', 'detail', 'note', 'comment'], [lat, lon, name]);
+                        if (desc < 0) for (let i = 0; i < headers.length; i++) if (i !== lat && i !== lon && i !== name) { desc = i; break; }
+                        mapping = { lat, lon, name, desc };
+                    }
+
                     mappingPanel.style.display = 'block';
                     buildSelectors();
                     updatePreview();
                     commitBtn.disabled = false;
                 }
 
-                ['sheet-lat','sheet-lon','sheet-name','sheet-desc'].forEach(id => {
-                    fsContent.querySelector('#' + id).addEventListener('change', (e) => {
-                        mapping[id.split('-')[1]] = parseInt(e.target.value, 10);
-                    });
-                });
+                if (isSegments) {
+                    fsContent.querySelector('#sheet-lat1').addEventListener('change', (e) => { mapping.lat1 = parseInt(e.target.value, 10); });
+                    fsContent.querySelector('#sheet-lon1').addEventListener('change', (e) => { mapping.lon1 = parseInt(e.target.value, 10); });
+                    fsContent.querySelector('#sheet-lat2').addEventListener('change', (e) => { mapping.lat2 = parseInt(e.target.value, 10); });
+                    fsContent.querySelector('#sheet-lon2').addEventListener('change', (e) => { mapping.lon2 = parseInt(e.target.value, 10); });
+                } else {
+                    fsContent.querySelector('#sheet-lat').addEventListener('change', (e) => { mapping.lat = parseInt(e.target.value, 10); });
+                    fsContent.querySelector('#sheet-lon').addEventListener('change', (e) => { mapping.lon = parseInt(e.target.value, 10); });
+                }
+                fsContent.querySelector('#sheet-name').addEventListener('change', (e) => { mapping.name = parseInt(e.target.value, 10); });
+                fsContent.querySelector('#sheet-desc').addEventListener('change', (e) => { mapping.desc = parseInt(e.target.value, 10); });
+
                 pasteEl.addEventListener('input', processPaste);
 
                 fsContent.querySelector('#sheet-cancel').addEventListener('click', () => {
@@ -4057,6 +4339,49 @@
                     });
                     if (parent) addNodeToTree(importFolder, parent); else addNodeToTree(importFolder);
 
+                    // ===== Segments =====
+                    if (isSegments) {
+                        let added = 0, skipped = 0;
+                        const bounds = L.latLngBounds([]);
+                        rows.forEach((row, i) => {
+                            const lat1 = num(row[mapping.lat1]);
+                            const lon1 = num(row[mapping.lon1]);
+                            const lat2 = num(row[mapping.lat2]);
+                            const lon2 = num(row[mapping.lon2]);
+                            const validLat = v => !isNaN(v) && v >= -90 && v <= 90;
+                            const validLon = v => !isNaN(v) && v >= -180 && v <= 180;
+                            if (!validLat(lat1) || !validLat(lat2) || !validLon(lon1) || !validLon(lon2)) { skipped++; return; }
+                            const name = (mapping.name >= 0 && row[mapping.name]) ? row[mapping.name] : `Segment ${i + 1}`;
+                            const desc = mapping.desc >= 0 ? row[mapping.desc] || '' : '';
+                            const latlngs = [[lat1, lon1], [lat2, lon2]];
+                            const dist = pathDistance(latlngs.map(p => L.latLng(p[0], p[1])));
+                            const line = L.polyline(latlngs, { color: '#4d7c0f', weight: 3 });
+                            line.bindPopup(`<b>${escapeHtml(name)}</b><br>Length: ${formatDistance(dist)}${desc ? '<br>' + escapeHtml(desc) : ''}`);
+                            drawnItems.addLayer(line);
+                            const newNode = createNode({ type: 'path', name, layer: line, meta: { desc, distance: dist, points: latlngs, color: '#4d7c0f', lineThickness: 3 } });
+                            bindLayerFocus(newNode, line);
+                            attachLayerDrag(newNode, line);
+                            addNodeToTree(newNode, importFolder);
+                            bounds.extend([lat1, lon1]);
+                            bounds.extend([lat2, lon2]);
+                            added++;
+                        });
+                        if (added > 0) {
+                            await persistTree();
+                            document.getElementById('fs-modal-overlay').classList.remove('open');
+                            fsContent.innerHTML = '';
+                            updateMapToolsVisibility();
+                            if (bounds.isValid()) setTimeout(() => map.fitBounds(bounds, { ...availableMapPadding(), maxZoom: 16 }), 100);
+                            showToast(`Imported ${added} segment(s) into "${importFolder.name}"${skipped ? `, skipped ${skipped}` : ''}`, 'fa-check');
+                        } else {
+                            await deleteNodeWithChildren(importFolder);
+                            renderTree();
+                            showToast('No valid row had both points', 'fa-exclamation-circle');
+                        }
+                        return;
+                    }
+
+                    // ===== Path =====
                     if (isPath) {
                         const groups = new Map();
                         const order = [];
@@ -4069,7 +4394,7 @@
                             if (!groups.has(key)) { groups.set(key, []); order.push(key); }
                             groups.get(key).push({ lat, lng: lon, desc: (mapping.desc >= 0 ? (row[mapping.desc] || '') : '') });
                         });
-                        if (order.length === 0) { showToast('No valid coordinates found', 'fa-exclamation-circle'); return; }
+                        if (order.length === 0) { showToast('No valid coordinates found', 'fa-exclamation-circle'); await deleteNodeWithChildren(importFolder); renderTree(); return; }
                         let pathCount = 0, dropped = 0;
                         order.forEach(key => {
                             const verts = groups.get(key);
@@ -4107,6 +4432,7 @@
                         return;
                     }
 
+                    // ===== Points =====
                     let added = 0, skipped = 0;
                     const bounds = L.latLngBounds([]);
                     rows.forEach((row, i) => {
@@ -4294,7 +4620,6 @@
                 drawState.points.push(latlng);
                 updateTempPreview(latlng);
             });
-
             map.on('mousemove', (e) => {
                 map._lastMouseLatLng = e.latlng;
                 updateTerrainDisplay(e.latlng.lat, e.latlng.lng);
@@ -4381,7 +4706,6 @@
                     showToast(`LOS added: ${result.name}`, 'fa-satellite-dish');
                 });
             }
-
             function losLineGeometry(node, bearingDeg, stepMeters = 10) {
                 const center = L.latLng(node.meta.lat, node.meta.lng);
                 const radius = node.meta.radius || 10000;
@@ -4415,7 +4739,6 @@
                 }
                 return { pts, lostAt, antennaElev, targetElevEnd, centerElev };
             }
-
             function truncateLOSPoints(pts, lostAt) {
                 if (lostAt === null) return pts;
                 const out = pts.filter(p => p.d <= lostAt);
@@ -4431,7 +4754,6 @@
                 }
                 return out;
             }
-
             function buildLOSLayers(node, highlightBearing) {
                 if (!node.meta.lat || !node.meta.lng) return [];
                 const center = L.latLng(node.meta.lat, node.meta.lng);
@@ -4485,7 +4807,6 @@
                 }
                 return layers;
             }
-
             function buildTopographicContours(center, radius, interval, color) {
                 const layers = [];
                 const stepMeters = 50;
@@ -4548,7 +4869,6 @@
                 }
                 return layers;
             }
-
             let losHighlightLayer = null;
             function setLOSHighlight(node, bearingDeg) {
                 if (losHighlightLayer) { map.removeLayer(losHighlightLayer); losHighlightLayer = null; }
@@ -4593,7 +4913,7 @@
                 return `${(m2 / 1e6).toExponential(2)} km²`;
             }
 
-            // ==================== KML IMPORT ====================
+            // ==================== KML IMPORT / EXPORT ====================
             kmlInput.addEventListener('change', async (e) => {
                 const files = e.target.files;
                 if (!files || !files.length) return;
@@ -4690,8 +5010,6 @@
                 if (!text) return [];
                 return text.trim().split(/\s+/).map(p => p.split(',').map(parseFloat)).filter(b => b.length >= 2 && !isNaN(b[0]) && !isNaN(b[1]));
             }
-
-            // ==================== EXPORT ====================
             function exportKMLAll() {
                 const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<kml xmlns="http://www.opengis.net/kml/2.2">', '<Document>'];
                 lines.push(`<name>Telco Earth Export</name>`);
@@ -5133,7 +5451,6 @@
                 updateMapToolsVisibility();
                 setTimeout(() => drawProfileChart(), 320);
             }
-
             function openLOSProfile(node) {
                 if (!node || node.type !== 'los') { showToast('Not a LOS object', 'fa-exclamation-circle'); return; }
                 if (terrainStore.size === 0) { showToast('Load HGT data first', 'fa-exclamation-circle'); return; }
@@ -5162,7 +5479,6 @@
                 renderLOSProfile(node, 0);
                 setTimeout(() => drawProfileChart(), 320);
             }
-
             function renderLOSProfile(node, bearingDeg) {
                 const geo = losLineGeometry(node, bearingDeg);
                 if (geo.pts.length < 2) { showToast('No terrain data along this bearing', 'fa-exclamation-circle'); return; }
@@ -5213,7 +5529,6 @@
                 `;
                 drawProfileChart();
             }
-
             function drawProfileChart() {
                 if (!profileData) return;
                 const canvas = profileCanvas;
@@ -5330,7 +5645,6 @@
                     ctx.strokeStyle = 'white'; ctx.lineWidth = 2.5; ctx.stroke();
                 });
             }
-
             function sampleAtCanvasX(x) {
                 if (!profileData) return null;
                 const rect = profileCanvas.getBoundingClientRect();
@@ -5348,7 +5662,6 @@
                 }
                 return closest;
             }
-
             profileCanvas.addEventListener('mousemove', (e) => {
                 if (!profileData) return;
                 const rect = profileCanvas.getBoundingClientRect();
@@ -5405,7 +5718,6 @@
                 drawProfileChart();
                 showToast(`Marker placed at ${formatDistance(sample.d)}`, 'fa-map-pin');
             });
-
             document.getElementById('profile-clear-pins').addEventListener('click', () => {
                 const n = profilePinsGroup.getLayers().length;
                 clearProfilePins();
