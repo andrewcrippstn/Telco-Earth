@@ -1490,16 +1490,12 @@
                     if (e.target.closest('.fx-vis')) return;
                     e.stopPropagation();
 
-                    // Ctrl/Cmd → multi-select from search results
                     if (e.ctrlKey || e.metaKey) {
-                        // If a single active node exists and isn't in multi, fold it in first
                         if (selectedNodeId && selectedNodeId !== node.id && !multiSelection.has(selectedNodeId)) {
                             if (findNode(selectedNodeId)) multiSelection.add(selectedNodeId);
                         }
                         if (multiSelection.has(node.id)) multiSelection.delete(node.id);
                         else multiSelection.add(node.id);
-
-                        // If we're back to exactly one item, treat it as a single selection
                         if (multiSelection.size === 1) {
                             selectedNodeId = multiSelection.values().next().value;
                             multiSelection.clear();
@@ -1510,7 +1506,6 @@
                         return;
                     }
 
-                    // Plain click → clear search, navigate, open editor for non-folders
                     placesSearchQuery = '';
                     if (searchInputEl) searchInputEl.value = '';
                     if (searchClearEl) searchClearEl.classList.remove('show');
@@ -1645,28 +1640,22 @@
                     if (e.target.closest('.fx-vis')) return;
                     e.stopPropagation();
 
-                    // ===== Ctrl / Cmd multi-select =====
                     if (e.ctrlKey || e.metaKey) {
-                        // Seed the multi-set with the currently single-selected node
                         if (selectedNodeId && selectedNodeId !== node.id && !multiSelection.has(selectedNodeId)) {
                             if (findNode(selectedNodeId)) multiSelection.add(selectedNodeId);
                         }
                         if (multiSelection.has(node.id)) multiSelection.delete(node.id);
                         else multiSelection.add(node.id);
-
-                        // Collapse back to single selection when only one item remains
                         if (multiSelection.size === 1) {
                             selectedNodeId = multiSelection.values().next().value;
                             multiSelection.clear();
                         } else {
                             selectedNodeId = node.id;
                         }
-
                         renderTree();
                         return;
                     }
 
-                    // ===== Plain click =====
                     if (multiSelection.size > 0) multiSelection.clear();
                     selectedNodeId = node.id;
                     if (node.type === 'folder' || node.type === 'kml') {
@@ -4040,7 +4029,6 @@
                 const typeOptions = [
                     { key: 'points', icon: 'fa-map-pin', label: 'Points', desc: 'One marker per row' },
                     { key: 'path', icon: 'fa-route', label: 'Path', desc: 'One vertex per row' },
-                    { key: 'segments', icon: 'fa-arrows-left-right', label: 'Segments', desc: 'Two points per row' },
                     { key: 'kml', icon: 'fa-file-code', label: 'KML / KMZ', desc: 'Points, lines, polygons' }
                 ];
                 const formatHints = {
@@ -4050,45 +4038,21 @@
                     },
                     path: {
                         columns: 'lat, lng, [name], [description]',
-                        note: 'One row per vertex. Rows sharing the same Name are grouped into a single path (in row order). Include a header row.'
-                    },
-                    segments: {
-                        columns: 'lat1, lng1, lat2, lng2, [name], [description]',
-                        note: 'Each row is a two-point line (start → end). Two Latitude and two Longitude columns are mandatory. Include a header row.'
+                        note: 'One row per vertex. Rows sharing the same Name are grouped into a single path (in row order). The description is taken from the first row of each name group. Include a header row.'
                     },
                     kml: null
                 };
 
                 function render() {
                     const isKML = currentType === 'kml';
-                    const isSegments = currentType === 'segments';
                     const isPath = currentType === 'path';
                     const hint = formatHints[currentType];
 
-                    const pastePlaceholder = isSegments
-                        ? 'Paste cells from Excel — one row per line segment. Include a header row with two latitude and two longitude columns.'
-                        : isPath
-                            ? 'Paste cells from Excel — one row per vertex, ordered. Include a header row. Lat/Lon required; a Name column groups rows into separate paths (optional).'
-                            : 'Paste cells from Excel (Ctrl+V / Cmd+V) — include header row.';
+                    const pastePlaceholder = isPath
+                        ? 'Paste cells from Excel — one row per vertex, ordered. Include a header row. Lat/Lon required; a Name column groups rows into separate paths (optional).'
+                        : 'Paste cells from Excel (Ctrl+V / Cmd+V) — include header row.';
 
-                    const mappingHTML = isSegments ? `
-                        <div class="sheet-panel" id="sheet-mapping-panel" style="display:none;">
-                            <div class="sheet-panel-title">02 — Map columns</div>
-                            <div class="sheet-mapping-row">
-                                <div><label>Latitude 1 (start)</label><select id="sheet-lat1"></select></div>
-                                <div><label>Longitude 1 (start)</label><select id="sheet-lon1"></select></div>
-                            </div>
-                            <div class="sheet-mapping-row">
-                                <div><label>Latitude 2 (end)</label><select id="sheet-lat2"></select></div>
-                                <div><label>Longitude 2 (end)</label><select id="sheet-lon2"></select></div>
-                            </div>
-                            <div class="sheet-mapping-row">
-                                <div><label>Name</label><select id="sheet-name"></select></div>
-                                <div><label>Description</label><select id="sheet-desc"></select></div>
-                            </div>
-                            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--ink-3);margin-top:4px;" id="sheet-count"></div>
-                        </div>
-                    ` : `
+                    const mappingHTML = `
                         <div class="sheet-panel" id="sheet-mapping-panel" style="display:none;">
                             <div class="sheet-panel-title">02 — Map columns</div>
                             <div class="sheet-mapping-row">
@@ -4103,9 +4067,7 @@
                         </div>
                     `;
 
-                    const commitLabel = isSegments ? 'Import as line segments'
-                        : isPath ? 'Import as path'
-                        : 'Import as placemarks';
+                    const commitLabel = isPath ? 'Import as path' : 'Import as placemarks';
 
                     fsContent.innerHTML = `
                         <div class="sheet-layout">
@@ -4195,7 +4157,6 @@
             }
 
             function initSpreadsheetUI(importType, targetFolderId) {
-                const isSegments = importType === 'segments';
                 const isPath = importType === 'path';
                 const fsContent = document.getElementById('fs-modal-content');
                 const pasteEl = fsContent.querySelector('#sheet-paste');
@@ -4206,9 +4167,7 @@
 
                 let headers = [];
                 let rows = [];
-                let mapping = isSegments
-                    ? { lat1: 0, lon1: 1, lat2: 2, lon2: 3, name: -1, desc: -1 }
-                    : { lat: 0, lon: 1, name: -1, desc: -1 };
+                let mapping = { lat: 0, lon: 1, name: -1, desc: -1 };
 
                 function parseDelimited(text, delim) {
                     const out = []; let row = [], cur = '', inQ = false;
@@ -4239,15 +4198,8 @@
                     const options = (selected, withNone) =>
                         (withNone ? `<option value="-1" ${selected < 0 ? 'selected' : ''}>— None —</option>` : '') +
                         headers.map((h, i) => `<option value="${i}" ${i === selected ? 'selected' : ''}>${escapeHtml(h || 'Col ' + (i+1))}${escapeHtml(sample(i))}</option>`).join('');
-                    if (isSegments) {
-                        fsContent.querySelector('#sheet-lat1').innerHTML = options(mapping.lat1, false);
-                        fsContent.querySelector('#sheet-lon1').innerHTML = options(mapping.lon1, false);
-                        fsContent.querySelector('#sheet-lat2').innerHTML = options(mapping.lat2, false);
-                        fsContent.querySelector('#sheet-lon2').innerHTML = options(mapping.lon2, false);
-                    } else {
-                        fsContent.querySelector('#sheet-lat').innerHTML = options(mapping.lat, false);
-                        fsContent.querySelector('#sheet-lon').innerHTML = options(mapping.lon, false);
-                    }
+                    fsContent.querySelector('#sheet-lat').innerHTML = options(mapping.lat, false);
+                    fsContent.querySelector('#sheet-lon').innerHTML = options(mapping.lon, false);
                     fsContent.querySelector('#sheet-name').innerHTML = options(mapping.name, true);
                     fsContent.querySelector('#sheet-desc').innerHTML = options(mapping.desc, true);
                 }
@@ -4274,30 +4226,15 @@
                     headers = all[0];
                     rows = all.slice(1);
 
-                    if (isSegments) {
-                        const latCols = [], lonCols = [];
-                        headers.forEach((h, i) => {
-                            const hl = h.toLowerCase();
-                            if (hl.includes('lat')) latCols.push(i);
-                            else if (hl.includes('lng') || hl.includes('lon')) lonCols.push(i);
-                        });
-                        mapping.lat1 = latCols[0] ?? 0;
-                        mapping.lat2 = latCols[1] ?? 2;
-                        mapping.lon1 = lonCols[0] ?? 1;
-                        mapping.lon2 = lonCols[1] ?? 3;
-                        mapping.name = findCol(['name', 'tag', 'title', 'label'], [mapping.lat1, mapping.lat2, mapping.lon1, mapping.lon2]);
-                        mapping.desc = findCol(['desc', 'detail', 'note', 'comment'], [mapping.lat1, mapping.lat2, mapping.lon1, mapping.lon2, mapping.name]);
-                    } else {
-                        let lat = findCol(['latitude', 'lat']);
-                        let lon = findCol(['longitude', 'long', 'lng', 'lon'], [lat]);
-                        if (lat < 0) lat = 0;
-                        if (lon < 0) lon = Math.min(1, headers.length - 1);
-                        let name = findCol(['name', 'tag', 'title', 'label'], [lat, lon]);
-                        if (name < 0) for (let i = 0; i < headers.length; i++) if (i !== lat && i !== lon) { name = i; break; }
-                        let desc = findCol(['desc', 'detail', 'note', 'comment'], [lat, lon, name]);
-                        if (desc < 0) for (let i = 0; i < headers.length; i++) if (i !== lat && i !== lon && i !== name) { desc = i; break; }
-                        mapping = { lat, lon, name, desc };
-                    }
+                    let lat = findCol(['latitude', 'lat']);
+                    let lon = findCol(['longitude', 'long', 'lng', 'lon'], [lat]);
+                    if (lat < 0) lat = 0;
+                    if (lon < 0) lon = Math.min(1, headers.length - 1);
+                    let name = findCol(['name', 'tag', 'title', 'label'], [lat, lon]);
+                    if (name < 0) for (let i = 0; i < headers.length; i++) if (i !== lat && i !== lon) { name = i; break; }
+                    let desc = findCol(['desc', 'detail', 'note', 'comment'], [lat, lon, name]);
+                    if (desc < 0) for (let i = 0; i < headers.length; i++) if (i !== lat && i !== lon && i !== name) { desc = i; break; }
+                    mapping = { lat, lon, name, desc };
 
                     mappingPanel.style.display = 'block';
                     buildSelectors();
@@ -4305,15 +4242,8 @@
                     commitBtn.disabled = false;
                 }
 
-                if (isSegments) {
-                    fsContent.querySelector('#sheet-lat1').addEventListener('change', (e) => { mapping.lat1 = parseInt(e.target.value, 10); });
-                    fsContent.querySelector('#sheet-lon1').addEventListener('change', (e) => { mapping.lon1 = parseInt(e.target.value, 10); });
-                    fsContent.querySelector('#sheet-lat2').addEventListener('change', (e) => { mapping.lat2 = parseInt(e.target.value, 10); });
-                    fsContent.querySelector('#sheet-lon2').addEventListener('change', (e) => { mapping.lon2 = parseInt(e.target.value, 10); });
-                } else {
-                    fsContent.querySelector('#sheet-lat').addEventListener('change', (e) => { mapping.lat = parseInt(e.target.value, 10); });
-                    fsContent.querySelector('#sheet-lon').addEventListener('change', (e) => { mapping.lon = parseInt(e.target.value, 10); });
-                }
+                fsContent.querySelector('#sheet-lat').addEventListener('change', (e) => { mapping.lat = parseInt(e.target.value, 10); });
+                fsContent.querySelector('#sheet-lon').addEventListener('change', (e) => { mapping.lon = parseInt(e.target.value, 10); });
                 fsContent.querySelector('#sheet-name').addEventListener('change', (e) => { mapping.name = parseInt(e.target.value, 10); });
                 fsContent.querySelector('#sheet-desc').addEventListener('change', (e) => { mapping.desc = parseInt(e.target.value, 10); });
 
@@ -4339,48 +4269,6 @@
                     });
                     if (parent) addNodeToTree(importFolder, parent); else addNodeToTree(importFolder);
 
-                    // ===== Segments =====
-                    if (isSegments) {
-                        let added = 0, skipped = 0;
-                        const bounds = L.latLngBounds([]);
-                        rows.forEach((row, i) => {
-                            const lat1 = num(row[mapping.lat1]);
-                            const lon1 = num(row[mapping.lon1]);
-                            const lat2 = num(row[mapping.lat2]);
-                            const lon2 = num(row[mapping.lon2]);
-                            const validLat = v => !isNaN(v) && v >= -90 && v <= 90;
-                            const validLon = v => !isNaN(v) && v >= -180 && v <= 180;
-                            if (!validLat(lat1) || !validLat(lat2) || !validLon(lon1) || !validLon(lon2)) { skipped++; return; }
-                            const name = (mapping.name >= 0 && row[mapping.name]) ? row[mapping.name] : `Segment ${i + 1}`;
-                            const desc = mapping.desc >= 0 ? row[mapping.desc] || '' : '';
-                            const latlngs = [[lat1, lon1], [lat2, lon2]];
-                            const dist = pathDistance(latlngs.map(p => L.latLng(p[0], p[1])));
-                            const line = L.polyline(latlngs, { color: '#4d7c0f', weight: 3 });
-                            line.bindPopup(`<b>${escapeHtml(name)}</b><br>Length: ${formatDistance(dist)}${desc ? '<br>' + escapeHtml(desc) : ''}`);
-                            drawnItems.addLayer(line);
-                            const newNode = createNode({ type: 'path', name, layer: line, meta: { desc, distance: dist, points: latlngs, color: '#4d7c0f', lineThickness: 3 } });
-                            bindLayerFocus(newNode, line);
-                            attachLayerDrag(newNode, line);
-                            addNodeToTree(newNode, importFolder);
-                            bounds.extend([lat1, lon1]);
-                            bounds.extend([lat2, lon2]);
-                            added++;
-                        });
-                        if (added > 0) {
-                            await persistTree();
-                            document.getElementById('fs-modal-overlay').classList.remove('open');
-                            fsContent.innerHTML = '';
-                            updateMapToolsVisibility();
-                            if (bounds.isValid()) setTimeout(() => map.fitBounds(bounds, { ...availableMapPadding(), maxZoom: 16 }), 100);
-                            showToast(`Imported ${added} segment(s) into "${importFolder.name}"${skipped ? `, skipped ${skipped}` : ''}`, 'fa-check');
-                        } else {
-                            await deleteNodeWithChildren(importFolder);
-                            renderTree();
-                            showToast('No valid row had both points', 'fa-exclamation-circle');
-                        }
-                        return;
-                    }
-
                     // ===== Path =====
                     if (isPath) {
                         const groups = new Map();
@@ -4402,7 +4290,8 @@
                             const latlngs = verts.map(v => [v.lat, v.lng]);
                             const dist = pathDistance(latlngs.map(p => L.latLng(p[0], p[1])));
                             const name = (key === '__all__') ? `Path ${pathCount + 1}` : key;
-                            const desc = verts.map(v => v.desc).filter(Boolean).join(' · ');
+                            // Description is taken from the first row of the group only.
+                            const desc = verts[0].desc || '';
                             const line = L.polyline(latlngs, { color: '#4d7c0f', weight: 3 });
                             line.bindPopup(`<b>${escapeHtml(name)}</b><br>Length: ${formatDistance(dist)}${desc ? '<br>' + escapeHtml(desc) : ''}`);
                             drawnItems.addLayer(line);
