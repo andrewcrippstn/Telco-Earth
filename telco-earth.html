@@ -29,6 +29,17 @@
     .brand-mark { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--sage), #365314); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.78rem; box-shadow: 0 2px 8px rgba(77, 124, 15, 0.25); }
     .header-spacer { flex: 1; }
     .header-right { display: flex; align-items: center; gap: 8px; }
+
+    /* === Header search === */
+    .header-search { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--paper-soft); border: 1px solid var(--border); border-radius: 8px; transition: all 0.15s ease; width: 320px; max-width: 30vw; }
+    .header-search:focus-within { border-color: var(--sage); background: white; box-shadow: 0 0 0 3px var(--sage-soft); }
+    .header-search > i { color: var(--ink-3); font-size: 0.72rem; flex-shrink: 0; }
+    .header-search input { flex: 1; border: none; background: transparent; outline: none; font-size: 0.78rem; color: var(--ink); font-family: inherit; min-width: 0; padding: 0; }
+    .header-search input::placeholder { color: var(--ink-3); }
+    .header-search-clear { width: 18px; height: 18px; border-radius: 4px; border: none; background: transparent; color: var(--ink-3); cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 0.6rem; flex-shrink: 0; padding: 0; }
+    .header-search-clear.show { display: flex; }
+    .header-search-clear:hover { background: var(--paper-2); color: var(--ink); }
+
     .h-select { background: var(--paper-soft); border: 1px solid var(--border); color: var(--ink); padding: 7px 12px; border-radius: 7px; font-size: 0.78rem; font-weight: 500; cursor: pointer; outline: none; font-family: inherit; transition: all 0.15s ease; }
     .h-select:hover { border-color: var(--border-hi); }
     .h-select:focus { border-color: var(--sage); box-shadow: 0 0 0 3px var(--sage-soft); }
@@ -59,16 +70,6 @@
     .panel-tab .tab-count { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; padding: 0 4px; border-radius: 6px; background: var(--paper-2); color: var(--ink-3); line-height: 1.4; font-weight: 500; }
     .panel-tab.active .tab-count { background: var(--sage-soft-hi); color: var(--sage); }
 
-    .search-box { display: none; align-items: center; gap: 6px; padding: 6px 10px; background: var(--paper); border: 1px solid var(--border); border-radius: 7px; margin-bottom: 8px; transition: all 0.15s ease; }
-    .search-box.show { display: flex; }
-    .search-box:focus-within { border-color: var(--sage); box-shadow: 0 0 0 3px var(--sage-soft); }
-    .search-box > i.fa-magnifying-glass { color: var(--ink-3); font-size: 0.72rem; flex-shrink: 0; }
-    .search-box input { flex: 1; border: none; background: transparent; outline: none; font-size: 0.78rem; color: var(--ink); font-family: inherit; min-width: 0; padding: 0; }
-    .search-box input::placeholder { color: var(--ink-3); }
-    .search-clear { width: 18px; height: 18px; border-radius: 4px; border: none; background: transparent; color: var(--ink-3); cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 0.6rem; flex-shrink: 0; padding: 0; }
-    .search-clear.show { display: flex; }
-    .search-clear:hover { background: var(--paper-2); color: var(--ink); }
-
     .breadcrumb { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; padding: 6px 8px; border-radius: 7px; background: var(--paper); border: 1px solid var(--border); margin-bottom: 8px; font-size: 0.72rem; min-height: 30px; transition: all 0.15s ease; }
     .breadcrumb.drag-hover { border-color: var(--sage); background: var(--sage-soft); }
     .breadcrumb-back { width: 22px; height: 22px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: var(--ink-2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0; }
@@ -82,7 +83,11 @@
     .breadcrumb-sep { color: var(--ink-3); font-size: 0.6rem; padding: 0 1px; }
 
     .subrail-body { flex: 1; overflow-y: auto; padding: 0 10px 10px; min-height: 0; }
-    .subrail-footer { padding: 10px 12px 12px; border-top: 1px solid var(--border); background: var(--paper-soft); flex-shrink: 0; display: flex; gap: 6px; }
+
+    /* === Footer: collapsed menu === */
+    .subrail-footer { padding: 8px 12px 10px; border-top: 1px solid var(--border); background: var(--paper-soft); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; }
+    .footer-row { display: flex; gap: 6px; align-items: stretch; }
+    .footer-row .subrail-hbtn { flex: 1; }
 
     .subrail-hbtn { flex: 1; min-width: 60px; padding: 9px 12px; border-radius: 8px; background: var(--paper); border: 1px solid var(--border); cursor: pointer; font-size: 0.75rem; font-weight: 500; color: var(--ink-1); display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s ease; font-family: inherit; }
     .subrail-hbtn:hover { background: var(--paper-2); color: var(--ink); border-color: var(--border-hi); }
@@ -91,6 +96,37 @@
     .subrail-hbtn.primary:hover { background: var(--sage-hi); }
     .subrail-hbtn.danger { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-border); }
     .subrail-hbtn.danger:hover { background: var(--danger); color: white; }
+    .subrail-hbtn.icon-only { flex: 0 0 auto; width: 38px; padding: 9px 0; }
+
+    /* toggle button for collapsed menu */
+    .menu-toggle { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 12px; border-radius: 8px; background: var(--paper); border: 1px solid var(--border); cursor: pointer; font-family: inherit; font-size: 0.75rem; font-weight: 500; color: var(--ink-1); transition: all 0.15s ease; width: 100%; }
+    .menu-toggle:hover { background: var(--paper-2); color: var(--ink); border-color: var(--border-hi); }
+    .menu-toggle.open { background: var(--sage-soft); color: var(--sage); border-color: var(--sage-border); }
+    .menu-toggle-left { display: flex; align-items: center; gap: 8px; }
+    .menu-toggle i.fa-sliders { font-size: 0.72rem; }
+    .menu-toggle .menu-chev { font-size: 0.6rem; color: var(--ink-3); transition: transform 0.2s ease; }
+    .menu-toggle.open .menu-chev { transform: rotate(180deg); }
+
+    .menu-panel { display: none; flex-direction: column; gap: 8px; padding: 10px; border-radius: 8px; background: var(--paper); border: 1px solid var(--border-hi); box-shadow: inset 0 1px 0 rgba(0,0,0,0.02); }
+    .menu-panel.open { display: flex; }
+
+    /* section label */
+    .menu-section-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); font-weight: 600; padding: 2px 2px 4px; }
+
+    /* sort dropdown (native select styled) */
+    .menu-select { width: 100%; padding: 7px 10px; border-radius: 7px; background: var(--paper); border: 1px solid var(--border); color: var(--ink); font-family: inherit; font-size: 0.75rem; font-weight: 500; cursor: pointer; outline: none; transition: all 0.15s ease; }
+    .menu-select:hover { border-color: var(--border-hi); background: var(--paper-2); }
+    .menu-select:focus { border-color: var(--sage); box-shadow: 0 0 0 3px var(--sage-soft); }
+    .menu-select option { background: white; color: var(--ink); }
+
+    /* gps search inside options menu */
+    .menu-gps { display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: var(--paper-soft); border: 1px solid var(--border); border-radius: 7px; transition: all 0.15s ease; }
+    .menu-gps:focus-within { border-color: var(--sage); background: white; box-shadow: 0 0 0 3px var(--sage-soft); }
+    .menu-gps > i { color: var(--ink-3); font-size: 0.72rem; flex-shrink: 0; }
+    .menu-gps input { flex: 1; border: none; background: transparent; outline: none; font-size: 0.75rem; color: var(--ink); font-family: inherit; min-width: 0; padding: 0; }
+    .menu-gps input::placeholder { color: var(--ink-3); }
+    .menu-gps-go { width: 26px; height: 26px; border-radius: 6px; border: none; background: var(--sage); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; transition: all 0.15s ease; flex-shrink: 0; }
+    .menu-gps-go:hover { background: var(--sage-hi); }
 
     .fx-row { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 7px; cursor: pointer; font-size: 0.79rem; color: var(--ink-1); transition: all 0.12s ease; border: 1px solid transparent; user-select: none; min-height: 32px; }
     .fx-row:hover { background: var(--paper); border-color: var(--border); color: var(--ink); }
@@ -202,10 +238,6 @@
 
     .reposition-ring { filter: drop-shadow(0 0 10px var(--sage-hi)) drop-shadow(0 0 20px rgba(101,163,13,0.5)); animation: repositionPulse 1.4s ease-in-out infinite; }
     @keyframes repositionPulse { 0%, 100% { filter: drop-shadow(0 0 8px var(--sage-hi)); } 50% { filter: drop-shadow(0 0 16px var(--sage-hi)) drop-shadow(0 0 28px rgba(101,163,13,0.6)); } }
-    .reposition-banner { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); background: var(--sage); color: white; padding: 10px 20px; border-radius: 100px; font-size: 0.82rem; font-weight: 500; box-shadow: 0 8px 24px rgba(77, 124, 15, 0.4); z-index: 1500; display: none; align-items: center; gap: 10px; }
-    .reposition-banner.show { display: flex; }
-    .reposition-banner button { background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 10px; border-radius: 100px; font-size: 0.72rem; cursor: pointer; font-family: inherit; font-weight: 500; }
-    .reposition-banner button:hover { background: rgba(255,255,255,0.35); }
 
     .context-menu { position: fixed; background: var(--paper); border: 1px solid var(--border-hi); border-radius: 10px; padding: 5px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18); z-index: 7000; min-width: 220px; display: none; font-size: 0.82rem; }
     .context-menu.open { display: block; }
@@ -377,6 +409,7 @@
     @media (max-width: 900px) {
         .header { padding: 8px 12px; }
         .brand span { display: none; }
+        .header-search { width: 180px; max-width: 40vw; }
         .subrail.open { width: 260px; }
         .icon-grid { grid-template-columns: repeat(6, 1fr); }
         .sheet-body { grid-template-columns: 1fr; }
@@ -392,6 +425,15 @@
             <span>Telco Earth</span>
         </div>
         <div class="header-spacer"></div>
+
+        <!-- GPS search (in header) -->
+        <div class="header-search" id="gps-search">
+            <i class="fas fa-crosshairs"></i>
+            <input type="text" id="gps-search-input" placeholder="Go to lat, lng…" autocomplete="off" title="Enter coordinates e.g. 46.5, 8.0 or 46.5N 8.0E">
+            <button class="header-search-clear" id="gps-search-clear" title="Clear"><i class="fas fa-times"></i></button>
+            <button class="header-search-go" id="gps-search-go" title="Go to coordinates"><i class="fas fa-arrow-right"></i></button>
+        </div>
+
         <div class="header-right">
             <select class="h-select" id="provider-select" title="Map provider">
                 <optgroup label="Satellite & Imagery">
@@ -441,11 +483,6 @@
                         <span class="subrail-count" id="subrail-count"></span>
                     </div>
                     <div id="panel-tabs" class="panel-tabs"></div>
-                    <div class="search-box" id="places-search-box">
-                        <i class="fas fa-magnifying-glass"></i>
-                        <input type="text" id="places-search-input" placeholder="Search all places…" autocomplete="off">
-                        <button class="search-clear" id="places-search-clear" title="Clear"><i class="fas fa-times"></i></button>
-                    </div>
                     <div id="breadcrumb" class="breadcrumb"></div>
                 </div>
                 <div class="subrail-body" id="subrail-body"></div>
@@ -462,11 +499,6 @@
                 <button class="map-tool" id="tool-measure"><i class="fas fa-ruler"></i> Measure</button>
                 <button class="map-tool" id="tool-measure-area"><i class="fas fa-vector-square"></i> Area</button>
                 <button class="map-tool" id="tool-los"><i class="fas fa-satellite-dish"></i> LOS</button>
-            </div>
-            <div class="reposition-banner" id="reposition-banner">
-                <i class="fas fa-arrows-up-down-left-right"></i>
-                <span>Drag the object to reposition</span>
-                <button id="reposition-done">Done</button>
             </div>
             <div class="elev-card hidden" id="elev-card">
                 <div class="elev-label"><i class="fas fa-mountain"></i> Elevation</div>
@@ -826,6 +858,7 @@
             let multiSelection = new Set();
             let currentFolderId = null;
             let placesSearchQuery = '';
+            let placesSortMode = 'default';
             let nextId = 1;
             function genId() { return 'node-' + Date.now() + '-' + (nextId++); }
             function findNode(id, nodes = treeNodes) {
@@ -869,6 +902,54 @@
                     parentFolder.children.push(node);
                 } else treeNodes.push(node);
                 renderTree();
+            }
+
+            // ==================== SORT NODES ====================
+            function sortNodes(nodes) {
+                if (placesSortMode === 'default' || nodes.length < 2) return nodes;
+                const sorted = nodes.slice();
+                const isFolder = n => (n.type === 'folder' || n.type === 'kml') ? 0 : 1;
+                if (placesSortMode === 'name-asc') {
+                    sorted.sort((a, b) => {
+                        const f = isFolder(a) - isFolder(b);
+                        if (f !== 0) return f;
+                        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+                    });
+                } else if (placesSortMode === 'name-desc') {
+                    sorted.sort((a, b) => {
+                        const f = isFolder(a) - isFolder(b);
+                        if (f !== 0) return f;
+                        return b.name.localeCompare(a.name, undefined, { sensitivity: 'base' });
+                    });
+                } else if (placesSortMode === 'type') {
+                    const order = { folder: 0, kml: 0, placemark: 1, path: 2, measure: 3, polygon: 4, 'measure-area': 5, los: 6, terrain: 7 };
+                    sorted.sort((a, b) => {
+                        const ao = order[a.type] ?? 99;
+                        const bo = order[b.type] ?? 99;
+                        if (ao !== bo) return ao - bo;
+                        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+                    });
+                }
+                return sorted;
+            }
+
+            // ==================== BRING TO FRONT ====================
+            let _frontZ = 1000;
+            function bringNodeToFront(node) {
+                if (!node || !node.layer) return;
+                _frontZ = _frontZ + 10;
+                if (_frontZ >= 64000) _frontZ = 1000;
+                const z = _frontZ;
+                const apply = (layer) => {
+                    if (!layer) return;
+                    if (layer instanceof L.LayerGroup) {
+                        layer.eachLayer(l => apply(l));
+                    } else {
+                        if (layer.setZIndexOffset) { try { layer.setZIndexOffset(z); } catch(e){} }
+                        if (layer.bringToFront) { try { layer.bringToFront(); } catch(e){} }
+                    }
+                };
+                apply(node.layer);
             }
 
             // ==================== PERSISTENCE ====================
@@ -920,6 +1001,7 @@
                 currentFolderId = loc && loc.parent ? loc.parent.id : null;
                 selectedNodeId = node.id;
                 multiSelection.clear();
+                bringNodeToFront(node);
                 renderTree();
                 requestAnimationFrame(() => {
                     const row = subrailBody.querySelector(`.fx-row[data-node-id="${node.id}"]`);
@@ -929,7 +1011,10 @@
 
             function bindLayerFocus(node, layer) {
                 if (!layer || !layer.on) return;
-                layer.on('click', () => focusNodeInTree(node));
+                layer.on('click', () => {
+                    bringNodeToFront(node);
+                    focusNodeInTree(node);
+                });
             }
 
             function attachLayerDrag(node, layer) {
@@ -1104,9 +1189,11 @@
             const subrail = document.getElementById('subrail');
             const breadcrumbEl = document.getElementById('breadcrumb');
             const panelTabsEl = document.getElementById('panel-tabs');
-            const searchBoxEl = document.getElementById('places-search-box');
-            const searchInputEl = document.getElementById('places-search-input');
-            const searchClearEl = document.getElementById('places-search-clear');
+            const gpsSearchInput = document.getElementById('gps-search-input');
+            const gpsSearchClear = document.getElementById('gps-search-clear');
+
+            // footer collapsed menu state (persisted in-memory)
+            let footerMenuOpen = false;
 
             const TYPE_ICONS = {
                 folder: 'fa-folder', placemark: 'fa-map-pin',
@@ -1160,11 +1247,6 @@
                 }
 
                 const searchMode = inPlacesSearch();
-                if (activeSection === 'places' && placesTab === 'places') {
-                    searchBoxEl.classList.add('show');
-                } else {
-                    searchBoxEl.classList.remove('show');
-                }
 
                 if (activeSection === 'places' && placesTab === 'places' && !searchMode) {
                     const folder = currentFolderId ? findNode(currentFolderId) : null;
@@ -1188,57 +1270,170 @@
                 breadcrumbEl.style.display = showCrumb ? '' : 'none';
                 if (showCrumb) renderBreadcrumb();
 
+                // ===== Footer (collapsed menu) =====
                 subrailFooter.innerHTML = '';
                 subrailFooter.style.display = showCrumb ? '' : 'none';
-                if (showCrumb) {
-                    if (multiSelection.size > 0) {
-                        const countLabel = document.createElement('div');
-                        countLabel.style.cssText = 'flex:1;padding:9px 12px;border-radius:8px;background:var(--sage-soft-hi);color:var(--sage);font-size:0.75rem;font-weight:600;display:flex;align-items:center;gap:6px;';
-                        countLabel.innerHTML = `<i class="fas fa-check-square"></i> ${multiSelection.size} selected`;
-                        subrailFooter.appendChild(countLabel);
+                if (!showCrumb) return;
 
-                        const editBtn = document.createElement('button');
-                        editBtn.className = 'subrail-hbtn';
-                        editBtn.style.flex = '0 0 auto';
-                        editBtn.innerHTML = '<i class="fas fa-pen"></i> Edit';
-                        editBtn.addEventListener('click', () => openBulkEditorForSelection());
-                        subrailFooter.appendChild(editBtn);
+                if (multiSelection.size > 0) {
+                    // Multi-selection actions
+                    const row = document.createElement('div');
+                    row.className = 'footer-row';
+                    const countLabel = document.createElement('div');
+                    countLabel.style.cssText = 'flex:1;padding:9px 12px;border-radius:8px;background:var(--sage-soft-hi);color:var(--sage);font-size:0.75rem;font-weight:600;display:flex;align-items:center;gap:6px;';
+                    countLabel.innerHTML = `<i class="fas fa-check-square"></i> ${multiSelection.size} selected`;
+                    row.appendChild(countLabel);
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'subrail-hbtn danger icon-only';
+                    delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                    delBtn.title = 'Delete selected';
+                    delBtn.addEventListener('click', async () => {
+                        if (!confirm(`Delete ${multiSelection.size} selected item(s)?`)) return;
+                        const ids = Array.from(multiSelection);
+                        for (const id of ids) {
+                            const n = findNode(id);
+                            if (n) await deleteNodeWithChildren(n);
+                        }
+                        multiSelection.clear();
+                        selectedNodeId = null;
+                        renderTree();
+                        await persistTree();
+                        showToast(`Deleted ${ids.length} item(s)`, 'fa-trash');
+                    });
+                    row.appendChild(delBtn);
+                    const clearBtn = document.createElement('button');
+                    clearBtn.className = 'subrail-hbtn icon-only';
+                    clearBtn.innerHTML = '<i class="fas fa-xmark"></i>';
+                    clearBtn.title = 'Clear selection';
+                    clearBtn.addEventListener('click', () => {
+                        multiSelection.clear();
+                        renderTree();
+                    });
+                    row.appendChild(clearBtn);
+                    subrailFooter.appendChild(row);
 
-                        const delBtn = document.createElement('button');
-                        delBtn.className = 'subrail-hbtn danger';
-                        delBtn.style.flex = '0 0 auto';
-                        delBtn.innerHTML = '<i class="fas fa-trash"></i>';
-                        delBtn.addEventListener('click', async () => {
-                            if (!confirm(`Delete ${multiSelection.size} selected item(s)?`)) return;
-                            const ids = Array.from(multiSelection);
-                            for (const id of ids) {
-                                const n = findNode(id);
-                                if (n) await deleteNodeWithChildren(n);
-                            }
-                            multiSelection.clear();
-                            selectedNodeId = null;
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'subrail-hbtn';
+                    editBtn.innerHTML = '<i class="fas fa-pen"></i> Edit selection';
+                    editBtn.addEventListener('click', () => openBulkEditorForSelection());
+                    subrailFooter.appendChild(editBtn);
+                    return;
+                }
+
+                // Collapsed menu: [Options ▾] trigger at bottom
+                const triggerBtn = document.createElement('button');
+                triggerBtn.className = 'menu-toggle' + (footerMenuOpen ? ' open' : '');
+                const sortLabel = (placesSortMode === 'default') ? 'Options' : 'Options · ' + sortShortLabel(placesSortMode);
+                triggerBtn.innerHTML = `
+                    <div class="menu-toggle-left"><i class="fas fa-sliders"></i><span>${sortLabel}</span></div>
+                    <i class="fas fa-chevron-down menu-chev"></i>
+                `;
+                triggerBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    footerMenuOpen = !footerMenuOpen;
+                    updateSubrailChrome();
+                });
+                subrailFooter.appendChild(triggerBtn);
+
+                if (!footerMenuOpen) return;
+
+                const menuPanel = document.createElement('div');
+                menuPanel.className = 'menu-panel open';
+
+                // --- Sort section (native select) ---
+                const sortBlock = document.createElement('div');
+                sortBlock.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+                const sortLabelEl = document.createElement('div');
+                sortLabelEl.className = 'menu-section-label';
+                sortLabelEl.textContent = 'Sort places';
+                sortBlock.appendChild(sortLabelEl);
+                const sortSelect = document.createElement('select');
+                sortSelect.className = 'menu-select';
+                const sortOptions = [
+                    { key: 'default', label: 'Default order' },
+                    { key: 'name-asc', label: 'Name (A → Z)' },
+                    { key: 'name-desc', label: 'Name (Z → A)' },
+                    { key: 'type', label: 'Type' }
+                ];
+                sortOptions.forEach(opt => {
+                    const o = document.createElement('option');
+                    o.value = opt.key;
+                    o.textContent = opt.label;
+                    if (placesSortMode === opt.key) o.selected = true;
+                    sortSelect.appendChild(o);
+                });
+                sortSelect.addEventListener('change', (e) => {
+                    placesSortMode = e.target.value;
+                    updateSubrailChrome();
+                    if (activeSection === 'places' && placesTab === 'places') renderPlacesSection();
+                });
+                sortBlock.appendChild(sortSelect);
+                menuPanel.appendChild(sortBlock);
+
+                // --- Places search section ---
+                const searchBlock = document.createElement('div');
+                searchBlock.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+                const searchLabelEl = document.createElement('div');
+                searchLabelEl.className = 'menu-section-label';
+                searchLabelEl.textContent = 'Search places';
+                searchBlock.appendChild(searchLabelEl);
+                const searchRow = document.createElement('div');
+                searchRow.className = 'menu-gps';
+                searchRow.innerHTML = `
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="menu-places-input" placeholder="Search all places…" autocomplete="off">
+                    <button class="menu-gps-go" id="menu-places-clear" title="Clear" style="background:var(--paper-2);color:var(--ink-2);"><i class="fas fa-times"></i></button>
+                `;
+                searchBlock.appendChild(searchRow);
+                menuPanel.appendChild(searchBlock);
+
+                // --- Import ---
+                const importBtn = document.createElement('button');
+                importBtn.className = 'subrail-hbtn primary';
+                importBtn.style.width = '100%';
+                importBtn.innerHTML = '<i class="fas fa-file-import"></i> Import';
+                importBtn.addEventListener('click', () => openImportScreen(currentFolderId));
+                menuPanel.appendChild(importBtn);
+
+                subrailFooter.appendChild(menuPanel);
+
+                // Wire up places search inside the menu
+                const placesInput = menuPanel.querySelector('#menu-places-input');
+                const placesClear = menuPanel.querySelector('#menu-places-clear');
+                if (placesInput) {
+                    placesInput.value = placesSearchQuery || '';
+                    placesInput.addEventListener('input', () => {
+                        placesSearchQuery = placesInput.value;
+                        if (activeSection === 'places' && placesTab === 'places') renderTree();
+                    });
+                    placesInput.addEventListener('focus', () => {
+                        if (activeSection !== 'places' || placesTab !== 'places') {
+                            activeSection = 'places';
+                            placesTab = 'places';
+                            document.querySelectorAll('.rail-btn[data-subrail]').forEach(b => {
+                                b.classList.toggle('active', b.dataset.subrail === 'places');
+                            });
+                            subrail.classList.add('open');
                             renderTree();
-                            await persistTree();
-                            showToast(`Deleted ${ids.length} item(s)`, 'fa-trash');
-                        });
-                        subrailFooter.appendChild(delBtn);
+                        }
+                    });
+                }
+                if (placesClear) {
+                    placesClear.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        placesSearchQuery = '';
+                        if (placesInput) placesInput.value = '';
+                        if (activeSection === 'places' && placesTab === 'places') renderTree();
+                    });
+                }
+            }
 
-                        const clearBtn = document.createElement('button');
-                        clearBtn.className = 'subrail-hbtn';
-                        clearBtn.style.flex = '0 0 auto';
-                        clearBtn.innerHTML = '<i class="fas fa-xmark"></i>';
-                        clearBtn.addEventListener('click', () => {
-                            multiSelection.clear();
-                            renderTree();
-                        });
-                        subrailFooter.appendChild(clearBtn);
-                    } else {
-                        const importBtn = document.createElement('button');
-                        importBtn.className = 'subrail-hbtn primary';
-                        importBtn.innerHTML = '<i class="fas fa-file-import"></i> Import';
-                        importBtn.addEventListener('click', () => openImportScreen(currentFolderId));
-                        subrailFooter.appendChild(importBtn);
-                    }
+            function sortShortLabel(mode) {
+                switch (mode) {
+                    case 'name-asc': return 'A→Z';
+                    case 'name-desc': return 'Z→A';
+                    case 'type': return 'Type';
+                    default: return 'Sort';
                 }
             }
 
@@ -1369,9 +1564,10 @@
                 if (inPlacesSearch()) { renderSearchResults(); return; }
 
                 const folder = currentFolderId ? findNode(currentFolderId) : null;
-                const nodes = (folder ? (folder.children || []) : treeNodes).filter(n => {
+                const rawNodes = (folder ? (folder.children || []) : treeNodes).filter(n => {
                     return !(n.name === 'Terrain (HGT)' || n.type === 'terrain');
                 });
+                const nodes = sortNodes(rawNodes);
 
                 subrailBody.innerHTML = '';
 
@@ -1507,8 +1703,8 @@
                     }
 
                     placesSearchQuery = '';
-                    if (searchInputEl) searchInputEl.value = '';
-                    if (searchClearEl) searchClearEl.classList.remove('show');
+                    if (gpsSearchInput) gpsSearchInput.value = '';
+                    if (gpsSearchClear) gpsSearchClear.classList.remove('show');
 
                     if (node.type === 'folder' || node.type === 'kml') {
                         currentFolderId = node.id;
@@ -1521,10 +1717,17 @@
                     multiSelection.clear();
                     renderTree();
                     if (node.type !== 'folder' && node.type !== 'kml') {
+                        bringNodeToFront(node);
                         if (editorState) openEditorPanel(node, editorState.activeTab);
                         else openEditorPanel(node);
                         setTimeout(() => zoomToNode(node), 120);
                     }
+                });
+
+                row.addEventListener('dblclick', (e) => {
+                    if (e.target.closest('.fx-vis')) return;
+                    e.stopPropagation();
+                    zoomToNode(node);
                 });
 
                 row.addEventListener('contextmenu', (e) => {
@@ -1539,20 +1742,6 @@
 
                 return row;
             }
-
-            searchInputEl.addEventListener('input', () => {
-                placesSearchQuery = searchInputEl.value;
-                if (placesSearchQuery.trim()) searchClearEl.classList.add('show');
-                else searchClearEl.classList.remove('show');
-                if (activeSection === 'places' && placesTab === 'places') renderTree();
-            });
-            searchClearEl.addEventListener('click', () => {
-                placesSearchQuery = '';
-                searchInputEl.value = '';
-                searchClearEl.classList.remove('show');
-                searchInputEl.focus();
-                if (activeSection === 'places' && placesTab === 'places') renderTree();
-            });
 
             // ==================== DRAG HELPERS ====================
             let dragLineEl = null;
@@ -1585,7 +1774,7 @@
                 if (multiSelection.has(node.id)) row.classList.add('multi-selected');
                 if (node.visible === false) row.classList.add('hidden-item');
                 row.dataset.nodeId = node.id;
-                row.draggable = true;
+                row.draggable = (placesSortMode === 'default');
 
                 const icon = document.createElement('div');
                 icon.className = 'fx-icon';
@@ -1662,12 +1851,19 @@
                         currentFolderId = node.id;
                         renderTree();
                     } else {
+                        bringNodeToFront(node);
                         renderTree();
                         if (editorState) openEditorPanel(node, editorState.activeTab);
                         else if (node.layer && node.layer.openPopup) {
                             try { node.layer.openPopup(); } catch(e){}
                         }
                     }
+                });
+
+                row.addEventListener('dblclick', (e) => {
+                    if (e.target.closest('.fx-vis')) return;
+                    e.stopPropagation();
+                    zoomToNode(node);
                 });
 
                 row.addEventListener('contextmenu', (e) => {
@@ -1681,6 +1877,7 @@
                 });
 
                 row.addEventListener('dragstart', (e) => {
+                    if (!row.draggable) { e.preventDefault(); return; }
                     e.stopPropagation();
                     e.dataTransfer.setData('text/plain', node.id);
                     e.dataTransfer.effectAllowed = 'move';
@@ -1693,6 +1890,7 @@
                     hideDragLine();
                 });
                 row.addEventListener('dragover', (e) => {
+                    if (!row.draggable) return;
                     e.preventDefault();
                     e.stopPropagation();
                     const draggedId = e.dataTransfer.getData('text/plain') || getDraggingId();
@@ -1918,7 +2116,7 @@
                 const items = [];
                 items.push({ label: 'Edit…', icon: 'fa-pen', action: () => openEditorPanel(node) });
                 items.push({ label: 'Zoom to', icon: 'fa-crosshairs', action: () => zoomToNode(node) });
-                items.push({ label: 'Reposition on map', icon: 'fa-arrows-up-down-left-right', action: () => startReposition(node) });
+                // Note: "Reposition on map" removed — drag is available in the editor
                 items.push({ sep: true });
                 if (node.visible === false) {
                     items.push({ label: 'Show', icon: 'fa-eye', action: async () => { setNodeVisible(node, true); renderTree(); await persistTree(); }});
@@ -2301,7 +2499,6 @@
             function renderStaticSection(section) {
                 subrailFooter.style.display = 'none';
                 breadcrumbEl.style.display = 'none';
-                searchBoxEl.classList.remove('show');
                 if (section === 'draw') {
                     const items = [
                         { icon: 'fa-map-pin', label: 'Add placemark', desc: 'Click map to place a marker', action: () => beginDraw('placemark') },
@@ -2598,65 +2795,7 @@
                 }
             }
 
-            // ==================== REPOSITION ====================
-            let repositionState = null;
-            function startReposition(node) {
-                if (repositionState) endReposition();
-                repositionState = { node };
-                document.getElementById('reposition-banner').classList.add('show');
-                (function applyRing(n) {
-                    if (n.layer && n.layer.getElement && n.layer.getElement()) n.layer.getElement().classList.add('reposition-ring');
-                    if (n.children) n.children.forEach(applyRing);
-                })(node);
-                (function enableDrag(n) {
-                    if (n.type === 'placemark' && n.layer && n.layer.dragging) {
-                        n.layer.dragging.enable();
-                        n.layer.on('dragend', onRepositionDragEnd);
-                    } else if ((n.type === 'path' || n.type === 'polygon' || n.type === 'measure' || n.type === 'measure-area') && n.layer) {
-                        const bounds = n.layer.getBounds();
-                        if (bounds && bounds.isValid()) {
-                            const hitbox = L.rectangle(bounds, { color: 'transparent', fillColor: 'transparent', interactive: true, className: 'reposition-ring' }).addTo(map);
-                            n._repositionHitbox = hitbox;
-                            let dragStart = null;
-                            hitbox.on('mousedown', (ev) => {
-                                L.DomEvent.stopPropagation(ev);
-                                dragStart = { latlng: ev.latlng };
-                                map.dragging.disable();
-                                map.on('mousemove', onMove);
-                                map.on('mouseup', onUp);
-                            });
-                            function onMove(ev) {
-                                if (!dragStart) return;
-                                const dLat = ev.latlng.lat - dragStart.latlng.lat;
-                                const dLng = ev.latlng.lng - dragStart.latlng.lng;
-                                moveLayerBy(n, dLat, dLng);
-                                dragStart.latlng = ev.latlng;
-                                hitbox.setBounds(n.layer.getBounds());
-                            }
-                            function onUp() {
-                                dragStart = null;
-                                map.dragging.enable();
-                                map.off('mousemove', onMove);
-                                map.off('mouseup', onUp);
-                            }
-                        }
-                    } else if (n.type === 'los' && n.layer) {
-                        const centerMarker = L.marker([n.meta.lat, n.meta.lng], {
-                            icon: L.divIcon({ className: 'vertex-marker', iconSize: [14, 14] }),
-                            draggable: true, zIndexOffset: 1000
-                        }).addTo(map);
-                        n._losRepositionMarker = centerMarker;
-                        centerMarker.on('drag', (ev) => {
-                            const ll = ev.target.getLatLng();
-                            n.meta.lat = ll.lat;
-                            n.meta.lng = ll.lng;
-                            rebuildLOSLayer(n);
-                        });
-                    }
-                    if (n.children) n.children.forEach(enableDrag);
-                })(node);
-                showToast('Drag to reposition · click Done when finished', 'fa-arrows-up-down-left-right');
-            }
+            // ==================== MOVE ====================
             function moveLayerBy(node, dLat, dLng) {
                 if (node.type === 'placemark' && node.layer) {
                     const ll = node.layer.getLatLng();
@@ -2674,36 +2813,6 @@
                 }
                 if (node.children) node.children.forEach(c => moveLayerBy(c, dLat, dLng));
             }
-            function onRepositionDragEnd() {}
-            async function endReposition() {
-                if (!repositionState) return;
-                const node = repositionState.node;
-                (function teardown(n) {
-                    if (n.type === 'placemark' && n.layer && n.layer.dragging) {
-                        n.layer.dragging.disable();
-                        n.layer.off('dragend', onRepositionDragEnd);
-                    }
-                    if (n._repositionHitbox) { map.removeLayer(n._repositionHitbox); n._repositionHitbox = null; }
-                    if (n._losRepositionMarker) { map.removeLayer(n._losRepositionMarker); n._losRepositionMarker = null; }
-                    if (n.layer && n.layer.getElement && n.layer.getElement()) n.layer.getElement().classList.remove('reposition-ring');
-                    if (n.children) n.children.forEach(teardown);
-                })(node);
-                (function refreshMeta(n) {
-                    if ((n.type === 'path' || n.type === 'polygon' || n.type === 'measure' || n.type === 'measure-area') && n.layer) {
-                        let lls = n.layer.getLatLngs();
-                        if (Array.isArray(lls[0])) lls = lls[0];
-                        n.meta.points = lls.map(p => [p.lat, p.lng]);
-                    }
-                    if (n.children) n.children.forEach(refreshMeta);
-                })(node);
-                document.getElementById('reposition-banner').classList.remove('show');
-                repositionState = null;
-                renderTree();
-                await persistTree();
-                showToast('Reposition saved', 'fa-check');
-            }
-            document.getElementById('reposition-done').addEventListener('click', endReposition);
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && repositionState) endReposition(); });
 
             // ==================== RAIL ====================
             const railBtns = document.querySelectorAll('.rail-btn[data-subrail]');
@@ -2781,6 +2890,8 @@
 
             function openEditorPanel(node, startTab) {
                 if (editorState) closeEditorPanel();
+                bringNodeToFront(node);
+
                 const isShape = ['path','measure','polygon','measure-area'].includes(node.type);
                 const isLOS = node.type === 'los';
                 const isPlacemark = node.type === 'placemark';
@@ -3987,17 +4098,33 @@
                     const title = document.getElementById('modal-title');
                     const body = document.getElementById('modal-body');
                     const actions = document.getElementById('modal-actions');
+                    const showCoords = (node.type === 'placemark' || node.type === 'los') && node.meta.lat != null && node.meta.lng != null;
+
                     title.innerHTML = `<i class="fas ${TYPE_ICONS[node.type] || 'fa-pen'}"></i> New ${node.type}`;
+                    const coordHTML = showCoords ? `
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+                            <div>
+                                <label>Latitude</label>
+                                <input type="text" id="nn-lat" value="${Number(node.meta.lat).toFixed(6)}">
+                            </div>
+                            <div>
+                                <label>Longitude</label>
+                                <input type="text" id="nn-lng" value="${Number(node.meta.lng).toFixed(6)}">
+                            </div>
+                        </div>
+                    ` : '';
                     body.innerHTML = `
                         <label>Name</label><input type="text" id="nn-name" value="${escapeHtml(node.name)}" placeholder="Enter name…">
+                        ${coordHTML}
                         <label>Description</label><textarea id="nn-desc" rows="3" placeholder="Optional description…">${escapeHtml(node.meta.desc || '')}</textarea>
                     `;
                     actions.innerHTML = `
                         <button class="btn btn-secondary" id="nn-cancel">Cancel</button>
                         <button class="btn btn-primary" id="nn-ok">Create</button>
                     `;
-                    body.querySelector('#nn-name').focus();
-                    body.querySelector('#nn-name').select();
+                    const nameField = body.querySelector('#nn-name');
+                    nameField.focus();
+                    nameField.select();
                     const cleanup = () => {
                         modal.classList.remove('open');
                         body.innerHTML = '';
@@ -4006,8 +4133,33 @@
                     const finish = () => {
                         const name = body.querySelector('#nn-name').value.trim() || 'Untitled';
                         const desc = body.querySelector('#nn-desc').value.trim();
+                        let finalLat, finalLng;
+                        if (showCoords) {
+                            const latEl = body.querySelector('#nn-lat');
+                            const lngEl = body.querySelector('#nn-lng');
+                            const newLat = parseFloat(latEl.value);
+                            const newLng = parseFloat(lngEl.value);
+                            if (isNaN(newLat) || newLat < -90 || newLat > 90) {
+                                showToast('Invalid latitude (must be -90 to 90)', 'fa-exclamation-circle');
+                                latEl.focus(); latEl.select();
+                                return;
+                            }
+                            if (isNaN(newLng) || newLng < -180 || newLng > 180) {
+                                showToast('Invalid longitude (must be -180 to 180)', 'fa-exclamation-circle');
+                                lngEl.focus(); lngEl.select();
+                                return;
+                            }
+                            finalLat = newLat;
+                            finalLng = newLng;
+                        }
                         cleanup();
-                        resolve({ name, desc, color: node.meta.color || '#4d7c0f', icon: DEFAULT_ICON });
+                        resolve({
+                            name, desc,
+                            lat: finalLat,
+                            lng: finalLng,
+                            color: node.meta.color || '#4d7c0f',
+                            icon: DEFAULT_ICON
+                        });
                     };
                     document.getElementById('nn-ok').addEventListener('click', finish);
                     document.getElementById('nn-cancel').addEventListener('click', () => { cleanup(); resolve(null); });
@@ -4290,7 +4442,6 @@
                             const latlngs = verts.map(v => [v.lat, v.lng]);
                             const dist = pathDistance(latlngs.map(p => L.latLng(p[0], p[1])));
                             const name = (key === '__all__') ? `Path ${pathCount + 1}` : key;
-                            // Description is taken from the first row of the group only.
                             const desc = verts[0].desc || '';
                             const line = L.polyline(latlngs, { color: '#4d7c0f', weight: 3 });
                             line.bindPopup(`<b>${escapeHtml(name)}</b><br>Length: ${formatDistance(dist)}${desc ? '<br>' + escapeHtml(desc) : ''}`);
@@ -4367,7 +4518,6 @@
             }
             function beginDraw(type) {
                 cancelActiveDraw();
-                if (repositionState) endReposition();
                 drawState = { type, points: [], tempLayer: null, lastClickTime: 0 };
                 clearDrawModeUI();
                 const btn = document.getElementById(type === 'placemark' ? 'tool-placemark' : type === 'path' ? 'tool-path' : type === 'polygon' ? 'tool-polygon' : type === 'measure' ? 'tool-measure' : type === 'measure-area' ? 'tool-measure-area' : '');
@@ -4492,10 +4642,12 @@
                     hideSnapPreview();
                     refreshSnapZoneMode();
                     if (!result) return;
-                    const marker = L.marker(latlng, { icon: makeLeafletIcon(result.icon || DEFAULT_ICON, result.color) });
+                    const finalLat = (result.lat !== undefined && result.lat !== null) ? result.lat : latlng.lat;
+                    const finalLng = (result.lng !== undefined && result.lng !== null) ? result.lng : latlng.lng;
+                    const marker = L.marker([finalLat, finalLng], { icon: makeLeafletIcon(result.icon || DEFAULT_ICON, result.color) });
                     marker.bindPopup(`<b>${escapeHtml(result.name)}</b>${result.desc ? '<br>' + escapeHtml(result.desc) : ''}`);
                     drawnItems.addLayer(marker);
-                    const n = createNode({ type: 'placemark', name: result.name, layer: marker, meta: { desc: result.desc, lat: latlng.lat, lng: latlng.lng, icon: result.icon || DEFAULT_ICON, color: result.color } });
+                    const n = createNode({ type: 'placemark', name: result.name, layer: marker, meta: { desc: result.desc, lat: finalLat, lng: finalLng, icon: result.icon || DEFAULT_ICON, color: result.color } });
                     bindLayerFocus(n, marker);
                     attachLayerDrag(n, marker);
                     if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
@@ -4566,7 +4718,6 @@
             // ==================== LOS ====================
             function beginLOS() {
                 cancelActiveDraw();
-                if (repositionState) endReposition();
                 clearDrawModeUI();
                 const btn = document.getElementById('tool-los');
                 if (btn) btn.classList.add('active');
@@ -4582,9 +4733,11 @@
                         meta: { lat: latlng.lat, lng: latlng.lng, radius: 10000, numLines: 36, centerHeight: 30, targetHeight: 2, contourInterval: 500, color: '#ea580c', desc: '' }
                     });
                     if (!result) return;
+                    const finalLat = (result.lat !== undefined && result.lat !== null) ? result.lat : latlng.lat;
+                    const finalLng = (result.lng !== undefined && result.lng !== null) ? result.lng : latlng.lng;
                     const node = createNode({
                         type: 'los', name: result.name,
-                        meta: { lat: latlng.lat, lng: latlng.lng, radius: 10000, numLines: 36, centerHeight: 30, targetHeight: 2, contourInterval: 500, color: result.color || '#ea580c', desc: result.desc }
+                        meta: { lat: finalLat, lng: finalLng, radius: 10000, numLines: 36, centerHeight: 30, targetHeight: 2, contourInterval: 500, color: result.color || '#ea580c', desc: result.desc }
                     });
                     const layers = buildLOSLayers(node);
                     node.layer = L.layerGroup(layers);
@@ -5647,6 +5800,76 @@
             document.addEventListener('keydown', (e) => {
                 if ((e.key === 'l' || e.key === 'L') && !e.target.matches('input, textarea')) locateMe();
             });
+
+            // ==================== GPS COORDINATE PARSER ====================
+            function parseCoordString(str) {
+                if (!str) return null;
+                str = String(str).trim();
+                if (!str) return null;
+                const upper = str.toUpperCase();
+                const nsMatch = upper.match(/(-?\d+(?:\.\d+)?)\s*°?\s*([NS])/);
+                const ewMatch = upper.match(/(-?\d+(?:\.\d+)?)\s*°?\s*([EW])/);
+                if (nsMatch && ewMatch) {
+                    let lat = parseFloat(nsMatch[1]);
+                    let lng = parseFloat(ewMatch[1]);
+                    if (nsMatch[2] === 'S') lat = -Math.abs(lat);
+                    if (ewMatch[2] === 'W') lng = -Math.abs(lng);
+                    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+                }
+                const parts = str.split(/[,;\s]+/).filter(p => p.length > 0);
+                if (parts.length < 2) return null;
+                const lat = parseFloat(parts[0]);
+                const lng = parseFloat(parts[1]);
+                if (isNaN(lat) || isNaN(lng)) return null;
+                if (lat < -90 || lat > 90) return null;
+                if (lng < -180 || lng > 180) return null;
+                return { lat, lng };
+            }
+            function goToCoords(coord) {
+                const zoom = Math.max(map.getZoom(), 14);
+                map.flyTo([coord.lat, coord.lng], zoom, { duration: 1.2 });
+                const flash = L.circleMarker([coord.lat, coord.lng], {
+                    radius: 12, color: '#4d7c0f', weight: 3,
+                    fillColor: '#65a30d', fillOpacity: 0.35, interactive: false
+                }).addTo(map);
+                let ticks = 0;
+                const timer = setInterval(() => {
+                    ticks++;
+                    flash.setStyle({ opacity: Math.max(0, 1 - ticks * 0.15), fillOpacity: Math.max(0, 0.35 - ticks * 0.05) });
+                    if (ticks >= 7) { clearInterval(timer); map.removeLayer(flash); }
+                }, 200);
+                showToast(`Go to ${coord.lat.toFixed(5)}, ${coord.lng.toFixed(5)}`, 'fa-crosshairs');
+            }
+            (function initGPSSearch() {
+                const gpsInput = document.getElementById('gps-search-input');
+                const gpsBtn = document.getElementById('gps-search-go');
+                const gpsClear = document.getElementById('gps-search-clear');
+                if (!gpsInput || !gpsBtn) return;
+                const submit = () => {
+                    const coord = parseCoordString(gpsInput.value);
+                    if (!coord) {
+                        showToast('Invalid coordinates. Try "46.5, 8.0"', 'fa-exclamation-circle');
+                        return;
+                    }
+                    goToCoords(coord);
+                };
+                gpsInput.addEventListener('input', () => {
+                    if (gpsInput.value.trim()) gpsClear.classList.add('show');
+                    else gpsClear.classList.remove('show');
+                });
+                gpsInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); submit(); }
+                    else if (e.key === 'Escape') { gpsInput.value = ''; gpsClear.classList.remove('show'); gpsInput.blur(); }
+                });
+                gpsBtn.addEventListener('click', submit);
+                if (gpsClear) {
+                    gpsClear.addEventListener('click', () => {
+                        gpsInput.value = '';
+                        gpsClear.classList.remove('show');
+                        gpsInput.focus();
+                    });
+                }
+            })();
 
             // ==================== FIT TO PLACES ====================
             function fitToPlacesExtent() {
