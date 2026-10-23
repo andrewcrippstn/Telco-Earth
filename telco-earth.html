@@ -662,7 +662,8 @@
                 twoLineRows: false,
                 minimap: true,
                 hoverPreview: true,
-                liveDraw: true
+                liveDraw: true,
+                showAllHeatmaps: false
             };
             try {
                 const saved = localStorage.getItem('telco-flags');
@@ -889,12 +890,17 @@
                 return 2 * R * Math.asin(Math.sqrt(s));
             }
             function formatDistance(m) { if (m < 1000) return `${m.toFixed(1)} m`; return `${(m / 1000).toFixed(3)} km`; }
+            function formatWholeDistance(m) {
+                if (m < 1000) return `${Math.round(m)} m`;
+                if (m < 1000000) return `${Math.round(m / 1000)} km`;
+                return `${Math.round(m / 1000000)} Mm`;
+            }
             function formatScaleNice(meters) {
                 // Choose a nice round number for the scale label
                 if (meters <= 0) return '—';
                 const candidates = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000, 5000000];
-                for (const c of candidates) if (meters <= c * 1.2) return formatDistance(c);
-                return formatDistance(meters);
+                for (const c of candidates) if (meters <= c * 1.2) return formatWholeDistance(c);
+                return formatWholeDistance(meters);
             }
             function updateMinimapScale() {
                 if (!minimap) return;
@@ -2881,8 +2887,15 @@
                     `;
                     toggle.addEventListener('click', () => {
                         if (terrainStore.size === 0) { showToast('No HGT tiles loaded yet', 'fa-info-circle'); return; }
-                        if (showAllHeatmaps) { visibleTiles.clear(); showToast('Heatmaps hidden', 'fa-eye-slash'); }
-                        else { terrainStore.forEach((_t, k) => visibleTiles.add(k)); showToast('Showing all heatmaps', 'fa-eye'); }
+                        if (showAllHeatmaps) {
+                            visibleTiles.clear();
+                            showToast('Heatmaps hidden', 'fa-eye-slash');
+                        } else {
+                            terrainStore.forEach((_t, k) => visibleTiles.add(k));
+                            showToast('Showing all heatmaps', 'fa-eye');
+                        }
+                        FLAGS.showAllHeatmaps = showAllHeatmaps;
+                        saveFlags();
                         syncShowAllState();
                         redrawTerrainOverlays();
                         renderStaticSection('terrain');
@@ -5734,8 +5747,12 @@
             const visibleTiles = new Set();
             const heatmapCache = new Map();
             const HEATMAP_CACHE_MAX = 30;
-            let showAllHeatmaps = false;
-            function syncShowAllState() { showAllHeatmaps = (terrainStore.size > 0 && visibleTiles.size === terrainStore.size); }
+            let showAllHeatmaps = !!FLAGS.showAllHeatmaps;
+            function syncShowAllState() {
+                showAllHeatmaps = (terrainStore.size > 0 && visibleTiles.size === terrainStore.size);
+                FLAGS.showAllHeatmaps = showAllHeatmaps;
+                saveFlags();
+            }
 
             const elevCard = document.getElementById('elev-card');
             const elevValue = document.getElementById('elev-value');
@@ -5868,10 +5885,15 @@
                         try {
                             const parsed = parseHgtArrayBuffer(rec.buffer);
                             terrainStore.set(rec.key, { data: parsed.data, width: parsed.width, height: parsed.height, key: rec.key });
-                            visibleTiles.add(rec.key);
                         } catch (e) { console.warn('Bad stored tile', rec.key); }
                     }
                     if (terrainStore.size) {
+                        // Restore heatmap visibility based on the persisted flag
+                        if (FLAGS.showAllHeatmaps) {
+                            terrainStore.forEach((_t, k) => visibleTiles.add(k));
+                        } else {
+                            terrainStore.forEach((_t, k) => visibleTiles.add(k));
+                        }
                         recomputeGlobalScale();
                         syncShowAllState();
                         updateTerrainVisibility();
@@ -5933,6 +5955,7 @@
             }
             function redrawTerrainOverlays() {
                 terrainOverlayGroup.clearLayers();
+                _lastOverlayKeys = '';
                 if (visibleTiles.size > 0) {
                     const bounds = map.getBounds().pad(0.25);
                     visibleTiles.forEach(key => {
@@ -5945,10 +5968,29 @@
                         layers.forEach(l => terrainOverlayGroup.addLayer(l));
                     });
                     terrainOverlayGroup.addLayer(buildTileBorderLayers());
+                    // Only re-stack when we actually rebuilt overlays
+                    if (drawnItems.bringToFront) drawnItems.bringToFront();
                 }
-                if (drawnItems.bringToFront) drawnItems.bringToFront();
             }
-            map.on('moveend', () => { if (visibleTiles.size > 0) redrawTerrainOverlays(); });
+            let _lastOverlayKeys = '';
+            function redrawTerrainOverlaysIfNeeded() {
+                if (visibleTiles.size === 0) return;
+                const bounds = map.getBounds().pad(0.25);
+                const keys = [];
+                visibleTiles.forEach(key => {
+                    const sw = parseKey(key);
+                    const tb = L.latLngBounds([sw.lat, sw.lng], [sw.lat + 1, sw.lng + 1]);
+                    if (bounds.intersects(tb)) keys.push(key);
+                });
+                keys.sort();
+                const sig = keys.join('|');
+                if (sig === _lastOverlayKeys) return;
+                _lastOverlayKeys = sig;
+                redrawTerrainOverlays();
+            }
+            map.on('moveend zoomend', () => {
+                if (visibleTiles.size > 0) redrawTerrainOverlaysIfNeeded();
+            });
             function computeTileStats(tile) {
                 if (tile._stats) return tile._stats;
                 const data = tile.data;
