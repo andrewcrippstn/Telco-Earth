@@ -98,7 +98,6 @@
     .places-search-row .sr-clear { width: 20px; height: 20px; border-radius: 4px; border: none; background: transparent; color: var(--ink-3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; flex-shrink: 0; padding: 0; }
     .places-search-row .sr-clear:hover { background: var(--paper-2); color: var(--ink); }
 
-    /* Sort popover */
     .sort-popover { position: fixed; background: var(--paper); border: 1px solid var(--border-hi); border-radius: 10px; padding: 5px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15); z-index: 7000; min-width: 200px; display: none; font-size: 0.8rem; }
     .sort-popover.open { display: block; }
     .sort-popover .sp-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); padding: 6px 10px 4px; font-weight: 600; }
@@ -111,7 +110,6 @@
     .sort-popover .sp-apply { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 6px; background: var(--sage-soft); color: var(--sage); border: 1px solid var(--sage-border); cursor: pointer; font-family: inherit; font-size: 0.72rem; font-weight: 500; width: 100%; justify-content: center; margin-top: 4px; }
     .sort-popover .sp-apply:hover { background: var(--sage); color: white; }
 
-    /* Options cog popover (now in header) */
     .opts-popover { position: fixed; background: var(--paper); border: 1px solid var(--border-hi); border-radius: 10px; padding: 8px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15); z-index: 7000; min-width: 240px; display: none; }
     .opts-popover.open { display: block; }
     .opts-popover .fp-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); padding: 4px 6px 6px; font-weight: 600; }
@@ -228,11 +226,8 @@
 
     .map-area { flex: 1; position: relative; overflow: hidden; background: var(--paper); display: flex; flex-direction: column; }
     #map { position: absolute; inset: 0; z-index: 1; }
-
-    /* No zoom control anymore */
     .leaflet-control-zoom { display: none !important; }
 
-    /* Minimap: scale bar sits ON TOP of minimap as a header */
     .minimap-wrap { position: absolute; bottom: 20px; left: 20px; width: 160px; z-index: 500; transition: all 0.2s ease; }
     .minimap-wrap.hidden { display: none; }
     .minimap-header { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; background: rgba(255,255,255,0.96); border: 1px solid var(--border-hi); border-bottom: none; border-radius: 8px 8px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--ink-2); }
@@ -241,14 +236,14 @@
     .minimap-header .mm-close:hover { background: var(--paper-2); color: var(--ink); }
     .minimap-body { width: 160px; height: 120px; background: rgba(255,255,255,0.96); border: 1px solid var(--border-hi); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.12); position: relative; }
     #minimap { width: 100%; height: 100%; background: var(--paper-2); cursor: pointer; }
-
-    /* Hide default leaflet scale */
     .leaflet-control-scale { display: none !important; }
 
     .draw-status { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); padding: 8px 16px; background: var(--sage); color: white; border-radius: 100px; font-size: 0.75rem; font-weight: 500; box-shadow: 0 8px 24px rgba(77,124,15,0.4); z-index: 1500; display: none; align-items: center; gap: 10px; }
     .draw-status.show { display: flex; }
     .draw-status button { background: rgba(255,255,255,0.2); border: none; color: white; padding: 3px 10px; border-radius: 100px; font-size: 0.7rem; cursor: pointer; font-family: inherit; font-weight: 500; }
     .draw-status button:hover { background: rgba(255,255,255,0.35); }
+    .draw-status button#draw-status-finish { background: rgba(255, 255, 255, 0.35); font-weight: 600; }
+    .draw-status button#draw-status-finish:hover { background: rgba(255, 255, 255, 0.55); }
 
     .draw-badge { position: absolute; padding: 6px 12px; background: var(--ink); color: white; border-radius: 100px; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; font-weight: 500; z-index: 1400; display: none; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.25); white-space: nowrap; }
     .draw-badge.show { display: block; }
@@ -538,7 +533,13 @@
             <div class="draw-status" id="draw-status">
                 <i class="fas fa-pen-ruler"></i>
                 <span id="draw-status-text">Drawing</span>
+                <button id="draw-status-finish" style="display:none;">Finish</button>
                 <button id="draw-status-cancel">Cancel</button>
+            </div>
+            <div class="draw-status" id="los-tracking-hint" style="background: var(--los);">
+                <i class="fas fa-mouse-pointer"></i>
+                <span>Move mouse to preview · click to persist P2P</span>
+                <button id="los-tracking-cancel">Cancel</button>
             </div>
             <div class="draw-badge" id="draw-badge"></div>
             <div class="elev-card hidden" id="elev-card">
@@ -654,6 +655,8 @@
     <div class="rail-tooltip" id="rail-tooltip"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
     <script>
         (function() {
             'use strict';
@@ -720,6 +723,30 @@
                 navigator.clipboard.writeText(text)
                     .then(() => showToast((label || 'Copied') + ' to clipboard', 'fa-copy'))
                     .catch(() => showToast('Copy failed', 'fa-times'));
+            }
+
+            // ==================== COPY BUTTON HELPERS (XSS-safe) ====================
+            let _copyBtnSeq = 0;
+            window.__copyRegistry = window.__copyRegistry || {};
+            function copyBtnFor(text) {
+                const id = 'cpbtn-' + (_copyBtnSeq++);
+                window.__copyRegistry[id] = String(text);
+                return `<button class="copy-btn" data-copy-id="${id}" title="Copy" aria-label="Copy"><i class="fas fa-copy"></i></button>`;
+            }
+            function wireCopyButtons(root) {
+                (root || document).querySelectorAll('[data-copy-id]').forEach(btn => {
+                    if (btn.__copyWired) return;
+                    btn.__copyWired = true;
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const txt = window.__copyRegistry[btn.dataset.copyId];
+                        if (txt == null) return;
+                        copyToClipboard(txt, 'Value');
+                        btn.style.background = 'var(--sage-soft)';
+                        btn.style.color = 'var(--sage)';
+                        setTimeout(() => { btn.style.background = ''; btn.style.color = ''; }, 600);
+                    });
+                });
             }
 
             // ==================== APP SETTINGS ====================
@@ -847,7 +874,7 @@
             });
             function cachedTileLayer(url, options) { return new CachedTileLayer(url, options); }
 
-            // ==================== MAP (no zoom control) ====================
+            // ==================== MAP ====================
             const map = L.map('map', {
                 center: [46.5, 8.0], zoom: 6,
                 zoomControl: false, attributionControl: true,
@@ -874,13 +901,7 @@
             });
             map.on('mouseout', () => { mouseTracker.latlng = null; mouseTracker.containerPoint = null; });
 
-            // ==================== MINIMAP (with scale bar in header) ====================
-            let minimap = null;
-            let minimapViewportRect = null;
-            let minimapDots = null;
-            const mmScaleEl = document.getElementById('mm-scale');
-
-            // Distance between two latlngs
+            // ==================== DISTANCE HELPERS ====================
             function haversine(a, b) {
                 const R = 6371000;
                 const φ1 = a.lat * Math.PI / 180, φ2 = b.lat * Math.PI / 180;
@@ -889,28 +910,35 @@
                 const s = Math.sin(Δφ/2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) ** 2;
                 return 2 * R * Math.asin(Math.sqrt(s));
             }
-            function formatDistance(m) { if (m < 1000) return `${m.toFixed(1)} m`; return `${(m / 1000).toFixed(3)} km`; }
+            function formatDistance(m) {
+                if (m < 1000) return `${m.toFixed(1)} m`;
+                if (m < 10000) return `${(m / 1000).toFixed(3)} km`;
+                return `${(m / 1000).toFixed(2)} km`;
+            }
             function formatWholeDistance(m) {
                 if (m < 1000) return `${Math.round(m)} m`;
                 if (m < 1000000) return `${Math.round(m / 1000)} km`;
                 return `${Math.round(m / 1000000)} Mm`;
             }
             function formatScaleNice(meters) {
-                // Choose a nice round number for the scale label
                 if (meters <= 0) return '—';
                 const candidates = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000, 5000000];
                 for (const c of candidates) if (meters <= c * 1.2) return formatWholeDistance(c);
                 return formatWholeDistance(meters);
             }
+
+            // ==================== MINIMAP ====================
+            let minimap = null;
+            let minimapViewportRect = null;
+            let minimapDots = null;
+            const mmScaleEl = document.getElementById('mm-scale');
+
             function updateMinimapScale() {
                 if (!minimap) return;
-                // Compute the horizontal ground distance across the minimap's width
-                const size = minimap.getSize();
                 const b = minimap.getBounds();
                 const nw = b.getNorthWest();
                 const ne = b.getNorthEast();
                 const groundWidth = haversine(nw, ne);
-                // Represent the minimap body width (160px) with this distance
                 mmScaleEl.textContent = formatScaleNice(groundWidth);
             }
             function initMinimap() {
@@ -946,7 +974,6 @@
                 map.on('moveend zoomend', syncMinimap);
                 syncMinimap();
                 updateMinimapScale();
-                // Update scale label when minimap changes zoom / view
                 minimap.on('moveend zoomend', updateMinimapScale);
             }
             function syncMinimapLive() {
@@ -1660,12 +1687,6 @@
                 if (activeSection === 'places' && placesTab === 'places') {
                     if (inPlacesSearch()) renderSearchResults();
                     else renderPlacesSection();
-                    if (placesSearchQuery) {
-                        const n = subrailBody.querySelectorAll('.fx-row').length;
-                        placesSearchCount.textContent = n + ' results';
-                    } else {
-                        placesSearchCount.textContent = '';
-                    }
                     updateSubrailChrome();
                 }
             });
@@ -1810,9 +1831,15 @@
             const VIRTUAL_WINDOW = 80;
             let _renderWindowStart = 0;
 
+            let _lastRenderedFolderId = '__init__';
             function renderPlacesSection() {
                 if (placesTab === 'archive') { renderArchiveSection(); return; }
                 if (inPlacesSearch()) { renderSearchResults(); return; }
+
+                if (_lastRenderedFolderId !== currentFolderId) {
+                    _renderWindowStart = 0;
+                    _lastRenderedFolderId = currentFolderId;
+                }
 
                 const folder = currentFolderId ? findNode(currentFolderId) : null;
                 const rawNodes = (folder ? (folder.children || []) : treeNodes).filter(n => {
@@ -2755,6 +2782,7 @@
                 }
             }
 
+
             // ==================== SNAP ZONES ====================
             let snapRingLayer = null;
             let snapZoneActive = false;
@@ -3294,6 +3322,8 @@
                 editorState = null;
                 editorFooter.innerHTML = '';
                 setSnapZoneActive(false);
+                // NEW: stop any active LOS tracking when the editor closes
+                if (typeof stopLOSTracking === 'function') stopLOSTracking();
             }
             editorCloseBtn.addEventListener('click', closeEditorPanel);
 
@@ -3309,6 +3339,7 @@
                 if (e.target.closest('.hdr-icon-btn')) return;
                 if (e.target.closest('.places-search-row')) return;
                 if (e.target.closest('.editor-panel')) return;
+                if (e.target.closest('.profile-panel')) return;
                 closeEditorPanel();
             });
 
@@ -3342,6 +3373,13 @@
                 editorPanel.classList.add('open');
                 setTimeout(() => zoomToNode(node), 280);
                 refreshSnapZoneMode();
+
+                // NEW: LOS tracking — if no persisted P2P and trackMouse enabled, start tracking immediately
+                if (node.type === 'los' && !node.meta.persistedP2P && node.meta.trackMouse !== false) {
+                    if (typeof startLOSTracking === 'function') startLOSTracking(node);
+                } else {
+                    if (typeof stopLOSTracking === 'function') stopLOSTracking();
+                }
             }
 
             function openBulkEditorForSelection() {
@@ -3751,9 +3789,6 @@
             }
 
             // ============ PROPERTIES ============
-            function copyBtnFor(text) {
-                return `<button class="copy-btn" title="Copy" aria-label="Copy" onclick="(function(b){navigator.clipboard.writeText('${text.replace(/'/g, "\\'")}').then(()=>{b.style.background='var(--sage-soft)';b.style.color='var(--sage)';setTimeout(()=>{b.style.background='';b.style.color='';},600);}).catch(()=>{});})(this)"><i class="fas fa-copy"></i></button>`;
-            }
             function renderPropertiesTab() {
                 const node = editorState.node;
                 const rows = [['Type', node.type], ['Visible', node.visible === false ? 'No' : 'Yes']];
@@ -3804,6 +3839,29 @@
                     }).join('');
                 }
 
+                // Build LOS P2P status block (only for LOS)
+                let losP2PHTML = '';
+                if (editorState.isLOS) {
+                    if (node.meta.persistedP2P && node.meta.persistedP2P.lat != null) {
+                        const centerLL = L.latLng(node.meta.lat, node.meta.lng);
+                        const p2pLL = L.latLng(node.meta.persistedP2P.lat, node.meta.persistedP2P.lng);
+                        const brg = bearingDegBetween(centerLL, p2pLL);
+                        const dist = haversine(centerLL, p2pLL);
+                        losP2PHTML = `
+                            <div class="editor-hint" style="margin-top:8px;">
+                                <b>P2P link active</b> — bearing ${brg.toFixed(0)}°, distance ${formatDistance(dist)}.
+                                <button class="btn btn-secondary" id="los-clear-p2p" style="margin-top:6px;width:100%;font-size:0.72rem;"><i class="fas fa-times"></i> Clear P2P</button>
+                            </div>
+                        `;
+                    } else {
+                        losP2PHTML = `
+                            <div class="editor-hint" style="margin-top:8px;">
+                                <i class="fas fa-mouse-pointer"></i> <b>Move the mouse over the map</b> to preview a P2P link, then <b>click to persist</b>.
+                            </div>
+                        `;
+                    }
+                }
+
                 editorBody.innerHTML = `
                     <div class="editor-field"><label>Name</label><input type="text" id="ed-name" value="${escapeHtml(node.name)}"></div>
                     <div class="editor-field"><label>Description</label><textarea id="ed-desc" rows="3" placeholder="Optional description…">${escapeHtml(node.meta.desc || '')}</textarea></div>
@@ -3819,11 +3877,16 @@
                             <div class="editor-field"><label>Target height (m)</label><input type="number" id="los-th" value="${node.meta.targetHeight || 2}" min="0" step="1"></div>
                         </div>
                         <div class="editor-field"><label>Contour interval (m)</label><input type="number" id="los-contour" value="${node.meta.contourInterval || 500}" min="0" step="50"></div>
+                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-boundary" ${node.meta.showBoundary !== false ? 'checked' : ''}> Show boundary polygon</label>
+                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-curvature" ${node.meta.earthCurvature ? 'checked' : ''}> Earth curvature (4/3 R)</label>
+                        ${losP2PHTML}
                     ` : ''}
                     <div class="editor-section-label">Attributes</div>
                     <table class="props-table">${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>
                     ${vertAltHTML}
                 `;
+
+                wireCopyButtons(editorBody);
 
                 const nameInp = editorBody.querySelector('#ed-name');
                 const descInp = editorBody.querySelector('#ed-desc');
@@ -3850,6 +3913,28 @@
                         const inp = editorBody.querySelector(sel);
                         if (inp) inp.addEventListener('input', scheduleLivePropertiesApply);
                     });
+                    ['#los-boundary', '#los-curvature'].forEach(sel => {
+                        const inp = editorBody.querySelector(sel);
+                        if (inp) inp.addEventListener('change', scheduleLivePropertiesApply);
+                    });
+                    const clearP2PBtn = editorBody.querySelector('#los-clear-p2p');
+                    if (clearP2PBtn) {
+                        clearP2PBtn.addEventListener('click', async () => {
+                            node.meta.persistedP2P = null;
+                            node.meta.trackMouse = true;
+                            rebuildLOSLayer(node);
+                            renderEditorBody();
+                            // NEW: resume tracking so the user can pick a new endpoint
+                            if (typeof startLOSTracking === 'function') startLOSTracking(node);
+                            // Reset profile to tracking mode
+                            if (profileData && profileData.node === node) {
+                                profileData = null;
+                                drawProfileChart();
+                            }
+                            await persistTreeNow();
+                            showToast('P2P cleared — move mouse to preview, click to persist', 'fa-times');
+                        });
+                    }
                 }
             }
             async function saveEditorProperties(opts) {
@@ -3866,13 +3951,22 @@
                 if (latEl && lngEl) {
                     const lat = parseFloat(latEl.value);
                     const lng = parseFloat(lngEl.value);
-                    if (isFinite(lat) && isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                    const latOk = isFinite(lat) && lat >= -90 && lat <= 90;
+                    const lngOk = isFinite(lng) && lng >= -180 && lng <= 180;
+                    if (latOk && lngOk) {
                         node.meta.lat = lat;
                         node.meta.lng = lng;
                         if (node.type === 'placemark' && node.layer && node.layer.setLatLng) {
                             node.layer.setLatLng([lat, lng]);
                         } else if (node.type === 'los') {
                             rebuildLOSLayer(node);
+                        }
+                    } else {
+                        if (node.meta.lat != null) latEl.value = node.meta.lat.toFixed(6);
+                        if (node.meta.lng != null) lngEl.value = node.meta.lng.toFixed(6);
+                        if (!opts || !opts.silent) {
+                            showToast('Invalid coordinates — not saved', 'fa-exclamation-circle');
+                            return;
                         }
                     }
                 }
@@ -3887,6 +3981,12 @@
                     if (chEl) node.meta.centerHeight = parseFloat(chEl.value) || 0;
                     if (thEl) node.meta.targetHeight = parseFloat(thEl.value) || 0;
                     if (ciEl) node.meta.contourInterval = parseFloat(ciEl.value) || 0;
+                    const boundaryEl = editorBody.querySelector('#los-boundary');
+                    const curvatureEl = editorBody.querySelector('#los-curvature');
+                    if (boundaryEl) node.meta.showBoundary = boundaryEl.checked;
+                    if (curvatureEl) node.meta.earthCurvature = curvatureEl.checked;
+                    // NEW: if no persisted P2P, we're in tracking mode — keep trackMouse true
+                    if (!node.meta.persistedP2P) node.meta.trackMouse = true;
                     rebuildLOSLayer(node);
                 } else if (node.type === 'placemark' && node.layer && node.layer.getPopup && node.layer.getPopup()) {
                     const d = node.meta.desc ? '<br>' + escapeHtml(node.meta.desc) : '';
@@ -3984,7 +4084,7 @@
                     ${iconSection}
                     ${ringSection}
                     ${lineSection}
-                    ${tab === 'los' ? `<div class="editor-hint">Colour affects radial lines and rings.</div>` : ''}
+                    ${tab === 'los' ? `<div class="editor-hint">Colour affects radial lines, boundary polygon and P2P link.</div>` : ''}
                     ${folderBulkHTML}
                 `;
 
@@ -4430,6 +4530,7 @@
                         });
                     });
                     updateCount();
+                    wireCopyButtons(listEl);
                 }
                 function updateCount() { countEl.textContent = work.length; }
                 function updateRowInputs(i) {
@@ -4503,9 +4604,8 @@
             function rebuildLOSLayer(node) {
                 const wasVisible = node.visible !== false;
                 if (node.layer) {
-                    try { node.layer.eachLayer(l => { if (map.hasLayer(l)) map.removeLayer(l); }); } catch(e){}
-                    if (map.hasLayer(node.layer)) map.removeLayer(node.layer);
                     if (drawnItems.hasLayer(node.layer)) drawnItems.removeLayer(node.layer);
+                    if (map.hasLayer(node.layer)) map.removeLayer(node.layer);
                     node.layer.clearLayers();
                 }
                 const layers = buildLOSLayers(node);
@@ -4941,6 +5041,7 @@
                 });
             }
 
+
             // ==================== GEOJSON ====================
             function nodeToGeoJSON(node) {
                 if (node.type === 'placemark' && node.meta.lat != null) {
@@ -5067,300 +5168,19 @@
                 geojsonInput.value = '';
             });
 
-            // ==================== DRAWING ====================
-            let drawState = null;
-            const drawStatusEl = document.getElementById('draw-status');
-            const drawStatusText = document.getElementById('draw-status-text');
-            const drawBadgeEl = document.getElementById('draw-badge');
-
-            function showDrawStatus(text) { drawStatusText.textContent = text; drawStatusEl.classList.add('show'); }
-            function hideDrawStatus() { drawStatusEl.classList.remove('show'); hideDrawBadge(); }
-            function showDrawBadge(html, latlng) {
-                drawBadgeEl.innerHTML = html;
-                drawBadgeEl.classList.add('show');
-                if (latlng) {
-                    const pt = map.latLngToContainerPoint(latlng);
-                    drawBadgeEl.style.left = (pt.x + 20) + 'px';
-                    drawBadgeEl.style.top = (pt.y - 40) + 'px';
-                }
-            }
-            function hideDrawBadge() { drawBadgeEl.classList.remove('show'); }
-
-            document.getElementById('draw-status-cancel').addEventListener('click', () => {
-                cancelActiveDraw();
-                showToast('Drawing cancelled', 'fa-times');
-            });
-
-            function clearDrawModeUI() { document.querySelectorAll('.map-tool').forEach(el => el.classList.remove('active')); }
-            function cancelActiveDraw() {
-                if (drawState) { if (drawState.tempLayer) map.removeLayer(drawState.tempLayer); drawState = null; }
-                clearDrawModeUI();
-                map.getContainer().style.cursor = '';
-                hideSnapPreview();
-                hideDrawStatus();
-                refreshSnapZoneMode();
-            }
-            function beginDraw(type) {
-                cancelActiveDraw();
-                drawState = { type, points: [], tempLayer: null, lastClickTime: 0 };
-                clearDrawModeUI();
-                const btn = document.getElementById(type === 'placemark' ? 'tool-placemark' : type === 'path' ? 'tool-path' : type === 'polygon' ? 'tool-polygon' : type === 'measure' ? 'tool-measure' : type === 'measure-area' ? 'tool-measure-area' : '');
-                if (btn) btn.classList.add('active');
-                map.getContainer().style.cursor = 'crosshair';
-                if (type === 'placemark') { showToast('Click on the map to place a marker', 'fa-map-pin'); showDrawStatus('Click map to place a marker'); }
-                else if (type === 'path' || type === 'measure') { showToast('Click points · double-click to finish', 'fa-route'); showDrawStatus('Drawing path — double-click to finish'); }
-                else if (type === 'polygon' || type === 'measure-area') { showToast('Click points · double-click to close', 'fa-draw-polygon'); showDrawStatus('Drawing polygon — double-click to finish'); }
-                refreshSnapZoneMode();
-            }
-            function updateLiveBadge(cursorLatLng) {
-                if (!drawState || drawState.points.length === 0) { hideDrawBadge(); return; }
-                if (!FLAGS.liveDraw) return;
-                const pts = drawState.points.concat([cursorLatLng]);
-                const type = drawState.type;
-                if (type === 'path' || type === 'measure') {
-                    const d = pathDistance(pts);
-                    showDrawBadge(`<i class="fas fa-ruler"></i>${formatDistance(d)} · ${pts.length} vertices`, cursorLatLng);
-                } else if (type === 'polygon' || type === 'measure-area') {
-                    if (pts.length >= 3) {
-                        const a = polygonArea(pts);
-                        showDrawBadge(`<i class="fas fa-vector-square"></i>${formatArea(a)} · ${pts.length} vertices`, cursorLatLng);
-                    } else {
-                        showDrawBadge(`<i class="fas fa-draw-polygon"></i>${pts.length} vertices`, cursorLatLng);
-                    }
-                }
-            }
-            function updateTempPreview(latlng) {
-                if (!drawState) return;
-                if (drawState.tempLayer) { map.removeLayer(drawState.tempLayer); drawState.tempLayer = null; }
-                if (drawState.type === 'path' || drawState.type === 'measure') {
-                    const pts = drawState.points.concat([latlng]);
-                    if (pts.length >= 2) {
-                        const color = drawState.type === 'measure' ? '#f59e0b' : '#4d7c0f';
-                        const dash = drawState.type === 'measure' ? '6,4' : null;
-                        drawState.tempLayer = L.polyline(pts, { color, weight: 3, dashArray: dash || undefined, opacity: 0.75 }).addTo(map);
-                    }
-                } else if (drawState.type === 'polygon' || drawState.type === 'measure-area') {
-                    const pts = drawState.points.concat([latlng]);
-                    const color = drawState.type === 'measure-area' ? '#f59e0b' : '#4d7c0f';
-                    const dash = drawState.type === 'measure-area' ? '6,4' : null;
-                    if (pts.length >= 3) {
-                        drawState.tempLayer = L.polygon(pts, { color, weight: 2, fillOpacity: 0.12, dashArray: dash || undefined, opacity: 0.75 }).addTo(map);
-                    } else if (pts.length >= 2) {
-                        drawState.tempLayer = L.polyline(pts, { color, weight: 2, dashArray: '4,4', opacity: 0.75 }).addTo(map);
-                    }
-                }
-                updateLiveBadge(latlng);
-            }
-            async function finishPathOrPolygon() {
-                if (!drawState) return;
-                const pts = drawState.points;
-                const type = drawState.type;
-                if (drawState.tempLayer) { map.removeLayer(drawState.tempLayer); drawState.tempLayer = null; }
-                if (pts.length < 2) {
-                    showToast('Not enough points', 'fa-info-circle');
-                    drawState = null; clearDrawModeUI();
-                    map.getContainer().style.cursor = '';
-                    hideSnapPreview();
-                    hideDrawStatus();
-                    refreshSnapZoneMode();
-                    return;
-                }
-                const latlngs = pts.slice();
-                drawState = null; clearDrawModeUI();
-                map.getContainer().style.cursor = '';
-                hideSnapPreview();
-                hideDrawStatus();
-                refreshSnapZoneMode();
-
-                if (type === 'path' || type === 'measure') {
-                    const d = pathDistance(latlngs);
-                    const isMeasure = (type === 'measure');
-                    const color = isMeasure ? '#f59e0b' : '#4d7c0f';
-                    const line = L.polyline(latlngs, { color, weight: 3 });
-                    drawnItems.addLayer(line);
-                    if (isMeasure) {
-                        const distStr = formatDistance(d);
-                        line.bindPopup(`Distance: <b>${distStr}</b>`).openPopup();
-                        const n = createNode({ type: 'measure', name: `Distance: ${distStr}`, layer: line, meta: { distance: d, points: latlngs.map(p => [p.lat, p.lng]), color, lineThickness: 3 } });
-                        bindLayerFocus(n, line);
-                        attachLayerDrag(n, line);
-                        if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
-                        await persistTreeNow();
-                        showToast('Measured: ' + distStr, 'fa-ruler');
-                    } else {
-                        const result = await openNewNodeModal({ type: 'path', name: 'New path', meta: { distance: d, points: latlngs.map(p => [p.lat, p.lng]), color, desc: '', lineThickness: 3 } });
-                        if (!result) { drawnItems.removeLayer(line); return; }
-                        line.setStyle({ color: result.color });
-                        line.bindPopup(`<b>${escapeHtml(result.name)}</b><br>Length: ${formatDistance(d)}`);
-                        const n = createNode({ type: 'path', name: result.name, layer: line, meta: { distance: d, points: latlngs.map(p => [p.lat, p.lng]), color: result.color, desc: result.desc, lineThickness: 3 } });
-                        bindLayerFocus(n, line);
-                        attachLayerDrag(n, line);
-                        if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
-                        await persistTreeNow();
-                        showToast(`Path: ${result.name}`, 'fa-route');
-                    }
-                } else if (type === 'polygon' || type === 'measure-area') {
-                    if (pts.length < 3) { showToast('Need 3+ points', 'fa-info-circle'); return; }
-                    const isMeasure = (type === 'measure-area');
-                    const color = isMeasure ? '#f59e0b' : '#4d7c0f';
-                    const poly = L.polygon(latlngs, { color, weight: 2, fillOpacity: 0.2 });
-                    drawnItems.addLayer(poly);
-                    if (isMeasure) {
-                        const a = polygonArea(latlngs);
-                        const areaStr = formatArea(a);
-                        poly.bindPopup(`Area: <b>${areaStr}</b>`).openPopup();
-                        const n = createNode({ type: 'measure-area', name: `Area: ${areaStr}`, layer: poly, meta: { area: a, points: latlngs.map(p => [p.lat, p.lng]), color, lineThickness: 2 } });
-                        bindLayerFocus(n, poly);
-                        attachLayerDrag(n, poly);
-                        if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
-                        await persistTreeNow();
-                        showToast('Area: ' + areaStr, 'fa-vector-square');
-                    } else {
-                        const result = await openNewNodeModal({ type: 'polygon', name: 'New polygon', meta: { points: latlngs.map(p => [p.lat, p.lng]), color, desc: '', lineThickness: 2 } });
-                        if (!result) { drawnItems.removeLayer(poly); return; }
-                        poly.setStyle({ color: result.color });
-                        poly.bindPopup(`<b>${escapeHtml(result.name)}</b>`);
-                        const n = createNode({ type: 'polygon', name: result.name, layer: poly, meta: { points: latlngs.map(p => [p.lat, p.lng]), color: result.color, desc: result.desc, lineThickness: 2 } });
-                        bindLayerFocus(n, poly);
-                        attachLayerDrag(n, poly);
-                        if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
-                        await persistTreeNow();
-                        showToast(`Polygon: ${result.name}`, 'fa-draw-polygon');
-                    }
-                }
+            // ==================== LOS ENGINE (ported from LOS Lab) ====================
+            function earthBulge(d1, d2) {
+                const Re_eff = 6371000 * 4 / 3;
+                return (d1 * d2) / (2 * Re_eff);
             }
 
-            map.on('click', async (e) => {
-                const raw = e.latlng;
-                updateTerrainDisplay(raw.lat, raw.lng);
-                if (!drawState) return;
-                const now = Date.now();
-                const isDoubleClick = (now - (drawState.lastClickTime || 0)) < 350;
-                drawState.lastClickTime = now;
-
-                if (drawState.type === 'placemark') {
-                    const latlng = raw;
-                    const result = await openNewNodeModal({ type: 'placemark', name: 'New placemark', meta: { icon: DEFAULT_ICON, color: '#4d7c0f', desc: '', lat: latlng.lat, lng: latlng.lng } });
-                    drawState = null; clearDrawModeUI();
-                    map.getContainer().style.cursor = '';
-                    hideSnapPreview();
-                    hideDrawStatus();
-                    refreshSnapZoneMode();
-                    if (!result) return;
-                    const finalLat = (result.lat !== undefined && result.lat !== null) ? result.lat : latlng.lat;
-                    const finalLng = (result.lng !== undefined && result.lng !== null) ? result.lng : latlng.lng;
-                    const marker = L.marker([finalLat, finalLng], { icon: makeLeafletIcon(result.icon || DEFAULT_ICON, result.color) });
-                    marker.bindPopup(`<b>${escapeHtml(result.name)}</b>${result.desc ? '<br>' + escapeHtml(result.desc) : ''}`);
-                    drawnItems.addLayer(marker);
-                    const n = createNode({ type: 'placemark', name: result.name, layer: marker, meta: { desc: result.desc, lat: finalLat, lng: finalLng, icon: result.icon || DEFAULT_ICON, color: result.color } });
-                    bindLayerFocus(n, marker);
-                    attachLayerDrag(n, marker);
-                    if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
-                    await persistTreeNow();
-                    marker.openPopup();
-                    showToast(`Placemark: ${result.name}`, 'fa-map-pin');
-                    return;
-                }
-                if (isDoubleClick && (drawState.type === 'path' || drawState.type === 'polygon' || drawState.type === 'measure' || drawState.type === 'measure-area')) return;
-                const latlng = applySnapFromEvent(e, raw);
-                drawState.points.push(latlng);
-                updateTempPreview(latlng);
-            });
-            map.on('mousemove', (e) => {
-                map._lastMouseLatLng = e.latlng;
-                updateTerrainDisplay(e.latlng.lat, e.latlng.lng);
-                if (SETTINGS.snapToMarkers && (drawState || (editorState && editorState.activeTab === 'vertices'))) {
-                    updateSnapPreview(e.containerPoint);
-                    if (drawState && drawState.type !== 'placemark') {
-                        const snapped = applySnapFromContainerPoint(e.containerPoint, e.latlng);
-                        updateTempPreview(snapped);
-                    }
-                } else if (drawState && drawState.type !== 'placemark') {
-                    updateTempPreview(e.latlng);
-                }
-                if (drawState) updateLiveBadge(e.latlng);
-            });
-            map.on('mouseout', () => { hideSnapPreview(); hideDrawBadge(); });
-            map.on('dblclick', (e) => {
-                if (!drawState) return;
-                if (drawState.type === 'path' || drawState.type === 'polygon' || drawState.type === 'measure' || drawState.type === 'measure-area') {
-                    L.DomEvent.preventDefault(e);
-                    L.DomEvent.stopPropagation(e);
-                    finishPathOrPolygon();
-                }
-            });
-            map.on('contextmenu', (e) => {
-                if (drawState) { L.DomEvent.preventDefault(e); showToast('Drawing cancelled', 'fa-times'); cancelActiveDraw(); }
-            });
-
-            document.getElementById('tool-placemark').addEventListener('click', () => beginDraw('placemark'));
-            document.getElementById('tool-path').addEventListener('click', () => beginDraw('path'));
-            document.getElementById('tool-polygon').addEventListener('click', () => beginDraw('polygon'));
-            document.getElementById('tool-measure').addEventListener('click', () => beginDraw('measure'));
-            document.getElementById('tool-measure-area').addEventListener('click', () => beginDraw('measure-area'));
-            document.getElementById('tool-los').addEventListener('click', () => beginLOS());
-
-            async function clearAllDrawings() {
-                if (!confirm('Clear all drawings?')) return;
-                cancelActiveDraw();
-                drawnItems.clearLayers();
-                const removeTypes = ['placemark','path','polygon','measure','measure-area','los'];
-                function filterNodes(nodes) {
-                    return nodes.filter(n => {
-                        if (removeTypes.includes(n.type)) return false;
-                        if (n.children) n.children = filterNodes(n.children);
-                        return true;
-                    });
-                }
-                treeNodes = filterNodes(treeNodes);
-                selectedNodeId = null;
-                multiSelection.clear();
-                currentFolderId = null;
-                renderTree();
-                await persistTreeNow();
-                showToast('All drawings cleared', 'fa-eraser');
-            }
-
-            // ==================== LOS ====================
-            function beginLOS() {
-                cancelActiveDraw();
-                clearDrawModeUI();
-                const btn = document.getElementById('tool-los');
-                if (btn) btn.classList.add('active');
-                map.getContainer().style.cursor = 'crosshair';
-                showToast('Click on the map to place the LOS center', 'fa-satellite-dish');
-                showDrawStatus('Click map to place the LOS center');
-                map.once('click', async (e) => {
-                    map.getContainer().style.cursor = '';
-                    clearDrawModeUI();
-                    hideSnapPreview();
-                    hideDrawStatus();
-                    const latlng = applySnapFromEvent(e, e.latlng);
-                    const result = await openNewNodeModal({
-                        type: 'los', name: 'New LOS',
-                        meta: { lat: latlng.lat, lng: latlng.lng, radius: 10000, numLines: 36, centerHeight: 30, targetHeight: 2, contourInterval: 500, color: '#ea580c', desc: '' }
-                    });
-                    if (!result) return;
-                    const finalLat = (result.lat !== undefined && result.lat !== null) ? result.lat : latlng.lat;
-                    const finalLng = (result.lng !== undefined && result.lng !== null) ? result.lng : latlng.lng;
-                    const node = createNode({
-                        type: 'los', name: result.name,
-                        meta: { lat: finalLat, lng: finalLng, radius: 10000, numLines: 36, centerHeight: 30, targetHeight: 2, contourInterval: 500, color: result.color || '#ea580c', desc: result.desc }
-                    });
-                    const layers = buildLOSLayers(node);
-                    node.layer = L.layerGroup(layers);
-                    node.layer.addTo(drawnItems);
-                    if (drawnItems.bringToFront) drawnItems.bringToFront();
-                    if (currentFolderId) addNodeToTree(node, findNode(currentFolderId)); else addNodeToTree(node);
-                    await persistTreeNow();
-                    showToast(`LOS added: ${result.name}`, 'fa-satellite-dish');
-                });
-            }
-            function losLineGeometry(node, bearingDeg, stepMeters = 10) {
+            function losLineGeometry(node, bearingDeg, stepMeters) {
+                stepMeters = stepMeters || 10;
                 const center = L.latLng(node.meta.lat, node.meta.lng);
                 const radius = node.meta.radius || 10000;
                 const centerHeight = node.meta.centerHeight || 30;
                 const targetHeight = node.meta.targetHeight || 2;
+                const curvature = !!node.meta.earthCurvature;
                 const centerElev = getElevation(center.lat, center.lng);
                 const antennaElev = centerElev !== null ? centerElev + centerHeight : centerHeight;
                 const bearingRad = bearingDeg * Math.PI / 180;
@@ -5369,12 +5189,13 @@
                 for (let d = 0; d <= radius; d += stepMeters) {
                     const lat = center.lat + (d * Math.cos(bearingRad)) / 111320;
                     const lng = center.lng + (d * Math.sin(bearingRad)) / (111320 * cosLat);
-                    const groundElev = getElevation(lat, lng);
+                    let groundElev = getElevation(lat, lng);
                     if (groundElev === null) {
                         if (d === 0) return { pts: [], lostAt: null, antennaElev, targetElevEnd: null, centerElev };
                         break;
                     }
-                    pts.push({lat, lng, d, groundElev, targetElev: groundElev + targetHeight});
+                    if (curvature) groundElev -= earthBulge(d, radius - d);
+                    pts.push({ lat, lng, d, groundElev, targetElev: groundElev + targetHeight });
                 }
                 if (pts.length < 2) return { pts, lostAt: null, antennaElev, targetElevEnd: null, centerElev };
                 const endPt = pts[pts.length - 1];
@@ -5389,6 +5210,7 @@
                 }
                 return { pts, lostAt, antennaElev, targetElevEnd, centerElev };
             }
+
             function truncateLOSPoints(pts, lostAt) {
                 if (lostAt === null) return pts;
                 const out = pts.filter(p => p.d <= lostAt);
@@ -5404,127 +5226,128 @@
                 }
                 return out;
             }
+
+            function bearingDegBetween(a, b) {
+                const φ1 = a.lat * Math.PI / 180, φ2 = b.lat * Math.PI / 180;
+                const Δλ = (b.lng - a.lng) * Math.PI / 180;
+                const y = Math.sin(Δλ) * Math.cos(φ2);
+                const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+                let brg = Math.atan2(y, x) * 180 / Math.PI;
+                if (brg < 0) brg += 360;
+                return brg;
+            }
+
+            function buildBoundaryPoints(node) {
+                if (terrainStore.size === 0) return null;
+                const center = { lat: node.meta.lat, lng: node.meta.lng };
+                if (getElevation(center.lat, center.lng) === null) return null;
+                const nB = 180;
+                const points = [];
+                const radius = node.meta.radius || 10000;
+                const cosLat = Math.cos(center.lat * Math.PI / 180);
+                for (let i = 0; i < nB; i++) {
+                    const brg = i * 360 / nB;
+                    const geo = losLineGeometry(node, brg);
+                    if (!geo.pts || geo.pts.length < 2) continue;
+                    const reach = geo.lostAt !== null ? geo.lostAt : geo.pts[geo.pts.length - 1].d;
+                    const br = brg * Math.PI / 180;
+                    const pt = {
+                        lat: center.lat + (reach * Math.cos(br)) / 111320,
+                        lng: center.lng + (reach * Math.sin(br)) / (111320 * cosLat)
+                    };
+                    points.push([pt.lat, pt.lng]);
+                }
+                if (points.length < 3) return null;
+                points.push(points[0]);
+                return points;
+            }
+
+            function buildLinkSegments(node, start, end) {
+                const bearing = bearingDegBetween(start, end);
+                const geo = losLineGeometry(node, bearing);
+                if (!geo.pts || geo.pts.length < 2) return null;
+                const totalD = geo.pts[geo.pts.length - 1].d;
+                const raySlope = (geo.targetElevEnd - geo.antennaElev) / totalD;
+                const segments = [];
+                let curPts = [], curColor = null;
+                for (const p of geo.pts) {
+                    const rayElev = geo.antennaElev + raySlope * p.d;
+                    const color = p.groundElev > rayElev ? '#dc2626' : '#22c55e';
+                    if (curColor === null) {
+                        curColor = color;
+                        curPts = [[p.lat, p.lng]];
+                    } else if (color !== curColor) {
+                        curPts.push([p.lat, p.lng]);
+                        segments.push({ color: curColor, points: curPts });
+                        curPts = [[p.lat, p.lng]];
+                        curColor = color;
+                    } else {
+                        curPts.push([p.lat, p.lng]);
+                    }
+                }
+                if (curPts.length >= 2) segments.push({ color: curColor, points: curPts });
+                return { segments, geo, bearing };
+            }
+
             function buildLOSLayers(node, highlightBearing) {
                 if (!node.meta.lat || !node.meta.lng) return [];
                 const center = L.latLng(node.meta.lat, node.meta.lng);
                 const radius = node.meta.radius || 10000;
                 const numLines = node.meta.numLines || 36;
-                const centerHeight = node.meta.centerHeight || 30;
-                const targetHeight = node.meta.targetHeight || 2;
-                const contourInterval = node.meta.contourInterval || 0;
                 const color = node.meta.color || '#ea580c';
                 const centerElev = getElevation(center.lat, center.lng);
                 const layers = [];
-                if (contourInterval > 0 && terrainStore.size > 0) {
-                    const contourLines = buildTopographicContours(center, radius, contourInterval, color);
-                    contourLines.forEach(line => layers.push(line));
-                }
-                layers.push(L.circleMarker(center, { radius: 6, color: 'white', weight: 2, fillColor: color, fillOpacity: 1 }));
-                layers.push(L.circle(center, { radius: radius, color: color, weight: 1.5, dashArray: '6,4', fill: false, opacity: 0.7 }));
-                for (let i = 0; i < numLines; i++) {
-                    const bearing = (360 / numLines) * i;
-                    const isHighlighted = highlightBearing !== undefined && Math.abs(bearing - highlightBearing) < 0.01;
-                    const geo = losLineGeometry(node, bearing);
-                    if (geo.pts.length < 2) continue;
-                    const drawPts = truncateLOSPoints(geo.pts, geo.lostAt);
-                    const coords = drawPts.map(p => [p.lat, p.lng]);
-                    if (coords.length < 2) continue;
-                    layers.push(L.polyline(coords, { color: isHighlighted ? '#facc15' : color, weight: isHighlighted ? 5 : 2, opacity: isHighlighted ? 1 : 0.85 }));
-                }
-                if (centerElev !== null) {
-                    layers.push(L.circleMarker(center, { radius: 4, color: 'white', weight: 1.5, fillColor: '#166534', fillOpacity: 1 }));
-                    layers.push(L.marker(center, {
-                        icon: L.divIcon({
-                            className: 'los-height-label',
-                            html: `<div class="los-height-label-inner" style="background:#166534">⚡ ${Math.round(centerHeight)} m antenna</div>`,
-                            iconSize: [120, 16], iconAnchor: [-8, 8]
-                        }),
-                        interactive: false, zIndexOffset: 2000
-                    }));
-                    const targetSample = losLineGeometry(node, 0);
-                    if (targetSample.pts.length > 0) {
-                        const lastPt = targetSample.pts[targetSample.pts.length - 1];
-                        layers.push(L.circleMarker([lastPt.lat, lastPt.lng], { radius: 4, color: 'white', weight: 1.5, fillColor: '#ea580c', fillOpacity: 1 }));
-                        layers.push(L.marker([lastPt.lat, lastPt.lng], {
-                            icon: L.divIcon({
-                                className: 'los-height-label',
-                                html: `<div class="los-height-label-inner" style="background:#ea580c">🎯 ${Math.round(targetHeight)} m target</div>`,
-                                iconSize: [120, 16], iconAnchor: [-8, 8]
-                            }),
-                            interactive: false, zIndexOffset: 2000
+
+                // ---- P2P mode (LOS Lab style) ----
+                if (node.meta.persistedP2P && node.meta.persistedP2P.lat != null) {
+                    const link = buildLinkSegments(node, center, L.latLng(node.meta.persistedP2P.lat, node.meta.persistedP2P.lng));
+                    if (link) {
+                        for (const seg of link.segments) {
+                            layers.push(L.polyline(seg.points, { color: seg.color, weight: 3 }));
+                        }
+                        layers.push(L.circleMarker([node.meta.persistedP2P.lat, node.meta.persistedP2P.lng], {
+                            radius: 6, color: 'white', weight: 2,
+                            fillColor: link.geo.lostAt !== null ? '#dc2626' : '#22c55e', fillOpacity: 1
                         }));
                     }
-                }
-                return layers;
-            }
-            function buildTopographicContours(center, radius, interval, color) {
-                const layers = [];
-                const stepMeters = 50;
-                const cosLat = Math.cos(center.lat * Math.PI / 180);
-                const nSteps = Math.ceil(radius / stepMeters);
-                if (nSteps < 4) return [];
-                const grid = [];
-                for (let j = 0; j <= nSteps; j++) {
-                    const row = [];
-                    for (let i = 0; i <= nSteps; i++) {
-                        const dx = (i - nSteps/2) * stepMeters;
-                        const dy = (j - nSteps/2) * stepMeters;
-                        if (dx*dx + dy*dy > radius*radius) { row.push(null); continue; }
-                        const lat = center.lat + dy / 111320;
-                        const lng = center.lng + dx / (111320 * cosLat);
-                        row.push(getElevation(lat, lng));
-                    }
-                    grid.push(row);
-                }
-                let minE = Infinity, maxE = -Infinity;
-                for (const row of grid) for (const e of row) {
-                    if (e !== null) { if (e < minE) minE = e; if (e > maxE) maxE = e; }
-                }
-                if (!isFinite(minE) || !isFinite(maxE)) return [];
-                const startLevel = Math.ceil(minE / interval) * interval;
-                const endLevel = Math.floor(maxE / interval) * interval;
-                const toLat = (jj) => center.lat + ((jj - nSteps/2) * stepMeters) / 111320;
-                const toLng = (ii) => center.lng + ((ii - nSteps/2) * stepMeters) / (111320 * cosLat);
-                for (let level = startLevel; level <= endLevel; level += interval) {
-                    const segments = [];
-                    for (let j = 0; j < nSteps; j++) {
-                        for (let i = 0; i < nSteps; i++) {
-                            const tl = grid[j][i], tr = grid[j][i+1], bl = grid[j+1][i], br = grid[j+1][i+1];
-                            if (tl === null || tr === null || bl === null || br === null) continue;
-                            const idx = (tl > level ? 8 : 0) | (tr > level ? 4 : 0) | (br > level ? 2 : 0) | (bl > level ? 1 : 0);
-                            if (idx === 0 || idx === 15) continue;
-                            function interp(v1, v2, level) { if (v1 === v2) return 0.5; return (level - v1) / (v2 - v1); }
-                            const pts = [];
-                            if ((idx & 8) !== (idx & 4)) { const t = interp(tl, tr, level); pts.push([toLat(j), toLng(i + t)]); }
-                            if ((idx & 4) !== (idx & 2)) { const t = interp(tr, br, level); pts.push([toLat(j + t), toLng(i + 1)]); }
-                            if ((idx & 2) !== (idx & 1)) { const t = interp(br, bl, level); pts.push([toLat(j + 1), toLng(i + 1 - t)]); }
-                            if ((idx & 1) !== (idx & 8)) { const t = interp(bl, tl, level); pts.push([toLat(j + 1 - t), toLng(i)]); }
-                            if (pts.length >= 2) segments.push([pts[0], pts[1]]);
+                } else {
+                    // ---- Radial mode (LOS Lab boundary style) ----
+                    if (node.meta.showBoundary !== false) {
+                        const bpts = buildBoundaryPoints(node);
+                        if (bpts) {
+                            layers.push(L.polygon(bpts, {
+                                color, weight: 2.5, opacity: 0.9,
+                                fillColor: color, fillOpacity: 0.1, lineJoin: 'round'
+                            }));
                         }
                     }
-                    if (segments.length > 0) {
-                        layers.push(L.polyline(segments, { color, weight: 1, opacity: 0.5, dashArray: '3,3', interactive: false }));
-                        const mid = segments[0];
-                        const labelLat = (mid[0][0] + mid[1][0]) / 2;
-                        const labelLng = (mid[0][1] + mid[1][1]) / 2;
-                        layers.push(L.marker([labelLat, labelLng], {
-                            icon: L.divIcon({
-                                className: 'los-contour-label',
-                                html: `<div class="los-contour-label-inner">${level} m</div>`,
-                                iconSize: [40, 16], iconAnchor: [20, 8]
-                            }),
-                            interactive: false, zIndexOffset: -100
+                    for (let i = 0; i < numLines; i++) {
+                        const bearing = (360 / numLines) * i;
+                        const isHighlighted = highlightBearing !== undefined && Math.abs(bearing - highlightBearing) < 0.01;
+                        const geo = losLineGeometry(node, bearing);
+                        if (!geo.pts || geo.pts.length < 2) continue;
+                        const drawPts = truncateLOSPoints(geo.pts, geo.lostAt);
+                        const coords = drawPts.map(p => [p.lat, p.lng]);
+                        if (coords.length < 2) continue;
+                        layers.push(L.polyline(coords, {
+                            color: isHighlighted ? '#facc15' : color,
+                            weight: isHighlighted ? 5 : 2,
+                            opacity: isHighlighted ? 1 : 0.85
                         }));
                     }
                 }
+
+                // centre dot only — no antenna/target labels, no contours
+                layers.push(L.circleMarker(center, { radius: 6, color: 'white', weight: 2, fillColor: color, fillOpacity: 1 }));
                 return layers;
             }
+
             let losHighlightLayer = null;
             function setLOSHighlight(node, bearingDeg) {
                 if (losHighlightLayer) { map.removeLayer(losHighlightLayer); losHighlightLayer = null; }
                 if (!node || bearingDeg === undefined || bearingDeg === null) return;
                 const geo = losLineGeometry(node, bearingDeg);
-                if (geo.pts.length < 2) return;
+                if (!geo.pts || geo.pts.length < 2) return;
                 const drawPts = truncateLOSPoints(geo.pts, geo.lostAt);
                 const coords = drawPts.map(p => [p.lat, p.lng]);
                 if (coords.length < 2) return;
@@ -5800,14 +5623,27 @@
                 let normLng = lng;
                 while (normLng < -180) normLng += 360;
                 while (normLng > 180) normLng -= 360;
-                const tileLat = Math.floor(lat);
-                const tileLng = Math.floor(normLng);
-                const latKeyChar = tileLat >= 0 ? 'N' : 'S';
-                const lngKeyChar = tileLng >= 0 ? 'E' : 'W';
-                const latVal = Math.abs(tileLat).toString().padStart(2, '0');
-                const lngVal = Math.abs(tileLng).toString().padStart(3, '0');
-                const key = `${latKeyChar}${latVal}${lngKeyChar}${lngVal}`;
-                if (terrainStore.has(key)) return getElevationFromTile(terrainStore.get(key), lat, normLng);
+
+                const tryTiles = (tlat, tlng) => {
+                    const latC = tlat >= 0 ? 'N' : 'S';
+                    const lngC = tlng >= 0 ? 'E' : 'W';
+                    const key = `${latC}${Math.abs(tlat).toString().padStart(2,'0')}${lngC}${Math.abs(tlng).toString().padStart(3,'0')}`;
+                    if (!terrainStore.has(key)) return null;
+                    return getElevationFromTile(terrainStore.get(key), lat, normLng);
+                };
+
+                const tlat = Math.floor(lat);
+                const tlng = Math.floor(normLng);
+                let v = tryTiles(tlat, tlng);
+                if (v !== null) return v;
+
+                const eps = 0.002;
+                const latFrac = lat - tlat;
+                const lngFrac = normLng - tlng;
+                if (latFrac < eps) { v = tryTiles(tlat - 1, tlng); if (v !== null) return v; }
+                else if (latFrac > 1 - eps) { v = tryTiles(tlat + 1, tlng); if (v !== null) return v; }
+                if (lngFrac < eps) { v = tryTiles(tlat, tlng - 1); if (v !== null) return v; }
+                else if (lngFrac > 1 - eps) { v = tryTiles(tlat, tlng + 1); if (v !== null) return v; }
                 return null;
             }
             function updateTerrainDisplay(lat, lng) {
@@ -5888,12 +5724,9 @@
                         } catch (e) { console.warn('Bad stored tile', rec.key); }
                     }
                     if (terrainStore.size) {
-                        // Restore heatmap visibility based on the persisted flag
-                        if (FLAGS.showAllHeatmaps) {
-                            terrainStore.forEach((_t, k) => visibleTiles.add(k));
-                        } else {
-                            terrainStore.forEach((_t, k) => visibleTiles.add(k));
-                        }
+                        terrainStore.forEach((_t, k) => visibleTiles.add(k));
+                        FLAGS.showAllHeatmaps = true;
+                        saveFlags();
                         recomputeGlobalScale();
                         syncShowAllState();
                         updateTerrainVisibility();
@@ -5968,7 +5801,6 @@
                         layers.forEach(l => terrainOverlayGroup.addLayer(l));
                     });
                     terrainOverlayGroup.addLayer(buildTileBorderLayers());
-                    // Only re-stack when we actually rebuilt overlays
                     if (drawnItems.bringToFront) drawnItems.bringToFront();
                 }
             }
@@ -6017,15 +5849,16 @@
                 const w = tile.width, h = tile.height;
                 const img = ctx.createImageData(SIZE, SIZE);
                 const px = img.data;
+                const rangeH = h - 1;
+                const rangeW = w - 1;
                 for (let y = 0; y < SIZE; y++) {
-                    const srcY = Math.floor((y / SIZE) * (h - 1));
+                    const srcY = ((y * rangeH) / SIZE) | 0;
+                    const rowOff = srcY * w;
                     for (let x = 0; x < SIZE; x++) {
-                        const srcX = Math.floor((x / SIZE) * (w - 1));
-                        const v = data[srcY * w + srcX];
-                        const idx = (y * SIZE + x) * 4;
+                        const v = data[rowOff + (((x * rangeW) / SIZE) | 0)];
+                        const idx = (y * SIZE + x) << 2;
                         if (v === -32768 || v <= 0 || v > 9000) { px[idx + 3] = 0; continue; }
-                        const t = (v - minV) / range;
-                        const c = scheme.color(t);
+                        const c = scheme.color((v - minV) / range);
                         px[idx] = c[0]; px[idx+1] = c[1]; px[idx+2] = c[2];
                         px[idx+3] = c[3] !== undefined ? c[3] : 210;
                     }
@@ -6038,7 +5871,12 @@
                 if (heatmapCache.has(cacheKey)) return heatmapCache.get(cacheKey);
                 const canvas = buildHeatmapCanvasForTile(tile);
                 const stats = computeTileStats(tile);
-                const entry = { canvas, min: stats.min, max: stats.max };
+                const entry = {
+                    canvas,
+                    dataURL: canvas.toDataURL('image/png'),
+                    min: stats.min,
+                    max: stats.max
+                };
                 heatmapCache.set(cacheKey, entry);
                 while (heatmapCache.size > HEATMAP_CACHE_MAX) {
                     const oldest = heatmapCache.keys().next().value;
@@ -6051,8 +5889,7 @@
                 const sw = parseKey(key);
                 const tileBounds = [[sw.lat, sw.lng], [sw.lat + 1, sw.lng + 1]];
                 const heat = getOrCreateHeatmap(tile);
-                const dataURL = heat.canvas.toDataURL('image/png');
-                const overlay = L.imageOverlay(dataURL, tileBounds, {
+                const overlay = L.imageOverlay(heat.dataURL, tileBounds, {
                     opacity: 0.85, interactive: true, className: 'hgt-heat-canvas', zIndex: 400, pane: 'terrainPane'
                 });
                 overlay.bindTooltip(`<b>${escapeHtml(key)}</b><br>Tile: ${heat.min}–${heat.max} m<br>Shared scale: ${globalMin}–${globalMax} m`, { sticky: true, direction: 'top' });
@@ -6082,6 +5919,7 @@
             }
             function clearProfilePins() { profilePinsGroup.clearLayers(); }
 
+            // ---- Path profile (for path/polygon geometry) ----
             function openProfilePanel(node) {
                 if (!node || !node.meta.points || node.meta.points.length < 2) { showToast('No geometry to profile', 'fa-info-circle'); return; }
                 if (terrainStore.size === 0) { showToast('Load HGT data first', 'fa-exclamation-circle'); return; }
@@ -6101,22 +5939,22 @@
                         const lat = a.lat + (b.lat - a.lat) * t;
                         const lng = a.lng + (b.lng - a.lng) * t;
                         const elev = getElevation(lat, lng);
-                        if (elev !== null && !isNaN(elev)) samples.push({ d: totalDist, lat, lng, elev });
+                        if (elev !== null && !isNaN(elev)) samples.push({ d: totalDist, lat, lng, terr: elev, rayElev: elev });
                         totalDist += segLen / n;
                     }
                 }
                 const last = latlngs[latlngs.length - 1];
                 const lastElev = getElevation(last.lat, last.lng);
-                if (lastElev !== null && !isNaN(lastElev)) samples.push({ d: totalDist, lat: last.lat, lng: last.lng, elev: lastElev });
+                if (lastElev !== null && !isNaN(lastElev)) samples.push({ d: totalDist, lat: last.lat, lng: last.lng, terr: lastElev, rayElev: lastElev });
                 if (samples.length < 2) { showToast('Not enough terrain data along this path', 'fa-exclamation-circle'); return; }
                 let minE = Infinity, maxE = -Infinity;
-                samples.forEach(s => { if (s.elev < minE) minE = s.elev; if (s.elev > maxE) maxE = s.elev; });
+                samples.forEach(s => { if (s.terr < minE) minE = s.terr; if (s.terr > maxE) maxE = s.terr; });
                 let gain = 0, loss = 0;
                 for (let i = 1; i < samples.length; i++) {
-                    const d = samples[i].elev - samples[i - 1].elev;
+                    const d = samples[i].terr - samples[i - 1].terr;
                     if (d > 0) gain += d; else loss -= d;
                 }
-                profileData = { type: 'path', node, samples, minE, maxE, gain, loss, totalDist };
+                profileData = { type: 'path', node, samples, minE, maxE, gain, loss, totalDist, antennaElev: null, targetElevAtEnd: null };
                 profileTitle.childNodes[0].nodeValue = node.name + ' ';
                 profileSubtitle.textContent = `${formatDistance(totalDist)} · ${samples.length} samples`;
                 profileStats.innerHTML = `
@@ -6130,84 +5968,138 @@
                 updateMapToolsVisibility();
                 setTimeout(() => drawProfileChart(), 320);
             }
+
+            // ---- LOS profile ----
             function openLOSProfile(node) {
                 if (!node || node.type !== 'los') { showToast('Not a LOS object', 'fa-exclamation-circle'); return; }
                 if (terrainStore.size === 0) { showToast('Load HGT data first', 'fa-exclamation-circle'); return; }
                 clearProfileMarkers();
                 clearProfilePins();
-                const numLines = node.meta.numLines || 36;
-                const options = [];
-                for (let i = 0; i < numLines; i++) {
-                    const b = (360 / numLines) * i;
-                    options.push(`<option value="${b}">${String(Math.round(b)).padStart(3, '0')}°</option>`);
-                }
-                profileLineSelect.innerHTML = options.join('');
-                profileLineSelector.classList.add('show');
-                profileLineSelect.value = '0';
-                setLOSHighlight(node, 0);
-                profileLineSelect.onchange = () => {
-                    const bearing = parseFloat(profileLineSelect.value);
-                    setLOSHighlight(node, bearing);
-                    renderLOSProfile(node, bearing);
-                };
+                profileLineSelector.classList.remove('show');
+                profileLineSelect.onchange = null;
+
                 profileTitle.childNodes[0].nodeValue = node.name + ' ';
-                profileSubtitle.textContent = `Radius ${node.meta.radius || 10000} m · ${numLines} lines`;
                 profileHint.textContent = 'Hover to preview · click to place a marker';
                 profilePanel.classList.add('open');
                 updateMapToolsVisibility();
-                renderLOSProfile(node, 0);
-                setTimeout(() => drawProfileChart(), 320);
+
+                if (node.meta.persistedP2P && node.meta.persistedP2P.lat != null) {
+                    // Static P2P profile
+                    profileSubtitle.textContent = 'P2P link';
+                    renderP2PProfile(node);
+                    setTimeout(() => drawProfileChart(), 320);
+                } else {
+                    // Tracking mode — profile follows the mouse
+                    profileSubtitle.textContent = 'Tracking — move mouse';
+                    // Seed profileData so live tracking has an object to update
+                    profileData = { type: 'p2p', node, samples: [], minE: 0, maxE: 100, totalDist: 0, antennaElev: 0, targetElevAtEnd: 0, lostAt: null, bearing: 0, antennaHeight: node.meta.centerHeight || 30, targetHeight: node.meta.targetHeight || 2, curvature: !!node.meta.earthCurvature, previewP2P: null };
+                    drawProfileChart();
+                    if (typeof startLOSTracking === 'function') startLOSTracking(node);
+                }
             }
-            function renderLOSProfile(node, bearingDeg) {
+
+            // ---- P2P profile render (LOS Lab style) ----
+            // endPtOverride, when supplied, is used for live tracking (doesn't mutate node.meta.persistedP2P)
+            function renderP2PProfile(node, endPtOverride) {
+                const startPt = L.latLng(node.meta.lat, node.meta.lng);
+                let endPt;
+                if (endPtOverride) endPt = L.latLng(endPtOverride.lat, endPtOverride.lng);
+                else if (node.meta.persistedP2P && node.meta.persistedP2P.lat != null) endPt = L.latLng(node.meta.persistedP2P.lat, node.meta.persistedP2P.lng);
+                else return;
+
+                const startElev = getElevation(startPt.lat, startPt.lng);
+                const endElev = getElevation(endPt.lat, endPt.lng);
+                if (startElev === null || endElev === null) return;
+
+                const D = haversine(startPt, endPt);
+                if (D < 1) return;
+                const A = startElev + (node.meta.centerHeight || 30);
+                const B = endElev + (node.meta.targetHeight || 2);
+                const curvature = !!node.meta.earthCurvature;
+
+                const samples = [];
+                const stepM = Math.max(20, D / 300);
+                for (let d = 0; d <= D; d += stepM) {
+                    const t = d / D;
+                    const lat = startPt.lat + (endPt.lat - startPt.lat) * t;
+                    const lng = startPt.lng + (endPt.lng - startPt.lng) * t;
+                    let terr = getElevation(lat, lng);
+                    if (terr === null) continue;
+                    if (curvature) terr -= earthBulge(d, D - d);
+                    const rayElev = A + (B - A) * t;
+                    samples.push({ d, lat, lng, terr, rayElev, blocked: terr > rayElev });
+                }
+                if (samples.length < 2) return;
+
+                let minE = Infinity, maxE = -Infinity, lostAt = null;
+                samples.forEach(s => {
+                    if (s.terr < minE) minE = s.terr;
+                    if (s.terr > maxE) maxE = s.terr;
+                    if (s.rayElev < minE) minE = s.rayElev;
+                    if (s.rayElev > maxE) maxE = s.rayElev;
+                    if (s.blocked && lostAt === null) lostAt = s.d;
+                });
+                const pad = Math.max(20, (maxE - minE) * 0.1);
+                minE -= pad; maxE += pad;
+
+                const bearing = bearingDegBetween(startPt, endPt);
+
+                profileData = {
+                    type: 'p2p', node, samples,
+                    minE, maxE, totalDist: D,
+                    antennaElev: A, targetElevAtEnd: B,
+                    antennaHeight: node.meta.centerHeight || 30,
+                    targetHeight: node.meta.targetHeight || 2,
+                    lostAt, bearing, curvature,
+                    previewP2P: endPtOverride || null
+                };
+
+                profileStats.innerHTML = `
+                    <span>Bearing <strong>${bearing.toFixed(0)}°</strong></span>
+                    <span>Distance <strong>${formatDistance(D)}</strong></span>
+                    <span>Start <strong>${Math.round(A)} m</strong></span>
+                    <span>End <strong>${Math.round(B)} m</strong></span>
+                    <span>LOS lost <strong>${lostAt !== null ? formatDistance(lostAt) : 'clear'}</strong></span>
+                    ${curvature ? '<span style="color:var(--sage)"><strong>Curvature ON</strong></span>' : ''}
+                `;
+            }
+
+            // ---- Radial LOS profile (no P2P) ----
+            function renderRadialLOSProfile(node, bearingDeg) {
                 const geo = losLineGeometry(node, bearingDeg);
-                if (geo.pts.length < 2) { showToast('No terrain data along this bearing', 'fa-exclamation-circle'); return; }
-                const samples = geo.pts.map(p => ({ d: p.d, lat: p.lat, lng: p.lng, elev: p.groundElev, targetElev: p.targetElev }));
+                if (!geo.pts || geo.pts.length < 2) { showToast('No terrain data along this bearing', 'fa-exclamation-circle'); return; }
+                const samples = geo.pts.map(p => ({ d: p.d, lat: p.lat, lng: p.lng, terr: p.groundElev, rayElev: p.targetElev, blocked: p.groundElev > p.targetElev }));
                 let minE = Infinity, maxE = -Infinity;
                 samples.forEach(s => {
-                    if (s.elev != null && s.elev < minE) minE = s.elev;
-                    if (s.elev != null && s.elev > maxE) maxE = s.elev;
-                    if (s.targetElev != null && s.targetElev > maxE) maxE = s.targetElev;
+                    if (s.terr < minE) minE = s.terr;
+                    if (s.terr > maxE) maxE = s.terr;
+                    if (s.rayElev < minE) minE = s.rayElev;
+                    if (s.rayElev > maxE) maxE = s.rayElev;
                 });
-                if (geo.antennaElev != null && geo.antennaElev > maxE) maxE = geo.antennaElev;
-                if (minE === Infinity) minE = 0;
-                if (maxE === -Infinity) maxE = 100;
-                const padding = Math.max(20, (maxE - minE) * 0.1);
-                minE = Math.floor(minE - padding);
-                maxE = Math.ceil(maxE + padding);
+                if (!isFinite(minE)) { minE = 0; maxE = 100; }
+                const pad = Math.max(20, (maxE - minE) * 0.1);
+                minE -= pad; maxE += pad;
                 const totalDist = samples.length > 0 ? samples[samples.length - 1].d : 0;
-                const antennaElev = geo.antennaElev;
-                const targetElevAtEnd = geo.targetElevEnd;
-                const raySlope = (targetElevAtEnd - antennaElev) / totalDist;
-                const losSegments = [];
-                let currentSegment = { color: '#4d7c0f', points: [] };
-                losSegments.push(currentSegment);
-                samples.forEach((s) => {
-                    const rayElev = antennaElev + raySlope * s.d;
-                    const terrainHere = s.elev != null ? s.elev : 0;
-                    const blocked = terrainHere > rayElev;
-                    const pt = { d: s.d, elev: rayElev, blocked };
-                    const last = losSegments[losSegments.length - 1];
-                    if (blocked && last.color === '#4d7c0f') {
-                        losSegments.push({ color: '#dc2626', points: [last.points[last.points.length - 1]] });
-                    } else if (!blocked && last.color === '#dc2626') {
-                        losSegments.push({ color: '#4d7c0f', points: [last.points[last.points.length - 1]] });
-                    }
-                    losSegments[losSegments.length - 1].points.push(pt);
-                });
-                const cleanedSegments = losSegments.filter(seg => seg.points.length >= 2);
+                let lostAt = null;
+                samples.forEach(s => { if (s.blocked && lostAt === null) lostAt = s.d; });
                 profileData = {
-                    type: 'los', node, bearing: bearingDeg, samples, minE, maxE,
-                    totalDist, antennaElev, targetElevAtEnd,
-                    losSegments: cleanedSegments, centerElev: geo.centerElev, lostAt: geo.lostAt
+                    type: 'los', node, bearing: bearingDeg, samples,
+                    minE, maxE, totalDist,
+                    antennaElev: geo.antennaElev,
+                    targetElevAtEnd: geo.targetElevEnd,
+                    antennaHeight: node.meta.centerHeight || 30,
+                    targetHeight: node.meta.targetHeight || 2,
+                    lostAt, curvature: !!node.meta.earthCurvature
                 };
-                const lossText = geo.lostAt !== null ? `${Math.round(geo.lostAt)} m` : 'clear to edge';
+                const lossText = lostAt !== null ? `${Math.round(lostAt)} m` : 'clear to edge';
                 profileStats.innerHTML = `
-                    <span>Antenna <strong>${Math.round(antennaElev)} m</strong></span>
-                    <span>Target <strong>${Math.round(targetElevAtEnd)} m</strong></span>
+                    <span>Antenna <strong>${Math.round(geo.antennaElev)} m</strong></span>
+                    <span>Target <strong>${Math.round(geo.targetElevEnd)} m</strong></span>
                     <span>LOS lost at <strong>${lossText}</strong></span>
                 `;
-                drawProfileChart();
             }
+
+            // ---- Chart renderer (handles both path and LOS profiles) ----
             function drawProfileChart() {
                 if (!profileData) return;
                 const canvas = profileCanvas;
@@ -6220,127 +6112,168 @@
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                 const W = rect.width, H = rect.height;
                 ctx.clearRect(0, 0, W, H);
-                const { samples, minE, maxE, totalDist } = profileData;
-                const padL = 55, padR = 20, padT = 44, padB = 30;
+                ctx.fillStyle = '#fafaf7';
+                ctx.fillRect(0, 0, W, H);
+
+                const samples = profileData.samples || [];
+                const minE = profileData.minE;
+                const maxE = profileData.maxE;
+                const totalDist = profileData.totalDist;
+
+                if (samples.length < 2 || !isFinite(minE) || !isFinite(maxE) || !totalDist) {
+                    ctx.fillStyle = '#6d7167';
+                    ctx.font = '11px "IBM Plex Mono", monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Move mouse over the map to preview', W / 2, H / 2);
+                    return;
+                }
+
+                const padL = 55, padR = 20, padT = 30, padB = 26;
                 const plotW = W - padL - padR;
                 const plotH = H - padT - padB;
                 const range = Math.max(1, maxE - minE);
-                ctx.fillStyle = '#fafaf7';
-                ctx.fillRect(0, 0, W, H);
+
+                const xOf = d => padL + (d / totalDist) * plotW;
+                const yOf = e => padT + (1 - (e - minE) / range) * plotH;
+
+                // grid + axis labels
                 ctx.strokeStyle = 'rgba(0,0,0,0.06)';
                 ctx.lineWidth = 1;
+                ctx.font = '10px "IBM Plex Mono", monospace';
+                ctx.fillStyle = '#6d7167';
+                ctx.textAlign = 'right';
                 for (let i = 0; i <= 4; i++) {
                     const y = padT + (i / 4) * plotH;
                     ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
-                    const elev = maxE - (i / 4) * range;
-                    ctx.fillStyle = '#6d7167';
-                    ctx.font = '10px "IBM Plex Mono", monospace';
-                    ctx.textAlign = 'right';
-                    ctx.fillText(Math.round(elev) + ' m', padL - 6, y + 3);
+                    ctx.fillText(Math.round(maxE - (i / 4) * range) + ' m', padL - 6, y + 3);
                 }
-                ctx.fillStyle = '#6d7167';
-                ctx.font = '10px "IBM Plex Mono", monospace';
                 ctx.textAlign = 'center';
                 for (let i = 0; i <= 4; i++) {
                     const x = padL + (i / 4) * plotW;
-                    const d = (i / 4) * totalDist;
-                    ctx.fillText(formatDistance(d), x, H - 8);
+                    ctx.fillText(formatDistance((i / 4) * totalDist), x, H - 8);
                 }
-                const gradient = ctx.createLinearGradient(0, padT, 0, padT + plotH);
-                gradient.addColorStop(0, 'rgba(77, 124, 15, 0.35)');
-                gradient.addColorStop(1, 'rgba(77, 124, 15, 0.03)');
+
+                // terrain fill + line
+                const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+                grad.addColorStop(0, 'rgba(77,124,15,0.35)');
+                grad.addColorStop(1, 'rgba(77,124,15,0.02)');
                 ctx.beginPath();
-                ctx.moveTo(padL, padT + plotH);
-                for (const s of samples) {
-                    if (s.elev == null) continue;
-                    const x = padL + (s.d / totalDist) * plotW;
-                    const y = padT + (1 - (s.elev - minE) / range) * plotH;
-                    ctx.lineTo(x, y);
-                }
-                ctx.lineTo(padL + plotW, padT + plotH);
+                ctx.moveTo(xOf(0), padT + plotH);
+                for (const s of samples) ctx.lineTo(xOf(s.d), yOf(s.terr));
+                ctx.lineTo(xOf(totalDist), padT + plotH);
                 ctx.closePath();
-                ctx.fillStyle = gradient;
+                ctx.fillStyle = grad;
                 ctx.fill();
+
                 ctx.beginPath();
                 let started = false;
-                for (let i = 0; i < samples.length; i++) {
-                    const s = samples[i];
-                    if (s.elev == null) continue;
-                    const x = padL + (s.d / totalDist) * plotW;
-                    const y = padT + (1 - (s.elev - minE) / range) * plotH;
-                    if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+                for (const s of samples) {
+                    if (!started) { ctx.moveTo(xOf(s.d), yOf(s.terr)); started = true; }
+                    else ctx.lineTo(xOf(s.d), yOf(s.terr));
                 }
                 ctx.strokeStyle = '#4d7c0f';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                if (profileData.type === 'los') {
-                    const antX = padL;
-                    const antY = padT + (1 - (profileData.antennaElev - minE) / range) * plotH;
-                    ctx.beginPath(); ctx.arc(antX, antY, 6, 0, Math.PI * 2);
+
+                // LOS ray — dashed, green when clear, red when blocked
+                if (profileData.type === 'p2p' || profileData.type === 'los') {
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([6, 4]);
+                    let prev = null;
+                    for (const s of samples) {
+                        const x = xOf(s.d);
+                        const y = yOf(s.rayElev);
+                        if (prev) {
+                            ctx.beginPath();
+                            ctx.moveTo(prev.x, prev.y);
+                            ctx.lineTo(x, y);
+                            ctx.strokeStyle = s.blocked ? '#dc2626' : '#22c55e';
+                            ctx.stroke();
+                        }
+                        prev = { x, y };
+                    }
+                    ctx.setLineDash([]);
+                }
+
+                // Antenna + target towers and dots (only for LOS profiles)
+                if (profileData.type === 'p2p' || profileData.type === 'los') {
+                    const x0 = xOf(0), y0 = yOf(profileData.antennaElev);
+                    const groundStart = samples[0].terr;
+                    const groundY0 = yOf(groundStart);
+                    ctx.beginPath(); ctx.moveTo(x0, groundY0); ctx.lineTo(x0, y0);
+                    ctx.strokeStyle = '#166534'; ctx.lineWidth = 2.5; ctx.stroke();
+                    ctx.beginPath(); ctx.arc(x0, y0, 5, 0, Math.PI * 2);
                     ctx.fillStyle = '#166534'; ctx.fill();
                     ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
-                    ctx.fillStyle = '#166534';
-                    ctx.font = 'bold 10px "IBM Plex Mono", monospace';
-                    ctx.textAlign = 'left';
-                    ctx.fillText('ANT', antX + 10, antY + 3);
-                    const endX = padL + plotW;
-                    const endY = padT + (1 - (profileData.targetElevAtEnd - minE) / range) * plotH;
-                    ctx.beginPath(); ctx.arc(endX, endY, 6, 0, Math.PI * 2);
+
+                    const x1 = xOf(totalDist), y1 = yOf(profileData.targetElevAtEnd);
+                    const groundEnd = samples[samples.length - 1].terr;
+                    const groundY1 = yOf(groundEnd);
+                    ctx.beginPath(); ctx.moveTo(x1, groundY1); ctx.lineTo(x1, y1);
+                    ctx.strokeStyle = '#ea580c'; ctx.lineWidth = 2.5; ctx.stroke();
+                    ctx.beginPath(); ctx.arc(x1, y1, 5, 0, Math.PI * 2);
                     ctx.fillStyle = '#ea580c'; ctx.fill();
                     ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
-                    ctx.fillStyle = '#ea580c';
+
+                    // height labels above the towers
                     ctx.font = 'bold 10px "IBM Plex Mono", monospace';
+                    ctx.textAlign = 'left';
+                    ctx.fillStyle = '#166534';
+                    ctx.fillText('⏶ ' + Math.round(profileData.antennaHeight) + ' m', x0 + 8, y0 - 8);
                     ctx.textAlign = 'right';
-                    ctx.fillText('TGT', endX - 10, endY + 3);
-                    ctx.beginPath(); ctx.moveTo(antX, antY); ctx.lineTo(endX, endY);
-                    ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 1;
-                    ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
-                    for (const seg of profileData.losSegments) {
-                        ctx.beginPath();
-                        let first = true;
-                        for (const p of seg.points) {
-                            const x = padL + (p.d / totalDist) * plotW;
-                            const y = padT + (1 - (p.elev - minE) / range) * plotH;
-                            if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
-                        }
-                        ctx.strokeStyle = seg.color; ctx.lineWidth = 2.5; ctx.stroke();
+                    ctx.fillStyle = '#ea580c';
+                    ctx.fillText(Math.round(profileData.targetHeight) + ' m ⏶', x1 - 8, y1 - 8);
+
+                    // ground labels below the towers
+                    ctx.font = '9px "IBM Plex Mono", monospace';
+                    ctx.fillStyle = '#6d7167';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(Math.round(groundStart) + ' m', x0 + 8, groundY0 - 4);
+                    ctx.textAlign = 'right';
+                    ctx.fillText(Math.round(groundEnd) + ' m', x1 - 8, groundY1 - 4);
+
+                    if (profileData.curvature) {
+                        ctx.fillStyle = 'rgba(77,124,15,0.7)';
+                        ctx.font = '9px "IBM Plex Mono", monospace';
+                        ctx.textAlign = 'left';
+                        ctx.fillText('↓ curvature applied', padL + 4, padT + 12);
                     }
                 }
+
+                // hover marker
                 if (profileHoverSample) {
                     const s = profileHoverSample;
-                    const x = padL + (s.d / totalDist) * plotW;
-                    const y = padT + (1 - (s.elev - minE) / range) * plotH;
-                    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    ctx.beginPath(); ctx.arc(xOf(s.d), yOf(s.terr), 5, 0, Math.PI * 2);
                     ctx.fillStyle = '#4d7c0f'; ctx.fill();
                     ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
                 }
+
+                // pins
                 profilePinsGroup.eachLayer(m => {
                     const s = m._profileSample;
                     if (!s) return;
-                    const x = padL + (s.d / totalDist) * plotW;
-                    const y = padT + (1 - (s.elev - minE) / range) * plotH;
-                    ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI * 2);
+                    ctx.beginPath(); ctx.arc(xOf(s.d), yOf(s.terr), 7, 0, Math.PI * 2);
                     ctx.fillStyle = '#ea580c'; ctx.fill();
                     ctx.strokeStyle = 'white'; ctx.lineWidth = 2.5; ctx.stroke();
                 });
             }
+
             function sampleAtCanvasX(x) {
-                if (!profileData) return null;
+                if (!profileData || !profileData.samples || profileData.samples.length < 2) return null;
                 const rect = profileCanvas.getBoundingClientRect();
                 const padL = 55, padR = 20;
                 const plotW = rect.width - padL - padR;
                 const t = (x - padL) / plotW;
                 if (t < 0 || t > 1) return null;
                 const targetDist = t * profileData.totalDist;
-                let closest = null;
-                let bestD = Infinity;
+                let closest = null, bestD = Infinity;
                 for (const s of profileData.samples) {
-                    if (s.elev == null) continue;
                     const d = Math.abs(s.d - targetDist);
                     if (d < bestD) { bestD = d; closest = s; }
                 }
                 return closest;
             }
+
             profileCanvas.addEventListener('mousemove', (e) => {
                 if (!profileData) return;
                 const rect = profileCanvas.getBoundingClientRect();
@@ -6354,11 +6287,7 @@
                 }
                 profileHoverSample = sample;
                 profileHover.classList.add('show');
-                profileHover.innerHTML = `
-                    <div><strong>${Math.round(sample.elev)} m</strong></div>
-                    <div>${sample.lat.toFixed(5)}, ${sample.lng.toFixed(5)}</div>
-                    <div>at ${formatDistance(sample.d)}</div>
-                `;
+                profileHover.innerHTML = `<strong>${Math.round(sample.terr)} m</strong> at ${formatDistance(sample.d)}${sample.blocked ? ' · <span style="color:#dc2626">BLOCKED</span>' : ''}`;
                 if (profileHoverMarker) profileHoverMarker.setLatLng([sample.lat, sample.lng]);
                 else {
                     profileHoverMarker = L.marker([sample.lat, sample.lng], {
@@ -6381,7 +6310,7 @@
                 if (!sample) return;
                 const name = `Pin @ ${formatDistance(sample.d)}`;
                 const marker = L.marker([sample.lat, sample.lng], { icon: makeLeafletIcon(DEFAULT_ICON, '#ea580c') });
-                marker.bindPopup(`<b>${Math.round(sample.elev)} m</b><br>${sample.lat.toFixed(6)}, ${sample.lng.toFixed(6)}<br>at ${formatDistance(sample.d)}`);
+                marker.bindPopup(`<b>${Math.round(sample.terr)} m</b><br>${sample.lat.toFixed(6)}, ${sample.lng.toFixed(6)}<br>at ${formatDistance(sample.d)}`);
                 drawnItems.addLayer(marker);
                 const node = createNode({
                     type: 'placemark', name, layer: marker,
@@ -6418,6 +6347,8 @@
             });
             window.addEventListener('resize', () => { if (profileData) drawProfileChart(); });
 
+
+
             // ==================== GEOLOCATION ====================
             function locateMe() {
                 if (!navigator.geolocation) { showToast('Geolocation not supported', 'fa-info-circle'); return; }
@@ -6434,6 +6365,7 @@
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             }
+
             document.addEventListener('keydown', (e) => {
                 if ((e.key === 'l' || e.key === 'L') && !e.target.matches('input, textarea')) locateMe();
                 if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !e.target.matches('input, textarea')) {
@@ -6450,6 +6382,13 @@
                         const target = mouseTracker.latlng || null;
                         const folder = currentFolderId ? findNode(currentFolderId) : null;
                         pastePlacemarkInto(folder, target);
+                    }
+                }
+                if ((e.key === 'Enter') && drawState && !e.target.matches('input, textarea')) {
+                    const t = drawState.type;
+                    if (t === 'path' || t === 'polygon' || t === 'measure' || t === 'measure-area') {
+                        e.preventDefault();
+                        finishPathOrPolygon();
                     }
                 }
             });
@@ -6493,11 +6432,10 @@
                 }, 200);
                 showToast(`Go to ${coord.lat.toFixed(5)}, ${coord.lng.toFixed(5)}`, 'fa-crosshairs');
             }
-            (function initGPSSearch() {
-                const gpsInput = document.getElementById('gps-search-input');
-                const gpsBtn = document.getElementById('gps-search-go');
-                const gpsClear = document.getElementById('gps-search-clear');
-                if (!gpsInput || !gpsBtn) return;
+            const gpsInput = document.getElementById('gps-search-input');
+            const gpsBtn = document.getElementById('gps-search-go');
+            const gpsClear = document.getElementById('gps-search-clear');
+            if (gpsInput && gpsBtn) {
                 const submit = () => {
                     const coord = parseCoordString(gpsInput.value);
                     if (!coord) {
@@ -6522,7 +6460,7 @@
                         gpsInput.focus();
                     });
                 }
-            })();
+            }
 
             // ==================== FIT TO PLACES ====================
             function fitToPlacesExtent() {
@@ -6545,6 +6483,466 @@
                 }
             }
 
+            // ==================== LOS P2P TRACKING ====================
+            // Tracking state — set when a LOS editor opens with no persisted P2P.
+            // Mouse movement previews the P2P endpoint; a map click persists it.
+            let losTrackingNode = null;
+            let losTrackingMouseLatLng = null;
+            let losTrackingEndpoint = null;
+            let losTrackingRAF = null;
+            const losPreviewGroup = L.featureGroup().addTo(map);
+            const losTrackingHintEl = document.getElementById('los-tracking-hint');
+
+            function startLOSTracking(node) {
+                if (!node || node.type !== 'los') return;
+                losTrackingNode = node;
+                losTrackingMouseLatLng = null;
+                losTrackingEndpoint = null;
+                map.getContainer().style.cursor = 'crosshair';
+                if (losTrackingHintEl) losTrackingHintEl.classList.add('show');
+            }
+
+            function stopLOSTracking() {
+                losTrackingNode = null;
+                losTrackingMouseLatLng = null;
+                losTrackingEndpoint = null;
+                if (losTrackingRAF) { cancelAnimationFrame(losTrackingRAF); losTrackingRAF = null; }
+                losPreviewGroup.clearLayers();
+                map.getContainer().style.cursor = '';
+                if (losTrackingHintEl) losTrackingHintEl.classList.remove('show');
+            }
+
+            function updateLOSTracking() {
+                if (!losTrackingNode || !losTrackingMouseLatLng) return;
+                const los = losTrackingNode;
+                const center = L.latLng(los.meta.lat, los.meta.lng);
+                const mouse = losTrackingMouseLatLng;
+                const rawDist = haversine(center, mouse);
+                if (rawDist < 5) { losPreviewGroup.clearLayers(); losTrackingEndpoint = null; return; }
+                const radius = los.meta.radius || 10000;
+                const dist = Math.min(radius, rawDist);
+                const brg = bearingDegBetween(center, mouse);
+                const cosLat = Math.cos(center.lat * Math.PI / 180);
+                const endpoint = {
+                    lat: center.lat + (dist * Math.cos(brg * Math.PI / 180)) / 111320,
+                    lng: center.lng + (dist * Math.sin(brg * Math.PI / 180)) / (111320 * cosLat)
+                };
+                losTrackingEndpoint = endpoint;
+
+                losPreviewGroup.clearLayers();
+                const link = buildLinkSegments(los, center, L.latLng(endpoint.lat, endpoint.lng));
+                if (link) {
+                    for (const seg of link.segments) {
+                        losPreviewGroup.addLayer(L.polyline(seg.points, { color: seg.color, weight: 3, dashArray: '6,3' }));
+                    }
+                    losPreviewGroup.addLayer(L.circleMarker([endpoint.lat, endpoint.lng], {
+                        radius: 6, color: 'white', weight: 2,
+                        fillColor: link.geo.lostAt !== null ? '#dc2626' : '#22c55e', fillOpacity: 1
+                    }));
+                }
+
+                // If the profile panel is open for this LOS, update it live
+                if (profileData && profileData.node === los && profilePanel.classList.contains('open')) {
+                    renderP2PProfile(los, endpoint);
+                    drawProfileChart();
+                }
+            }
+
+            // Mouse move: track for LOS preview
+            map.on('mousemove', (e) => {
+                if (!losTrackingNode) return;
+                losTrackingMouseLatLng = e.latlng;
+                if (losTrackingRAF) cancelAnimationFrame(losTrackingRAF);
+                losTrackingRAF = requestAnimationFrame(updateLOSTracking);
+            });
+            map.on('mouseout', () => {
+                if (!losTrackingNode) return;
+                losPreviewGroup.clearLayers();
+                losTrackingEndpoint = null;
+                losTrackingMouseLatLng = null;
+            });
+
+            // Cancel button on the tracking hint
+            if (document.getElementById('los-tracking-cancel')) {
+                document.getElementById('los-tracking-cancel').addEventListener('click', () => {
+                    stopLOSTracking();
+                    showToast('Tracking cancelled', 'fa-times');
+                });
+            }
+
+            // Click: persist the P2P endpoint (only when tracking and no draw in progress)
+            map.on('click', async (e) => {
+                if (drawState) return;
+                if (!losTrackingNode) return;
+                if (!losTrackingEndpoint) return;
+                const los = losTrackingNode;
+                const center = L.latLng(los.meta.lat, los.meta.lng);
+                const dist = haversine(center, L.latLng(losTrackingEndpoint.lat, losTrackingEndpoint.lng));
+                if (dist < 5) return;
+
+                los.meta.persistedP2P = { lat: losTrackingEndpoint.lat, lng: losTrackingEndpoint.lng };
+                los.meta.trackMouse = false;
+
+                stopLOSTracking();
+                rebuildLOSLayer(los);
+                await persistTreeNow();
+
+                if (editorState && editorState.node === los) renderEditorBody();
+                showToast('P2P endpoint set', 'fa-link');
+
+                if (profileData && profileData.node === los && profilePanel.classList.contains('open')) {
+                    profileSubtitle.textContent = 'P2P link';
+                    renderP2PProfile(los);
+                    drawProfileChart();
+                }
+            });
+
+            // ==================== DRAWING ====================
+            let drawState = null;
+            const drawStatusEl = document.getElementById('draw-status');
+            const drawStatusText = document.getElementById('draw-status-text');
+            const drawBadgeEl = document.getElementById('draw-badge');
+            const drawFinishBtn = document.getElementById('draw-status-finish');
+
+            function showDrawStatus(text, showFinish) {
+                drawStatusText.textContent = text;
+                drawFinishBtn.style.display = showFinish ? '' : 'none';
+                drawStatusEl.classList.add('show');
+            }
+            function hideDrawStatus() {
+                drawStatusEl.classList.remove('show');
+                drawFinishBtn.style.display = 'none';
+                hideDrawBadge();
+            }
+            function showDrawBadge(html, latlng) {
+                drawBadgeEl.innerHTML = html;
+                drawBadgeEl.classList.add('show');
+                if (latlng) {
+                    const pt = map.latLngToContainerPoint(latlng);
+                    drawBadgeEl.style.left = (pt.x + 20) + 'px';
+                    drawBadgeEl.style.top = (pt.y - 40) + 'px';
+                }
+            }
+            function hideDrawBadge() { drawBadgeEl.classList.remove('show'); }
+
+            document.getElementById('draw-status-cancel').addEventListener('click', () => {
+                cancelActiveDraw();
+                showToast('Drawing cancelled', 'fa-times');
+            });
+            document.getElementById('draw-status-finish').addEventListener('click', () => {
+                if (!drawState) return;
+                const t = drawState.type;
+                if (t === 'path' || t === 'polygon' || t === 'measure' || t === 'measure-area') {
+                    finishPathOrPolygon();
+                } else {
+                    cancelActiveDraw();
+                }
+            });
+
+            function clearDrawModeUI() { document.querySelectorAll('.map-tool').forEach(el => el.classList.remove('active')); }
+            function cancelActiveDraw() {
+                if (drawState) { if (drawState.tempLayer) map.removeLayer(drawState.tempLayer); drawState = null; }
+                clearDrawModeUI();
+                map.getContainer().style.cursor = '';
+                hideSnapPreview();
+                hideDrawStatus();
+                refreshSnapZoneMode();
+            }
+            function beginDraw(type) {
+                cancelActiveDraw();
+                // Starting a draw cancels any active LOS tracking so clicks don't leak through
+                if (typeof stopLOSTracking === 'function') stopLOSTracking();
+                drawState = { type, points: [], tempLayer: null, lastClickTime: 0 };
+                clearDrawModeUI();
+                const btn = document.getElementById(type === 'placemark' ? 'tool-placemark' : type === 'path' ? 'tool-path' : type === 'polygon' ? 'tool-polygon' : type === 'measure' ? 'tool-measure' : type === 'measure-area' ? 'tool-measure-area' : '');
+                if (btn) btn.classList.add('active');
+                map.getContainer().style.cursor = 'crosshair';
+                if (type === 'placemark') {
+                    showToast('Click on the map to place a marker', 'fa-map-pin');
+                    showDrawStatus('Click map to place a marker', false);
+                } else if (type === 'path' || type === 'measure') {
+                    showToast('Click points · double-click or Finish to end', 'fa-route');
+                    showDrawStatus('Drawing path — Finish or double-click to end', true);
+                } else if (type === 'polygon' || type === 'measure-area') {
+                    showToast('Click points · double-click or Finish to close', 'fa-draw-polygon');
+                    showDrawStatus('Drawing polygon — Finish or double-click to close', true);
+                }
+                refreshSnapZoneMode();
+            }
+            function updateLiveBadge(cursorLatLng) {
+                if (!drawState || drawState.points.length === 0) { hideDrawBadge(); return; }
+                if (!FLAGS.liveDraw) return;
+                const pts = drawState.points.concat([cursorLatLng]);
+                const type = drawState.type;
+                if (type === 'path' || type === 'measure') {
+                    const d = pathDistance(pts);
+                    showDrawBadge(`<i class="fas fa-ruler"></i>${formatDistance(d)} · ${pts.length} vertices`, cursorLatLng);
+                } else if (type === 'polygon' || type === 'measure-area') {
+                    if (pts.length >= 3) {
+                        const a = polygonArea(pts);
+                        showDrawBadge(`<i class="fas fa-vector-square"></i>${formatArea(a)} · ${pts.length} vertices`, cursorLatLng);
+                    } else {
+                        showDrawBadge(`<i class="fas fa-draw-polygon"></i>${pts.length} vertices`, cursorLatLng);
+                    }
+                }
+            }
+            function updateTempPreview(latlng) {
+                if (!drawState) return;
+                const type = drawState.type;
+                const isMeasure = (type === 'measure' || type === 'measure-area');
+                const color = isMeasure ? '#f59e0b' : '#4d7c0f';
+                const pts = drawState.points.concat([latlng]);
+
+                if (type === 'path' || type === 'measure') {
+                    if (pts.length >= 2) {
+                        if (drawState.tempLayer && drawState.tempLayer instanceof L.Polyline && !(drawState.tempLayer instanceof L.Polygon)) {
+                            drawState.tempLayer.setLatLngs(pts);
+                        } else {
+                            if (drawState.tempLayer) map.removeLayer(drawState.tempLayer);
+                            drawState.tempLayer = L.polyline(pts, { color, weight: 3, opacity: 0.75 }).addTo(map);
+                        }
+                    }
+                } else if (type === 'polygon' || type === 'measure-area') {
+                    if (pts.length >= 3) {
+                        if (drawState.tempLayer && drawState.tempLayer instanceof L.Polygon) {
+                            drawState.tempLayer.setLatLngs(pts);
+                        } else {
+                            if (drawState.tempLayer) map.removeLayer(drawState.tempLayer);
+                            drawState.tempLayer = L.polygon(pts, { color, weight: 2, fillOpacity: 0.12, opacity: 0.75 }).addTo(map);
+                        }
+                    } else if (pts.length >= 2) {
+                        if (drawState.tempLayer && drawState.tempLayer instanceof L.Polyline && !(drawState.tempLayer instanceof L.Polygon)) {
+                            drawState.tempLayer.setLatLngs(pts);
+                        } else {
+                            if (drawState.tempLayer) map.removeLayer(drawState.tempLayer);
+                            drawState.tempLayer = L.polyline(pts, { color, weight: 2, dashArray: '4,4', opacity: 0.75 }).addTo(map);
+                        }
+                    }
+                }
+                updateLiveBadge(latlng);
+            }
+            async function finishPathOrPolygon() {
+                if (!drawState) return;
+                const pts = drawState.points;
+                const type = drawState.type;
+                const isPoly = (type === 'polygon' || type === 'measure-area');
+                const minPts = isPoly ? 3 : 2;
+                if (drawState.tempLayer) { map.removeLayer(drawState.tempLayer); drawState.tempLayer = null; }
+                if (pts.length < minPts) {
+                    showToast(isPoly ? 'Need at least 3 points for a polygon' : 'Need at least 2 points', 'fa-info-circle');
+                    drawState = null; clearDrawModeUI();
+                    map.getContainer().style.cursor = '';
+                    hideSnapPreview();
+                    hideDrawStatus();
+                    refreshSnapZoneMode();
+                    return;
+                }
+                const latlngs = pts.slice();
+                drawState = null; clearDrawModeUI();
+                map.getContainer().style.cursor = '';
+                hideSnapPreview();
+                hideDrawStatus();
+                refreshSnapZoneMode();
+
+                if (type === 'path' || type === 'measure') {
+                    const d = pathDistance(latlngs);
+                    const isMeasure = (type === 'measure');
+                    const color = isMeasure ? '#f59e0b' : '#4d7c0f';
+                    const line = L.polyline(latlngs, { color, weight: 3 });
+                    drawnItems.addLayer(line);
+                    if (isMeasure) {
+                        const distStr = formatDistance(d);
+                        line.bindPopup(`Distance: <b>${distStr}</b>`).openPopup();
+                        const n = createNode({ type: 'measure', name: `Distance: ${distStr}`, layer: line, meta: { distance: d, points: latlngs.map(p => [p.lat, p.lng]), color, lineThickness: 3 } });
+                        bindLayerFocus(n, line);
+                        attachLayerDrag(n, line);
+                        if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
+                        await persistTreeNow();
+                        showToast('Measured: ' + distStr, 'fa-ruler');
+                    } else {
+                        const result = await openNewNodeModal({ type: 'path', name: 'New path', meta: { distance: d, points: latlngs.map(p => [p.lat, p.lng]), color, desc: '', lineThickness: 3 } });
+                        if (!result) { drawnItems.removeLayer(line); return; }
+                        line.setStyle({ color: result.color });
+                        line.bindPopup(`<b>${escapeHtml(result.name)}</b><br>Length: ${formatDistance(d)}`);
+                        const n = createNode({ type: 'path', name: result.name, layer: line, meta: { distance: d, points: latlngs.map(p => [p.lat, p.lng]), color: result.color, desc: result.desc, lineThickness: 3 } });
+                        bindLayerFocus(n, line);
+                        attachLayerDrag(n, line);
+                        if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
+                        await persistTreeNow();
+                        showToast(`Path: ${result.name}`, 'fa-route');
+                    }
+                } else if (type === 'polygon' || type === 'measure-area') {
+                    const isMeasure = (type === 'measure-area');
+                    const color = isMeasure ? '#f59e0b' : '#4d7c0f';
+                    const poly = L.polygon(latlngs, { color, weight: 2, fillOpacity: 0.2 });
+                    drawnItems.addLayer(poly);
+                    if (isMeasure) {
+                        const a = polygonArea(latlngs);
+                        const areaStr = formatArea(a);
+                        poly.bindPopup(`Area: <b>${areaStr}</b>`).openPopup();
+                        const n = createNode({ type: 'measure-area', name: `Area: ${areaStr}`, layer: poly, meta: { area: a, points: latlngs.map(p => [p.lat, p.lng]), color, lineThickness: 2 } });
+                        bindLayerFocus(n, poly);
+                        attachLayerDrag(n, poly);
+                        if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
+                        await persistTreeNow();
+                        showToast('Area: ' + areaStr, 'fa-vector-square');
+                    } else {
+                        const result = await openNewNodeModal({ type: 'polygon', name: 'New polygon', meta: { points: latlngs.map(p => [p.lat, p.lng]), color, desc: '', lineThickness: 2 } });
+                        if (!result) { drawnItems.removeLayer(poly); return; }
+                        poly.setStyle({ color: result.color });
+                        poly.bindPopup(`<b>${escapeHtml(result.name)}</b>`);
+                        const n = createNode({ type: 'polygon', name: result.name, layer: poly, meta: { points: latlngs.map(p => [p.lat, p.lng]), color: result.color, desc: result.desc, lineThickness: 2 } });
+                        bindLayerFocus(n, poly);
+                        attachLayerDrag(n, poly);
+                        if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
+                        await persistTreeNow();
+                        showToast(`Polygon: ${result.name}`, 'fa-draw-polygon');
+                    }
+                }
+            }
+
+            map.on('click', async (e) => {
+                const raw = e.latlng;
+                if (terrainStore.size > 0) updateTerrainDisplay(raw.lat, raw.lng);
+                if (!drawState) return;
+                const now = Date.now();
+                const isDoubleClick = (now - (drawState.lastClickTime || 0)) < 350;
+                drawState.lastClickTime = now;
+
+                if (drawState.type === 'placemark') {
+                    const latlng = raw;
+                    const result = await openNewNodeModal({ type: 'placemark', name: 'New placemark', meta: { icon: DEFAULT_ICON, color: '#4d7c0f', desc: '', lat: latlng.lat, lng: latlng.lng } });
+                    drawState = null; clearDrawModeUI();
+                    map.getContainer().style.cursor = '';
+                    hideSnapPreview();
+                    hideDrawStatus();
+                    refreshSnapZoneMode();
+                    if (!result) return;
+                    const finalLat = (result.lat !== undefined && result.lat !== null) ? result.lat : latlng.lat;
+                    const finalLng = (result.lng !== undefined && result.lng !== null) ? result.lng : latlng.lng;
+                    const marker = L.marker([finalLat, finalLng], { icon: makeLeafletIcon(result.icon || DEFAULT_ICON, result.color) });
+                    marker.bindPopup(`<b>${escapeHtml(result.name)}</b>${result.desc ? '<br>' + escapeHtml(result.desc) : ''}`);
+                    drawnItems.addLayer(marker);
+                    const n = createNode({ type: 'placemark', name: result.name, layer: marker, meta: { desc: result.desc, lat: finalLat, lng: finalLng, icon: result.icon || DEFAULT_ICON, color: result.color } });
+                    bindLayerFocus(n, marker);
+                    attachLayerDrag(n, marker);
+                    if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
+                    await persistTreeNow();
+                    marker.openPopup();
+                    showToast(`Placemark: ${result.name}`, 'fa-map-pin');
+                    return;
+                }
+                if (isDoubleClick && (drawState.type === 'path' || drawState.type === 'polygon' || drawState.type === 'measure' || drawState.type === 'measure-area')) return;
+                const latlng = applySnapFromEvent(e, raw);
+                drawState.points.push(latlng);
+                updateTempPreview(latlng);
+            });
+
+            map.on('mousemove', (e) => {
+                map._lastMouseLatLng = e.latlng;
+                if (terrainStore.size > 0) updateTerrainDisplay(e.latlng.lat, e.latlng.lng);
+                if (SETTINGS.snapToMarkers && (drawState || (editorState && editorState.activeTab === 'vertices'))) {
+                    updateSnapPreview(e.containerPoint);
+                    if (drawState && drawState.type !== 'placemark') {
+                        const snapped = applySnapFromContainerPoint(e.containerPoint, e.latlng);
+                        updateTempPreview(snapped);
+                    }
+                } else if (drawState && drawState.type !== 'placemark') {
+                    updateTempPreview(e.latlng);
+                }
+                if (drawState) updateLiveBadge(e.latlng);
+            });
+            map.on('mouseout', () => { hideSnapPreview(); hideDrawBadge(); });
+            map.on('dblclick', (e) => {
+                if (!drawState) return;
+                if (drawState.type === 'path' || drawState.type === 'polygon' || drawState.type === 'measure' || drawState.type === 'measure-area') {
+                    L.DomEvent.preventDefault(e);
+                    L.DomEvent.stopPropagation(e);
+                    finishPathOrPolygon();
+                }
+            });
+            map.on('contextmenu', (e) => {
+                if (drawState) { L.DomEvent.preventDefault(e); showToast('Drawing cancelled', 'fa-times'); cancelActiveDraw(); }
+            });
+
+            document.getElementById('tool-placemark').addEventListener('click', () => beginDraw('placemark'));
+            document.getElementById('tool-path').addEventListener('click', () => beginDraw('path'));
+            document.getElementById('tool-polygon').addEventListener('click', () => beginDraw('polygon'));
+            document.getElementById('tool-measure').addEventListener('click', () => beginDraw('measure'));
+            document.getElementById('tool-measure-area').addEventListener('click', () => beginDraw('measure-area'));
+            document.getElementById('tool-los').addEventListener('click', () => beginLOS());
+
+            async function clearAllDrawings() {
+                if (!confirm('Clear all drawings?')) return;
+                cancelActiveDraw();
+                drawnItems.clearLayers();
+                const removeTypes = ['placemark','path','polygon','measure','measure-area','los'];
+                function filterNodes(nodes) {
+                    return nodes.filter(n => {
+                        if (removeTypes.includes(n.type)) return false;
+                        if (n.children) n.children = filterNodes(n.children);
+                        return true;
+                    });
+                }
+                treeNodes = filterNodes(treeNodes);
+                selectedNodeId = null;
+                multiSelection.clear();
+                currentFolderId = null;
+                renderTree();
+                await persistTreeNow();
+                showToast('All drawings cleared', 'fa-eraser');
+            }
+
+            // ==================== LOS PLACEMENT ====================
+            function beginLOS() {
+                cancelActiveDraw();
+                if (typeof stopLOSTracking === 'function') stopLOSTracking();
+                clearDrawModeUI();
+                const btn = document.getElementById('tool-los');
+                if (btn) btn.classList.add('active');
+                map.getContainer().style.cursor = 'crosshair';
+                showToast('Click on the map to place the LOS center', 'fa-satellite-dish');
+                showDrawStatus('Click map to place the LOS center', false);
+                map.once('click', async (e) => {
+                    map.getContainer().style.cursor = '';
+                    clearDrawModeUI();
+                    hideSnapPreview();
+                    hideDrawStatus();
+                    const latlng = applySnapFromEvent(e, e.latlng);
+                    const result = await openNewNodeModal({
+                        type: 'los', name: 'New LOS',
+                        meta: { lat: latlng.lat, lng: latlng.lng, radius: 10000, numLines: 36, centerHeight: 30, targetHeight: 2, contourInterval: 500, color: '#ea580c', desc: '' }
+                    });
+                    if (!result) return;
+                    const finalLat = (result.lat !== undefined && result.lat !== null) ? result.lat : latlng.lat;
+                    const finalLng = (result.lng !== undefined && result.lng !== null) ? result.lng : latlng.lng;
+                    const node = createNode({
+                        type: 'los', name: result.name,
+                        meta: {
+                            lat: finalLat, lng: finalLng,
+                            radius: 10000, numLines: 36,
+                            centerHeight: 30, targetHeight: 2,
+                            contourInterval: 500,
+                            color: result.color || '#ea580c',
+                            desc: result.desc,
+                            showBoundary: true,
+                            earthCurvature: false,
+                            persistedP2P: null,
+                            trackMouse: true
+                        }
+                    });
+                    const layers = buildLOSLayers(node);
+                    node.layer = L.layerGroup(layers);
+                    node.layer.addTo(drawnItems);
+                    if (drawnItems.bringToFront) drawnItems.bringToFront();
+                    if (currentFolderId) addNodeToTree(node, findNode(currentFolderId)); else addNodeToTree(node);
+                    await persistTreeNow();
+                    showToast(`LOS added: ${result.name} — move mouse to preview P2P`, 'fa-satellite-dish');
+                    // Open the editor — openEditorPanel starts tracking automatically
+                    openEditorPanel(node);
+                });
+            }
+
             // ==================== INIT ====================
             (async function init() {
                 await loadSettings();
@@ -6564,3 +6962,9 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
