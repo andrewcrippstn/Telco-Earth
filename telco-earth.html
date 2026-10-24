@@ -369,7 +369,11 @@
     .sheet-preview td { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.04); color: var(--ink-2); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .sheet-mapping-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 
-    .profile-panel { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: var(--paper); border-top: 1px solid var(--border); z-index: 900; box-shadow: 0 -8px 30px rgba(0,0,0,0.12); display: flex; flex-direction: column; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+    .profile-panel { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: var(--paper); border-top: 1px solid var(--border); z-index: 900; box-shadow: 0 -8px 30px rgba(0,0,0,0.12); display: flex; flex-direction: column; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), right 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+.profile-panel.editor-open { right: 420px; }
+@media (max-width: 900px) {
+    .profile-panel.editor-open { right: 0; }
+}
     .profile-panel.open { height: 320px; }
     .profile-panel.expanded { height: 100%; }
     .profile-header { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--paper); flex-shrink: 0; flex-wrap: wrap; }
@@ -3233,8 +3237,20 @@
                         renderTree();
                     }
                     updateMapToolsVisibility();
+                    // NEW: sync profile panel left edge after subrail open/close transition settles
+                    setTimeout(syncProfilePanelLeft, 300);
                 });
             });
+
+            // NEW: helper that reads the current subrail width and writes it to the CSS variable
+            function syncProfilePanelLeft() {
+                const open = subrail.classList.contains('open');
+                const railRect = railEl.getBoundingClientRect();
+                const srRect = subrail.getBoundingClientRect();
+                const leftPx = open ? srRect.right : railRect.right;
+                document.documentElement.style.setProperty('--subrail-width', leftPx + 'px');
+                if (profileData) drawProfileChart();
+            }
 
             // ==================== SUBRAIL RESIZER ====================
             const subrailResizer = document.getElementById('subrail-resizer');
@@ -3251,6 +3267,8 @@
                 const w = Math.max(220, Math.min(600, e.clientX - railRect.right));
                 subrail.style.width = w + 'px';
                 SETTINGS.subrailWidth = w;
+                // NEW: keep profile panel aligned with subrail's right edge
+                document.documentElement.style.setProperty('--subrail-width', (railRect.right + w) + 'px');
             });
             document.addEventListener('mouseup', () => {
                 if (!_resizing) return;
@@ -3324,6 +3342,9 @@
                 setSnapZoneActive(false);
                 // NEW: stop any active LOS tracking when the editor closes
                 if (typeof stopLOSTracking === 'function') stopLOSTracking();
+                // NEW: expand profile panel back to full width
+                profilePanel.classList.remove('editor-open');
+                setTimeout(() => { if (profileData) drawProfileChart(); }, 320);
             }
             editorCloseBtn.addEventListener('click', closeEditorPanel);
 
@@ -3380,6 +3401,10 @@
                 } else {
                     if (typeof stopLOSTracking === 'function') stopLOSTracking();
                 }
+
+                // NEW: shrink profile panel so it doesn't overlap the editor
+                profilePanel.classList.add('editor-open');
+                setTimeout(() => { if (profileData) drawProfileChart(); }, 320);
             }
 
             function openBulkEditorForSelection() {
@@ -3420,6 +3445,8 @@
                 renderEditorBody();
                 renderEditorFooter();
                 editorPanel.classList.add('open');
+                profilePanel.classList.add('editor-open');
+                setTimeout(() => { if (profileData) drawProfileChart(); }, 320);
             }
 
             function openFolderContentsEditor(folderNode) {
@@ -6956,6 +6983,8 @@
                 const restored = await loadPersistedTree();
                 if (restored) setTimeout(fitToPlacesExtent, 200);
                 updateMapToolsVisibility();
+                // NEW: align profile panel to the subrail's right edge on first paint
+                syncProfilePanelLeft();
                 setTimeout(() => showToast('Telco Earth ready', 'fa-tower-broadcast'), 700);
             })();
         })();
