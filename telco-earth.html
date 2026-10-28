@@ -880,7 +880,7 @@
 
             // ==================== MAP ====================
             const map = L.map('map', {
-                center: [46.5, 8.0], zoom: 6,
+                center: [-42.0, 146.6], zoom: 7,
                 zoomControl: false, attributionControl: true,
                 minZoom: 2, maxZoom: 19,
                 worldCopyJump: true, doubleClickZoom: false,
@@ -1013,25 +1013,45 @@
                 document.getElementById('minimap-wrap').classList.add('hidden');
             });
 
+            const ATTR_LIST = '© State of Tasmania (<a href="https://www.thelist.tas.gov.au/" target="_blank" rel="noopener">the LIST</a>) CC BY-NC-ND 3.0 AU';
+            const LIST = 'https://services.thelist.tas.gov.au/arcgis/rest/services';
+
             const PROVIDERS = {
-                'nasa-blue-marble': { name: 'NASA Blue Marble', group: 'Satellite & Imagery', icon: 'fa-globe', url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 },
-                'nasa-night': { name: 'NASA Night', group: 'Satellite & Imagery', icon: 'fa-moon', url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 },
-                'satellite': { name: 'Esri World Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite-dish', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
-                'usgs-imagery': { name: 'USGS Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite', url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', attribution: 'USGS', maxZoom: 19 },
-                'osm': { name: 'OpenStreetMap', group: 'Standard maps', icon: 'fa-map', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© OpenStreetMap', maxZoom: 19, subdomains: 'abc' },
-                'osm-hot': { name: 'OSM Humanitarian', group: 'Standard maps', icon: 'fa-hand-holding-heart', url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', attribution: '© OSM HOT', maxZoom: 19, subdomains: 'abc' },
-                'osm-cycle': { name: 'CyclOSM', group: 'Standard maps', icon: 'fa-bicycle', url: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', attribution: '© CyclOSM', maxZoom: 20, subdomains: 'abc' },
-                'street': { name: 'Esri Street Map', group: 'Standard maps', icon: 'fa-road', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
-                'opentopo': { name: 'OpenTopoMap', group: 'Terrain', icon: 'fa-mountain', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', attribution: '© OpenTopoMap', maxZoom: 17 },
-                'topo': { name: 'Esri World Topo', group: 'Terrain', icon: 'fa-mountain-sun', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
-                'usgs-topo': { name: 'USGS Topo', group: 'Terrain', icon: 'fa-layer-group', url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', attribution: 'USGS', maxZoom: 19 },
-                'light-gray': { name: 'Light Gray', group: 'Minimal / Clean', icon: 'fa-square', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
-                'dark-gray': { name: 'Dark Gray', group: 'Minimal / Clean', icon: 'fa-square-full', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
-                'natgeo': { name: 'National Geographic', group: 'Artistic', icon: 'fa-compass', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri, National Geographic', maxZoom: 19 }
-            };
+    // ---- Satellite & Imagery (existing) ----
+    'nasa-blue-marble': { name: 'NASA Blue Marble', group: 'Satellite & Imagery', icon: 'fa-globe', url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 },
+    'nasa-night': { name: 'NASA Night', group: 'Satellite & Imagery', icon: 'fa-moon', url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 },
+    'satellite': { name: 'Esri World Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite-dish', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+    'usgs-imagery': { name: 'USGS Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite', url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', attribution: 'USGS', maxZoom: 19 },
+
+    // ---- Tasmania — The LIST (State of Tasmania) ----
+    'list-ortho': { name: 'TAS LIST Orthophoto', group: 'Tasmania — The LIST', icon: 'fa-map', url: LIST + '/Basemaps/Orthophoto/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+    'list-2026': { name: 'TAS Aerial 2026', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2026/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+    'list-2025': { name: 'TAS Aerial 2025', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2025/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+    'list-2024': { name: 'TAS Aerial 2024', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2024/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+    'list-2022': { name: 'TAS Aerial 2022', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2022/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+    'list-2015': { name: 'TAS Aerial 2015-16', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Raster/AerialPhoto2015_16/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+
+    // ---- Standard maps (existing) ----
+    'osm': { name: 'OpenStreetMap', group: 'Standard maps', icon: 'fa-map', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© OpenStreetMap', maxZoom: 19, subdomains: 'abc' },
+    'osm-hot': { name: 'OSM Humanitarian', group: 'Standard maps', icon: 'fa-hand-holding-heart', url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', attribution: '© OSM HOT', maxZoom: 19, subdomains: 'abc' },
+    'osm-cycle': { name: 'CyclOSM', group: 'Standard maps', icon: 'fa-bicycle', url: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', attribution: '© CyclOSM', maxZoom: 20, subdomains: 'abc' },
+    'street': { name: 'Esri Street Map', group: 'Standard maps', icon: 'fa-road', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+
+    // ---- Terrain (existing) ----
+    'opentopo': { name: 'OpenTopoMap', group: 'Terrain', icon: 'fa-mountain', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', attribution: '© OpenTopoMap', maxZoom: 17 },
+    'topo': { name: 'Esri World Topo', group: 'Terrain', icon: 'fa-mountain-sun', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+    'usgs-topo': { name: 'USGS Topo', group: 'Terrain', icon: 'fa-layer-group', url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', attribution: 'USGS', maxZoom: 19 },
+
+    // ---- Minimal / Clean (existing) ----
+    'light-gray': { name: 'Light Gray', group: 'Minimal / Clean', icon: 'fa-square', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+    'dark-gray': { name: 'Dark Gray', group: 'Minimal / Clean', icon: 'fa-square-full', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+
+    // ---- Artistic (existing) ----
+    'natgeo': { name: 'National Geographic', group: 'Artistic', icon: 'fa-compass', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri, National Geographic', maxZoom: 19 }
+};
 
             let currentLayer = null;
-            let currentProviderKey = 'satellite';
+            let currentProviderKey = 'list-ortho';
             function makeTileLayer(key) {
                 const p = PROVIDERS[key];
                 if (!p) return null;
