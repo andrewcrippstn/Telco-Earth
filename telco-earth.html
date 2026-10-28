@@ -754,13 +754,19 @@
             }
 
             // ==================== APP SETTINGS ====================
-            const SETTINGS = { snapToMarkers: false, snapPixels: 20, subrailWidth: 320 };
+            const SETTINGS = { snapToMarkers: false, snapPixels: 20, subrailWidth: 320, provider: 'satellite' };
             function loadSettings() {
                 return dbGet('settings', 'app').then(rec => {
                     if (rec && rec.value) Object.assign(SETTINGS, rec.value);
                 }).catch(() => {});
             }
             function saveSettings() { return dbPut('settings', { key: 'app', value: SETTINGS }).catch(() => {}); }
+            function saveProviderLocal(key) {
+                try { localStorage.setItem('telco-provider', key); } catch (e) {}
+            }
+            function loadProviderLocal() {
+                try { return localStorage.getItem('telco-provider'); } catch (e) { return null; }
+            }
 
             // ==================== HEATMAP COLOUR SCHEMES ====================
             const HEATMAP_SCHEMES = {
@@ -1017,41 +1023,41 @@
             const LIST = 'https://services.thelist.tas.gov.au/arcgis/rest/services';
 
             const PROVIDERS = {
-    // ---- Satellite & Imagery (existing) ----
-    'nasa-blue-marble': { name: 'NASA Blue Marble', group: 'Satellite & Imagery', icon: 'fa-globe', url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 },
-    'nasa-night': { name: 'NASA Night', group: 'Satellite & Imagery', icon: 'fa-moon', url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 },
-    'satellite': { name: 'Esri World Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite-dish', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
-    'usgs-imagery': { name: 'USGS Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite', url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', attribution: 'USGS', maxZoom: 19 },
+                // ---- Satellite & Imagery ----
+                'nasa-blue-marble': { name: 'NASA Blue Marble', group: 'Satellite & Imagery', icon: 'fa-globe', url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 },
+                'nasa-night': { name: 'NASA Night', group: 'Satellite & Imagery', icon: 'fa-moon', url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg', attribution: 'NASA EOSDIS', maxZoom: 8, maxNativeZoom: 8 },
+                'satellite': { name: 'Esri World Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite-dish', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+                'usgs-imagery': { name: 'USGS Imagery', group: 'Satellite & Imagery', icon: 'fa-satellite', url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', attribution: 'USGS', maxZoom: 19 },
 
-    // ---- Tasmania — The LIST (State of Tasmania) ----
-    'list-ortho': { name: 'TAS LIST Orthophoto', group: 'Tasmania — The LIST', icon: 'fa-map', url: LIST + '/Basemaps/Orthophoto/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
-    'list-2026': { name: 'TAS Aerial 2026', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2026/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
-    'list-2025': { name: 'TAS Aerial 2025', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2025/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
-    'list-2024': { name: 'TAS Aerial 2024', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2024/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
-    'list-2022': { name: 'TAS Aerial 2022', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2022/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
-    'list-2015': { name: 'TAS Aerial 2015-16', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Raster/AerialPhoto2015_16/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+                // ---- Tasmania — The LIST ----
+                'list-ortho': { name: 'TAS LIST Orthophoto', group: 'Tasmania — The LIST', icon: 'fa-map', url: LIST + '/Basemaps/Orthophoto/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+                'list-2026': { name: 'TAS Aerial 2026', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2026/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+                'list-2025': { name: 'TAS Aerial 2025', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2025/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+                'list-2024': { name: 'TAS Aerial 2024', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2024/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+                'list-2022': { name: 'TAS Aerial 2022', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Basemaps/AerialPhoto2022/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
+                'list-2015': { name: 'TAS Aerial 2015-16', group: 'Tasmania — The LIST', icon: 'fa-camera', url: LIST + '/Raster/AerialPhoto2015_16/MapServer/tile/{z}/{y}/{x}', attribution: ATTR_LIST, maxZoom: 19 },
 
-    // ---- Standard maps (existing) ----
-    'osm': { name: 'OpenStreetMap', group: 'Standard maps', icon: 'fa-map', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© OpenStreetMap', maxZoom: 19, subdomains: 'abc' },
-    'osm-hot': { name: 'OSM Humanitarian', group: 'Standard maps', icon: 'fa-hand-holding-heart', url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', attribution: '© OSM HOT', maxZoom: 19, subdomains: 'abc' },
-    'osm-cycle': { name: 'CyclOSM', group: 'Standard maps', icon: 'fa-bicycle', url: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', attribution: '© CyclOSM', maxZoom: 20, subdomains: 'abc' },
-    'street': { name: 'Esri Street Map', group: 'Standard maps', icon: 'fa-road', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+                // ---- Standard maps ----
+                'osm': { name: 'OpenStreetMap', group: 'Standard maps', icon: 'fa-map', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© OpenStreetMap', maxZoom: 19, subdomains: 'abc' },
+                'osm-hot': { name: 'OSM Humanitarian', group: 'Standard maps', icon: 'fa-hand-holding-heart', url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', attribution: '© OSM HOT', maxZoom: 19, subdomains: 'abc' },
+                'osm-cycle': { name: 'CyclOSM', group: 'Standard maps', icon: 'fa-bicycle', url: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', attribution: '© CyclOSM', maxZoom: 20, subdomains: 'abc' },
+                'street': { name: 'Esri Street Map', group: 'Standard maps', icon: 'fa-road', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
 
-    // ---- Terrain (existing) ----
-    'opentopo': { name: 'OpenTopoMap', group: 'Terrain', icon: 'fa-mountain', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', attribution: '© OpenTopoMap', maxZoom: 17 },
-    'topo': { name: 'Esri World Topo', group: 'Terrain', icon: 'fa-mountain-sun', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
-    'usgs-topo': { name: 'USGS Topo', group: 'Terrain', icon: 'fa-layer-group', url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', attribution: 'USGS', maxZoom: 19 },
+                // ---- Terrain ----
+                'opentopo': { name: 'OpenTopoMap', group: 'Terrain', icon: 'fa-mountain', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', attribution: '© OpenTopoMap', maxZoom: 17 },
+                'topo': { name: 'Esri World Topo', group: 'Terrain', icon: 'fa-mountain-sun', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+                'usgs-topo': { name: 'USGS Topo', group: 'Terrain', icon: 'fa-layer-group', url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', attribution: 'USGS', maxZoom: 19 },
 
-    // ---- Minimal / Clean (existing) ----
-    'light-gray': { name: 'Light Gray', group: 'Minimal / Clean', icon: 'fa-square', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
-    'dark-gray': { name: 'Dark Gray', group: 'Minimal / Clean', icon: 'fa-square-full', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+                // ---- Minimal / Clean ----
+                'light-gray': { name: 'Light Gray', group: 'Minimal / Clean', icon: 'fa-square', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
+                'dark-gray': { name: 'Dark Gray', group: 'Minimal / Clean', icon: 'fa-square-full', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri', maxZoom: 19 },
 
-    // ---- Artistic (existing) ----
-    'natgeo': { name: 'National Geographic', group: 'Artistic', icon: 'fa-compass', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri, National Geographic', maxZoom: 19 }
-};
+                // ---- Artistic ----
+                'natgeo': { name: 'National Geographic', group: 'Artistic', icon: 'fa-compass', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri, National Geographic', maxZoom: 19 }
+            };
 
             let currentLayer = null;
-            let currentProviderKey = 'list-ortho';
+            let currentProviderKey = 'satellite';
             function makeTileLayer(key) {
                 const p = PROVIDERS[key];
                 if (!p) return null;
@@ -1066,11 +1072,12 @@
                 currentLayer = makeTileLayer(key);
                 currentLayer.addTo(map);
                 currentProviderKey = key;
+                SETTINGS.provider = key;
+                saveSettings();
+                saveProviderLocal(key);
                 if (drawnItems.bringToFront) drawnItems.bringToFront();
                 showToast('Map: ' + PROVIDERS[key].name, 'fa-map');
             }
-            currentLayer = makeTileLayer(currentProviderKey);
-            currentLayer.addTo(map);
 
             // ==================== INDEXEDDB ====================
             const DB_NAME = 'telco-earth';
@@ -3257,12 +3264,10 @@
                         renderTree();
                     }
                     updateMapToolsVisibility();
-                    // NEW: sync profile panel left edge after subrail open/close transition settles
                     setTimeout(syncProfilePanelLeft, 300);
                 });
             });
 
-            // NEW: helper that reads the current subrail width and writes it to the CSS variable
             function syncProfilePanelLeft() {
                 const open = subrail.classList.contains('open');
                 const railRect = railEl.getBoundingClientRect();
@@ -3287,7 +3292,6 @@
                 const w = Math.max(220, Math.min(600, e.clientX - railRect.right));
                 subrail.style.width = w + 'px';
                 SETTINGS.subrailWidth = w;
-                // NEW: keep profile panel aligned with subrail's right edge
                 document.documentElement.style.setProperty('--subrail-width', (railRect.right + w) + 'px');
             });
             document.addEventListener('mouseup', () => {
@@ -3360,9 +3364,7 @@
                 editorState = null;
                 editorFooter.innerHTML = '';
                 setSnapZoneActive(false);
-                // NEW: stop any active LOS tracking when the editor closes
                 if (typeof stopLOSTracking === 'function') stopLOSTracking();
-                // NEW: expand profile panel back to full width
                 profilePanel.classList.remove('editor-open');
                 setTimeout(() => { if (profileData) drawProfileChart(); }, 320);
             }
@@ -3415,14 +3417,12 @@
                 setTimeout(() => zoomToNode(node), 280);
                 refreshSnapZoneMode();
 
-                // NEW: LOS tracking — if no persisted P2P and trackMouse enabled, start tracking immediately
                 if (node.type === 'los' && !node.meta.persistedP2P && node.meta.trackMouse !== false) {
                     if (typeof startLOSTracking === 'function') startLOSTracking(node);
                 } else {
                     if (typeof stopLOSTracking === 'function') stopLOSTracking();
                 }
 
-                // NEW: shrink profile panel so it doesn't overlap the editor
                 profilePanel.classList.add('editor-open');
                 setTimeout(() => { if (profileData) drawProfileChart(); }, 320);
             }
@@ -3886,7 +3886,6 @@
                     }).join('');
                 }
 
-                // Build LOS P2P status block (only for LOS)
                 let losP2PHTML = '';
                 if (editorState.isLOS) {
                     if (node.meta.persistedP2P && node.meta.persistedP2P.lat != null) {
@@ -3971,9 +3970,7 @@
                             node.meta.trackMouse = true;
                             rebuildLOSLayer(node);
                             renderEditorBody();
-                            // NEW: resume tracking so the user can pick a new endpoint
                             if (typeof startLOSTracking === 'function') startLOSTracking(node);
-                            // Reset profile to tracking mode
                             if (profileData && profileData.node === node) {
                                 profileData = null;
                                 drawProfileChart();
@@ -4032,7 +4029,6 @@
                     const curvatureEl = editorBody.querySelector('#los-curvature');
                     if (boundaryEl) node.meta.showBoundary = boundaryEl.checked;
                     if (curvatureEl) node.meta.earthCurvature = curvatureEl.checked;
-                    // NEW: if no persisted P2P, we're in tracking mode — keep trackMouse true
                     if (!node.meta.persistedP2P) node.meta.trackMouse = true;
                     rebuildLOSLayer(node);
                 } else if (node.type === 'placemark' && node.layer && node.layer.getPopup && node.layer.getPopup()) {
@@ -5215,7 +5211,7 @@
                 geojsonInput.value = '';
             });
 
-            // ==================== LOS ENGINE (ported from LOS Lab) ====================
+            // ==================== LOS ENGINE ====================
             function earthBulge(d1, d2) {
                 const Re_eff = 6371000 * 4 / 3;
                 return (d1 * d2) / (2 * Re_eff);
@@ -5345,7 +5341,6 @@
                 const centerElev = getElevation(center.lat, center.lng);
                 const layers = [];
 
-                // ---- P2P mode (LOS Lab style) ----
                 if (node.meta.persistedP2P && node.meta.persistedP2P.lat != null) {
                     const link = buildLinkSegments(node, center, L.latLng(node.meta.persistedP2P.lat, node.meta.persistedP2P.lng));
                     if (link) {
@@ -5358,7 +5353,6 @@
                         }));
                     }
                 } else {
-                    // ---- Radial mode (LOS Lab boundary style) ----
                     if (node.meta.showBoundary !== false) {
                         const bpts = buildBoundaryPoints(node);
                         if (bpts) {
@@ -5384,7 +5378,6 @@
                     }
                 }
 
-                // centre dot only — no antenna/target labels, no contours
                 layers.push(L.circleMarker(center, { radius: 6, color: 'white', weight: 2, fillColor: color, fillOpacity: 1 }));
                 return layers;
             }
@@ -5966,7 +5959,6 @@
             }
             function clearProfilePins() { profilePinsGroup.clearLayers(); }
 
-            // ---- Path profile (for path/polygon geometry) ----
             function openProfilePanel(node) {
                 if (!node || !node.meta.points || node.meta.points.length < 2) { showToast('No geometry to profile', 'fa-info-circle'); return; }
                 if (terrainStore.size === 0) { showToast('Load HGT data first', 'fa-exclamation-circle'); return; }
@@ -6016,7 +6008,6 @@
                 setTimeout(() => drawProfileChart(), 320);
             }
 
-            // ---- LOS profile ----
             function openLOSProfile(node) {
                 if (!node || node.type !== 'los') { showToast('Not a LOS object', 'fa-exclamation-circle'); return; }
                 if (terrainStore.size === 0) { showToast('Load HGT data first', 'fa-exclamation-circle'); return; }
@@ -6031,22 +6022,17 @@
                 updateMapToolsVisibility();
 
                 if (node.meta.persistedP2P && node.meta.persistedP2P.lat != null) {
-                    // Static P2P profile
                     profileSubtitle.textContent = 'P2P link';
                     renderP2PProfile(node);
                     setTimeout(() => drawProfileChart(), 320);
                 } else {
-                    // Tracking mode — profile follows the mouse
                     profileSubtitle.textContent = 'Tracking — move mouse';
-                    // Seed profileData so live tracking has an object to update
                     profileData = { type: 'p2p', node, samples: [], minE: 0, maxE: 100, totalDist: 0, antennaElev: 0, targetElevAtEnd: 0, lostAt: null, bearing: 0, antennaHeight: node.meta.centerHeight || 30, targetHeight: node.meta.targetHeight || 2, curvature: !!node.meta.earthCurvature, previewP2P: null };
                     drawProfileChart();
                     if (typeof startLOSTracking === 'function') startLOSTracking(node);
                 }
             }
 
-            // ---- P2P profile render (LOS Lab style) ----
-            // endPtOverride, when supplied, is used for live tracking (doesn't mutate node.meta.persistedP2P)
             function renderP2PProfile(node, endPtOverride) {
                 const startPt = L.latLng(node.meta.lat, node.meta.lng);
                 let endPt;
@@ -6111,7 +6097,6 @@
                 `;
             }
 
-            // ---- Radial LOS profile (no P2P) ----
             function renderRadialLOSProfile(node, bearingDeg) {
                 const geo = losLineGeometry(node, bearingDeg);
                 if (!geo.pts || geo.pts.length < 2) { showToast('No terrain data along this bearing', 'fa-exclamation-circle'); return; }
@@ -6146,7 +6131,6 @@
                 `;
             }
 
-            // ---- Chart renderer (handles both path and LOS profiles) ----
             function drawProfileChart() {
                 if (!profileData) return;
                 const canvas = profileCanvas;
@@ -6183,7 +6167,6 @@
                 const xOf = d => padL + (d / totalDist) * plotW;
                 const yOf = e => padT + (1 - (e - minE) / range) * plotH;
 
-                // grid + axis labels
                 ctx.strokeStyle = 'rgba(0,0,0,0.06)';
                 ctx.lineWidth = 1;
                 ctx.font = '10px "IBM Plex Mono", monospace';
@@ -6200,7 +6183,6 @@
                     ctx.fillText(formatDistance((i / 4) * totalDist), x, H - 8);
                 }
 
-                // terrain fill + line
                 const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
                 grad.addColorStop(0, 'rgba(77,124,15,0.35)');
                 grad.addColorStop(1, 'rgba(77,124,15,0.02)');
@@ -6222,7 +6204,6 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // LOS ray — dashed, green when clear, red when blocked
                 if (profileData.type === 'p2p' || profileData.type === 'los') {
                     ctx.lineWidth = 2;
                     ctx.setLineDash([6, 4]);
@@ -6242,7 +6223,6 @@
                     ctx.setLineDash([]);
                 }
 
-                // Antenna + target towers and dots (only for LOS profiles)
                 if (profileData.type === 'p2p' || profileData.type === 'los') {
                     const x0 = xOf(0), y0 = yOf(profileData.antennaElev);
                     const groundStart = samples[0].terr;
@@ -6262,7 +6242,6 @@
                     ctx.fillStyle = '#ea580c'; ctx.fill();
                     ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
 
-                    // height labels above the towers
                     ctx.font = 'bold 10px "IBM Plex Mono", monospace';
                     ctx.textAlign = 'left';
                     ctx.fillStyle = '#166534';
@@ -6271,7 +6250,6 @@
                     ctx.fillStyle = '#ea580c';
                     ctx.fillText(Math.round(profileData.targetHeight) + ' m ⏶', x1 - 8, y1 - 8);
 
-                    // ground labels below the towers
                     ctx.font = '9px "IBM Plex Mono", monospace';
                     ctx.fillStyle = '#6d7167';
                     ctx.textAlign = 'left';
@@ -6287,7 +6265,6 @@
                     }
                 }
 
-                // hover marker
                 if (profileHoverSample) {
                     const s = profileHoverSample;
                     ctx.beginPath(); ctx.arc(xOf(s.d), yOf(s.terr), 5, 0, Math.PI * 2);
@@ -6295,7 +6272,6 @@
                     ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
                 }
 
-                // pins
                 profilePinsGroup.eachLayer(m => {
                     const s = m._profileSample;
                     if (!s) return;
@@ -6394,8 +6370,6 @@
             });
             window.addEventListener('resize', () => { if (profileData) drawProfileChart(); });
 
-
-
             // ==================== GEOLOCATION ====================
             function locateMe() {
                 if (!navigator.geolocation) { showToast('Geolocation not supported', 'fa-info-circle'); return; }
@@ -6415,6 +6389,10 @@
 
             document.addEventListener('keydown', (e) => {
                 if ((e.key === 'l' || e.key === 'L') && !e.target.matches('input, textarea')) locateMe();
+                if ((e.key === 't' || e.key === 'T') && !e.target.matches('input, textarea')) {
+                    map.flyTo([-42.0, 146.6], 7, { duration: 1.2 });
+                    showToast('Centered on Tasmania', 'fa-map');
+                }
                 if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !e.target.matches('input, textarea')) {
                     if (selectedNodeId) {
                         const node = findNode(selectedNodeId);
@@ -6529,10 +6507,19 @@
                     map.fitBounds(bounds, { ...availableMapPadding(), maxZoom: 16, animate: false });
                 }
             }
+            function hasAnyPlaces() {
+                let found = false;
+                (function walk(nodes) {
+                    for (const n of nodes) {
+                        if (n.type === 'placemark' || n.type === 'los' || (n.meta && n.meta.points)) { found = true; return; }
+                        if (n.children) walk(n.children);
+                        if (found) return;
+                    }
+                })(treeNodes);
+                return found;
+            }
 
             // ==================== LOS P2P TRACKING ====================
-            // Tracking state — set when a LOS editor opens with no persisted P2P.
-            // Mouse movement previews the P2P endpoint; a map click persists it.
             let losTrackingNode = null;
             let losTrackingMouseLatLng = null;
             let losTrackingEndpoint = null;
@@ -6588,14 +6575,12 @@
                     }));
                 }
 
-                // If the profile panel is open for this LOS, update it live
                 if (profileData && profileData.node === los && profilePanel.classList.contains('open')) {
                     renderP2PProfile(los, endpoint);
                     drawProfileChart();
                 }
             }
 
-            // Mouse move: track for LOS preview
             map.on('mousemove', (e) => {
                 if (!losTrackingNode) return;
                 losTrackingMouseLatLng = e.latlng;
@@ -6609,7 +6594,6 @@
                 losTrackingMouseLatLng = null;
             });
 
-            // Cancel button on the tracking hint
             if (document.getElementById('los-tracking-cancel')) {
                 document.getElementById('los-tracking-cancel').addEventListener('click', () => {
                     stopLOSTracking();
@@ -6617,7 +6601,6 @@
                 });
             }
 
-            // Click: persist the P2P endpoint (only when tracking and no draw in progress)
             map.on('click', async (e) => {
                 if (drawState) return;
                 if (!losTrackingNode) return;
@@ -6697,7 +6680,6 @@
             }
             function beginDraw(type) {
                 cancelActiveDraw();
-                // Starting a draw cancels any active LOS tracking so clicks don't leak through
                 if (typeof stopLOSTracking === 'function') stopLOSTracking();
                 drawState = { type, points: [], tempLayer: null, lastClickTime: 0 };
                 clearDrawModeUI();
@@ -6985,7 +6967,6 @@
                     if (currentFolderId) addNodeToTree(node, findNode(currentFolderId)); else addNodeToTree(node);
                     await persistTreeNow();
                     showToast(`LOS added: ${result.name} — move mouse to preview P2P`, 'fa-satellite-dish');
-                    // Open the editor — openEditorPanel starts tracking automatically
                     openEditorPanel(node);
                 });
             }
@@ -6993,6 +6974,21 @@
             // ==================== INIT ====================
             (async function init() {
                 await loadSettings();
+
+                // Restore last-used basemap (localStorage preferred, then IndexedDB)
+                const savedProvider = (() => {
+                    const local = loadProviderLocal();
+                    if (local && PROVIDERS[local]) return local;
+                    if (SETTINGS.provider && PROVIDERS[SETTINGS.provider]) return SETTINGS.provider;
+                    return 'satellite';
+                })();
+
+                if (currentLayer && map.hasLayer(currentLayer)) map.removeLayer(currentLayer);
+                currentLayer = makeTileLayer(savedProvider);
+                currentLayer.addTo(map);
+                currentProviderKey = savedProvider;
+                if (drawnItems.bringToFront) drawnItems.bringToFront();
+
                 if (SETTINGS.subrailWidth && SETTINGS.subrailWidth > 220) {
                     subrail.style.width = SETTINGS.subrailWidth + 'px';
                 }
@@ -7001,9 +6997,8 @@
                 updateTerrainVisibility();
                 await loadPersistedTiles();
                 const restored = await loadPersistedTree();
-                if (restored) setTimeout(fitToPlacesExtent, 200);
+                if (restored && hasAnyPlaces()) setTimeout(fitToPlacesExtent, 200);
                 updateMapToolsVisibility();
-                // NEW: align profile panel to the subrail's right edge on first paint
                 syncProfilePanelLeft();
                 setTimeout(() => showToast('Telco Earth ready', 'fa-tower-broadcast'), 700);
             })();
@@ -7011,9 +7006,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
