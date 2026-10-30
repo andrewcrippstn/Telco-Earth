@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -145,7 +146,7 @@
     .toggle-switch-sm.on { background: var(--sage); border-color: var(--sage); }
     .toggle-switch-sm.on::after { left: 13px; }
 
-    .fx-row { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 7px; cursor: pointer; font-size: 0.79rem; color: var(--ink-1); transition: all 0.12s ease; border: 1px solid transparent; user-select: none; min-height: 32px; }
+    .fx-row { display: flex; align-items: center; gap: 6px; padding: 5px 7px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; color: var(--ink-1); transition: all 0.12s ease; border: 1px solid transparent; user-select: none; min-height: 28px; }
     .fx-row:hover { background: var(--paper); border-color: var(--border); color: var(--ink); }
     .fx-row.active { background: var(--sage-soft); color: var(--sage); border-color: var(--sage-border); font-weight: 500; }
     .fx-row.multi-selected { background: var(--sage-soft-hi); border-color: var(--sage-border); }
@@ -153,17 +154,17 @@
     .fx-row.drop-target { border-color: var(--sage); border-style: dashed; background: var(--sage-soft); }
     .fx-row.hidden-item { opacity: 0.5; }
     .fx-row.hidden-item .fx-label { text-decoration: line-through; text-decoration-color: var(--ink-3); }
-    .fx-row.two-line { min-height: 42px; padding: 5px 8px; }
-    .fx-row.two-line .fx-label { display: flex; flex-direction: column; gap: 1px; }
-    .fx-row .fx-subline { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fx-row.two-line { min-height: 38px; padding: 4px 7px; }
+    .fx-row.two-line .fx-label { display: flex; flex-direction: column; gap: 0; }
+    .fx-row .fx-subline { font-family: 'IBM Plex Mono', monospace; font-size: 0.52rem; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
 
-    .fx-icon { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; background: var(--paper-2); color: var(--ink-2); flex-shrink: 0; }
+    .fx-icon { width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; background: var(--paper-2); color: var(--ink-2); flex-shrink: 0; }
     .fx-row.active .fx-icon,
     .fx-row.multi-selected .fx-icon { background: var(--sage-soft-hi); }
-    .fx-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
-    .fx-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; padding: 1px 5px; border-radius: 4px; font-weight: 500; background: var(--paper-2); color: var(--ink-2); line-height: 1.4; }
-    .fx-chevron { font-size: 0.55rem; color: var(--ink-3); flex-shrink: 0; padding-left: 2px; }
-    .fx-vis { width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; color: var(--ink-3); cursor: pointer; flex-shrink: 0; transition: all 0.15s ease; }
+    .fx-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.25; }
+    .fx-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.52rem; padding: 0 4px; border-radius: 4px; font-weight: 500; background: var(--paper-2); color: var(--ink-2); line-height: 1.4; }
+    .fx-chevron { font-size: 0.5rem; color: var(--ink-3); flex-shrink: 0; padding-left: 2px; }
+    .fx-vis { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.58rem; color: var(--ink-3); cursor: pointer; flex-shrink: 0; transition: all 0.15s ease; }
     .fx-vis:hover { background: var(--paper-2); color: var(--ink); }
 
     .fx-empty { padding: 32px 20px; text-align: center; color: var(--ink-3); font-size: 0.78rem; line-height: 1.5; }
@@ -670,7 +671,13 @@
                 minimap: true,
                 hoverPreview: true,
                 liveDraw: true,
-                showAllHeatmaps: false
+                showAllHeatmaps: false,
+                showMapLabels: false,
+                mapLabelSize: 12,
+                mapLabelOffsetX: 10,
+                mapLabelOffsetY: 0,
+                mapLabelFont: 'Inter',
+                mapLabelShowDesc: false
             };
             try {
                 const saved = localStorage.getItem('telco-flags');
@@ -1471,12 +1478,16 @@
                             const line = L.polyline(n.meta.points, { color: n.meta.color || '#4d7c0f', weight: n.meta.lineThickness || 3 });
                             bindLayerFocus(n, line);
                             attachLayerDrag(n, line);
+                            const desc = n.meta.desc ? '<br>' + escapeHtml(n.meta.desc) : '';
+                            line.bindPopup(`<b>${escapeHtml(n.name)}</b>${desc}<br>Length: ${formatDistance(n.meta.distance || 0)}`);
                             n.layer = line;
                             if (n.visible !== false) line.addTo(drawnItems);
                         } else if ((n.type === 'polygon' || n.type === 'measure-area') && n.meta.points) {
                             const poly = L.polygon(n.meta.points, { color: n.meta.color || '#4d7c0f', weight: n.meta.lineThickness || 2, fillOpacity: 0.2 });
                             bindLayerFocus(n, poly);
                             attachLayerDrag(n, poly);
+                            const desc = n.meta.desc ? '<br>' + escapeHtml(n.meta.desc) : '';
+                            poly.bindPopup(`<b>${escapeHtml(n.name)}</b>${desc}${n.meta.area ? '<br>Area: ' + formatArea(n.meta.area) : ''}`);
                             n.layer = poly;
                             if (n.visible !== false) poly.addTo(drawnItems);
                         } else if (n.type === 'los') {
@@ -1493,7 +1504,78 @@
                 if (drawnItems.bringToFront) drawnItems.bringToFront();
                 rebuildSnapZoneLayer();
                 updateMinimapDots();
+                updateMapLabels();
             }
+
+            // ==================== MAP LABELS ====================
+            let mapLabelGroup = null;
+            function updateMapLabels() {
+                if (mapLabelGroup) {
+                    map.removeLayer(mapLabelGroup);
+                    mapLabelGroup = null;
+                }
+                if (!FLAGS.showMapLabels) return;
+                mapLabelGroup = L.featureGroup();
+                const size = FLAGS.mapLabelSize || 12;
+                const font = FLAGS.mapLabelFont || 'Inter';
+                const showDesc = FLAGS.mapLabelShowDesc;
+                const offX = FLAGS.mapLabelOffsetX || 10;
+                const offY = FLAGS.mapLabelOffsetY || 0;
+                function walk(nodes) {
+                    for (const n of nodes) {
+                        if (n.visible === false) continue;
+                        if (n.type === 'placemark' && n.meta.lat != null) {
+                            const pos = map.latLngToContainerPoint([n.meta.lat, n.meta.lng]);
+                            const html = `<div style="
+                                position:absolute;
+                                left:${pos.x + offX}px;
+                                top:${pos.y + offY}px;
+                                transform:translateY(-50%);
+                                font-family:'${font}',sans-serif;
+                                font-size:${size}px;
+                                font-weight:500;
+                                color:${n.meta.color || '#4d7c0f'};
+                                text-shadow:0 1px 3px rgba(255,255,255,0.9),0 0 2px rgba(255,255,255,0.8);
+                                white-space:nowrap;
+                                pointer-events:none;
+                                line-height:1.3;
+                            "><span style="font-weight:600;">${escapeHtml(n.name)}</span>${showDesc && n.meta.desc ? `<br><span style="font-size:${Math.max(8, size-3)}px;font-weight:400;color:var(--ink-2);">${escapeHtml(n.meta.desc)}</span>` : ''}</div>`;
+                            const label = L.marker([n.meta.lat, n.meta.lng], {
+                                icon: L.divIcon({ className: '', html: `<div style="position:relative;width:0;height:0;overflow:visible;">${html}</div>`, iconSize: [0, 0], iconAnchor: [0, 0] }),
+                                interactive: false, zIndexOffset: 500
+                            });
+                            mapLabelGroup.addLayer(label);
+                        }
+                        if ((n.type === 'path' || n.type === 'measure' || n.type === 'polygon' || n.type === 'measure-area') && n.meta.points && n.meta.points.length > 0) {
+                            const mid = n.meta.points[Math.floor(n.meta.points.length / 2)];
+                            const pos = map.latLngToContainerPoint(mid);
+                            const html = `<div style="
+                                position:absolute;
+                                left:${pos.x + offX}px;
+                                top:${pos.y + offY}px;
+                                transform:translateY(-50%);
+                                font-family:'${font}',sans-serif;
+                                font-size:${size}px;
+                                font-weight:500;
+                                color:${n.meta.color || '#4d7c0f'};
+                                text-shadow:0 1px 3px rgba(255,255,255,0.9),0 0 2px rgba(255,255,255,0.8);
+                                white-space:nowrap;
+                                pointer-events:none;
+                                line-height:1.3;
+                            "><span style="font-weight:600;">${escapeHtml(n.name)}</span>${showDesc && n.meta.desc ? `<br><span style="font-size:${Math.max(8, size-3)}px;font-weight:400;color:var(--ink-2);">${escapeHtml(n.meta.desc)}</span>` : ''}</div>`;
+                            const label = L.marker(mid, {
+                                icon: L.divIcon({ className: '', html: `<div style="position:relative;width:0;height:0;overflow:visible;">${html}</div>`, iconSize: [0, 0], iconAnchor: [0, 0] }),
+                                interactive: false, zIndexOffset: 500
+                            });
+                            mapLabelGroup.addLayer(label);
+                        }
+                        if (n.children) walk(n.children);
+                    }
+                }
+                walk(treeNodes);
+                mapLabelGroup.addTo(map);
+            }
+            map.on('moveend zoomend', () => { if (FLAGS.showMapLabels) updateMapLabels(); });
 
             // ==================== RENDER ====================
             const subrailBody = document.getElementById('subrail-body');
@@ -1537,6 +1619,7 @@
                 updateSubrailChrome();
                 if (activeSection === 'places') renderPlacesSection();
                 else renderStaticSection(activeSection);
+                updateMapLabels();
             }
 
             function updateSubrailChrome() {
@@ -1616,8 +1699,19 @@
                 rows.push(`<div class="fp-label">Display</div>`);
                 rows.push(`
                     <div class="fp-row">
-                        <span>Two-line rows (show description)</span>
+                        <span>Compact two-line rows</span>
                         <button class="toggle-switch-sm ${FLAGS.twoLineRows ? 'on' : ''}" id="opts-two-line" aria-pressed="${FLAGS.twoLineRows}"></button>
+                    </div>
+                `);
+                rows.push(`
+                    <div class="fp-row">
+                        <span>Map labels</span>
+                        <button class="toggle-switch-sm ${FLAGS.showMapLabels ? 'on' : ''}" id="opts-map-labels" aria-pressed="${FLAGS.showMapLabels}"></button>
+                    </div>
+                `);
+                rows.push(`
+                    <div class="fp-row" style="cursor:pointer;" id="opts-map-labels-config">
+                        <span style="color:var(--sage);font-size:0.72rem;"><i class="fas fa-sliders"></i> Label settings…</span>
                     </div>
                 `);
                 if (placesSortMode !== 'default') {
@@ -1629,6 +1723,17 @@
                 if (t) t.addEventListener('click', () => {
                     FLAGS.twoLineRows = !FLAGS.twoLineRows; saveFlags();
                     renderTree();
+                });
+                const ml = optsPopover.querySelector('#opts-map-labels');
+                if (ml) ml.addEventListener('click', () => {
+                    FLAGS.showMapLabels = !FLAGS.showMapLabels; saveFlags();
+                    updateMapLabels();
+                    renderOptsPopover();
+                });
+                const mlc = optsPopover.querySelector('#opts-map-labels-config');
+                if (mlc) mlc.addEventListener('click', () => {
+                    optsPopover.classList.remove('open');
+                    openMapLabelSettingsModal();
                 });
                 const ap = optsPopover.querySelector('#opts-apply-sort');
                 if (ap) ap.addEventListener('click', () => {
@@ -1661,6 +1766,74 @@
                 headerOptsBtn.style.background = '';
                 headerOptsBtn.style.color = '';
             });
+
+            // ==================== MAP LABEL SETTINGS MODAL ====================
+            function openMapLabelSettingsModal() {
+                const overlay = document.getElementById('modal-overlay');
+                const title = document.getElementById('modal-title');
+                const body = document.getElementById('modal-body');
+                const actions = document.getElementById('modal-actions');
+
+                title.innerHTML = '<i class="fas fa-tag"></i> Map label settings';
+                body.innerHTML = `
+                    <div style="margin-bottom:16px;">
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                            <input type="checkbox" id="ml-show-desc" ${FLAGS.mapLabelShowDesc ? 'checked' : ''}>
+                            Show description under name
+                        </label>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                        <div>
+                            <label>Font size (px)</label>
+                            <input type="number" id="ml-size" value="${FLAGS.mapLabelSize}" min="8" max="32" step="1" style="width:100%;padding:8px 12px;border:1px solid var(--border-hi);border-radius:8px;background:var(--paper);font-family:'IBM Plex Mono',monospace;">
+                        </div>
+                        <div>
+                            <label>Font family</label>
+                            <select id="ml-font" style="width:100%;padding:8px 12px;border:1px solid var(--border-hi);border-radius:8px;background:var(--paper);font-family:inherit;">
+                                <option value="Inter" ${FLAGS.mapLabelFont === 'Inter' ? 'selected' : ''}>Inter</option>
+                                <option value="Fraunces" ${FLAGS.mapLabelFont === 'Fraunces' ? 'selected' : ''}>Fraunces</option>
+                                <option value="IBM Plex Mono" ${FLAGS.mapLabelFont === 'IBM Plex Mono' ? 'selected' : ''}>IBM Plex Mono</option>
+                                <option value="system-ui" ${FLAGS.mapLabelFont === 'system-ui' ? 'selected' : ''}>System UI</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                        <div>
+                            <label>Offset X (px)</label>
+                            <input type="number" id="ml-offset-x" value="${FLAGS.mapLabelOffsetX}" min="-50" max="50" step="1" style="width:100%;padding:8px 12px;border:1px solid var(--border-hi);border-radius:8px;background:var(--paper);font-family:'IBM Plex Mono',monospace;">
+                        </div>
+                        <div>
+                            <label>Offset Y (px)</label>
+                            <input type="number" id="ml-offset-y" value="${FLAGS.mapLabelOffsetY}" min="-50" max="50" step="1" style="width:100%;padding:8px 12px;border:1px solid var(--border-hi);border-radius:8px;background:var(--paper);font-family:'IBM Plex Mono',monospace;">
+                        </div>
+                    </div>
+                    <div class="editor-hint">Labels appear at placemark and shape midpoints. Adjust offset to position relative to the icon.</div>
+                `;
+                actions.innerHTML = `
+                    <button class="btn btn-secondary" id="ml-cancel">Cancel</button>
+                    <button class="btn btn-primary" id="ml-save">Apply</button>
+                `;
+
+                const finish = () => {
+                    FLAGS.mapLabelSize = parseInt(document.getElementById('ml-size').value) || 12;
+                    FLAGS.mapLabelFont = document.getElementById('ml-font').value || 'Inter';
+                    FLAGS.mapLabelOffsetX = parseInt(document.getElementById('ml-offset-x').value) || 0;
+                    FLAGS.mapLabelOffsetY = parseInt(document.getElementById('ml-offset-y').value) || 0;
+                    FLAGS.mapLabelShowDesc = document.getElementById('ml-show-desc').checked;
+                    saveFlags();
+                    updateMapLabels();
+                    cleanup();
+                    showToast('Label settings applied', 'fa-check');
+                };
+                const cleanup = () => {
+                    overlay.classList.remove('open');
+                    body.innerHTML = '';
+                    actions.innerHTML = `<button class="btn btn-secondary" id="modal-cancel">Cancel</button><button class="btn btn-primary" id="modal-ok">Save</button>`;
+                };
+                document.getElementById('ml-save').addEventListener('click', finish);
+                document.getElementById('ml-cancel').addEventListener('click', cleanup);
+                overlay.classList.add('open');
+            }
 
             // ==================== SORT POPOVER ====================
             function openSortPopover() {
@@ -1910,19 +2083,19 @@
                 let start = _renderWindowStart;
                 const end = Math.min(nodes.length, start + VIRTUAL_WINDOW);
                 const topSpacer = document.createElement('div');
-                topSpacer.style.height = (start * 34) + 'px';
+                topSpacer.style.height = (start * 30) + 'px';
                 subrailBody.appendChild(topSpacer);
                 for (let i = start; i < end; i++) {
                     subrailBody.appendChild(buildFxRow(nodes[i]));
                 }
                 const bottomSpacer = document.createElement('div');
-                bottomSpacer.style.height = Math.max(0, (nodes.length - end) * 34) + 'px';
+                bottomSpacer.style.height = Math.max(0, (nodes.length - end) * 30) + 'px';
                 subrailBody.appendChild(bottomSpacer);
                 let scrollTimer = null;
                 subrailBody.onscroll = () => {
                     if (scrollTimer) clearTimeout(scrollTimer);
                     scrollTimer = setTimeout(() => {
-                        const approxRowHeight = 34;
+                        const approxRowHeight = 30;
                         const scrollTop = subrailBody.scrollTop;
                         const visibleRows = Math.ceil(subrailBody.clientHeight / approxRowHeight);
                         const newStart = Math.max(0, Math.floor(scrollTop / approxRowHeight) - Math.floor(visibleRows / 2));
@@ -1981,7 +2154,10 @@
                 opts = opts || {};
                 const row = document.createElement('div');
                 row.className = 'fx-row';
-                if (FLAGS.twoLineRows && node.type === 'placemark') row.classList.add('two-line');
+                const isFolder = node.type === 'folder' || node.type === 'kml';
+                const isShape = node.type === 'path' || node.type === 'measure' || node.type === 'polygon' || node.type === 'measure-area';
+                const showDesc = FLAGS.twoLineRows && (node.type === 'placemark' || isShape || isFolder);
+                if (showDesc) row.classList.add('two-line');
                 if (selectedNodeId === node.id) row.classList.add('active');
                 if (multiSelection.has(node.id)) row.classList.add('multi-selected');
                 if (node.visible === false) row.classList.add('hidden-item');
@@ -1991,7 +2167,7 @@
                 const icon = document.createElement('div');
                 icon.className = 'fx-icon';
                 let iconFa, iconColor;
-                if (node.type === 'folder' || node.type === 'kml') {
+                if (isFolder) {
                     iconFa = 'fa-folder'; iconColor = node.meta && node.meta.color ? node.meta.color : '';
                 } else if (node.type === 'placemark') {
                     iconFa = node.meta.icon || DEFAULT_ICON;
@@ -2007,18 +2183,23 @@
 
                 const label = document.createElement('div');
                 label.className = 'fx-label';
-                const showSecondLine = (FLAGS.twoLineRows && node.type === 'placemark') || opts.showPath;
-                if (showSecondLine) {
+                if (showDesc) {
                     const nameDiv = document.createElement('div');
                     nameDiv.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
                     nameDiv.textContent = node.name;
                     label.appendChild(nameDiv);
                     const sub = document.createElement('div');
                     sub.className = 'fx-subline';
-                    if (FLAGS.twoLineRows && node.type === 'placemark') {
+                    if (isFolder) {
+                        const childCount = (node.children || []).filter(c => !(c.name === 'Terrain (HGT)' || c.type === 'terrain')).length;
+                        sub.textContent = childCount + ' item' + (childCount !== 1 ? 's' : '') + (node.meta.desc ? ' · ' + node.meta.desc : '');
+                    } else if (isShape) {
+                        const dist = node.meta.distance ? formatDistance(node.meta.distance) : '';
+                        const area = node.meta.area ? formatArea(node.meta.area) : '';
+                        const verts = node.meta.points ? node.meta.points.length + ' vertices' : '';
+                        sub.textContent = [verts, dist, area, node.meta.desc].filter(Boolean).join(' · ') || 'No description';
+                    } else {
                         sub.textContent = (node.meta.desc && node.meta.desc.trim()) || 'No description';
-                    } else if (opts.showPath) {
-                        sub.textContent = 'Root' + (opts.parents && opts.parents.length ? ' / ' + opts.parents.map(p => p.name).join(' / ') : '');
                     }
                     label.appendChild(sub);
                 } else {
@@ -2034,7 +2215,7 @@
                     row.appendChild(badge);
                 }
 
-                if (node.type === 'folder' || node.type === 'kml') {
+                if (isFolder) {
                     const chev = document.createElement('i');
                     chev.className = 'fas fa-chevron-right fx-chevron';
                     row.appendChild(chev);
@@ -2491,17 +2672,6 @@
                 if ((node.type === 'folder' || node.type === 'kml') && clipboard && clipboard.type === 'placemark') {
                     items.push({ label: `Paste "${clipboard.name}" here`, icon: 'fa-paste', action: () => pastePlacemarkInto(node) });
                 }
-                if (node.type === 'folder' || node.type === 'kml') {
-                    items.push({ sep: true });
-                    items.push({ label: 'Show all children', icon: 'fa-eye', action: async () => {
-                        if (node.children) node.children.forEach(c => setNodeVisible(c, true));
-                        renderTree(); await persistTreeNow();
-                    }});
-                    items.push({ label: 'Hide all children', icon: 'fa-eye-slash', action: async () => {
-                        if (node.children) node.children.forEach(c => setNodeVisible(c, false));
-                        renderTree(); await persistTreeNow();
-                    }});
-                }
                 if ((node.type === 'path' || node.type === 'measure' || node.type === 'polygon' || node.type === 'measure-area') && node.meta.points) {
                     items.push({ sep: true });
                     items.push({ label: 'Reverse direction', icon: 'fa-right-left', action: async () => {
@@ -2686,6 +2856,7 @@
                 if (node.children) node.children.forEach(c => setNodeVisible(c, visible));
                 if (drawnItems.bringToFront) drawnItems.bringToFront();
                 updateMinimapDots();
+                updateMapLabels();
             }
             async function deleteNodeWithChildren(node) {
                 if (node.children) for (const c of node.children.slice()) await deleteNodeWithChildren(c);
@@ -2702,6 +2873,7 @@
                 removeNode(node.id);
                 if (selectedNodeId === node.id) selectedNodeId = null;
                 multiSelection.delete(node.id);
+                updateMapLabels();
             }
             async function archiveNode(node) {
                 if (!node) return;
@@ -2749,12 +2921,16 @@
                         const line = L.polyline(n.meta.points, { color: n.meta.color || '#4d7c0f', weight: n.meta.lineThickness || 3 });
                         bindLayerFocus(n, line);
                         attachLayerDrag(n, line);
+                        const desc = n.meta.desc ? '<br>' + escapeHtml(n.meta.desc) : '';
+                        line.bindPopup(`<b>${escapeHtml(n.name)}</b>${desc}<br>Length: ${formatDistance(n.meta.distance || 0)}`);
                         n.layer = line;
                         if (n.visible !== false) line.addTo(drawnItems);
                     } else if ((n.type === 'polygon' || n.type === 'measure-area') && n.meta.points) {
                         const poly = L.polygon(n.meta.points, { color: n.meta.color || '#4d7c0f', weight: n.meta.lineThickness || 2, fillOpacity: 0.2 });
                         bindLayerFocus(n, poly);
                         attachLayerDrag(n, poly);
+                        const desc = n.meta.desc ? '<br>' + escapeHtml(n.meta.desc) : '';
+                        poly.bindPopup(`<b>${escapeHtml(n.name)}</b>${desc}${n.meta.area ? '<br>Area: ' + formatArea(n.meta.area) : ''}`);
                         n.layer = poly;
                         if (n.visible !== false) poly.addTo(drawnItems);
                     } else if (n.type === 'los') {
@@ -3367,6 +3543,7 @@
                 if (typeof stopLOSTracking === 'function') stopLOSTracking();
                 profilePanel.classList.remove('editor-open');
                 setTimeout(() => { if (profileData) drawProfileChart(); }, 320);
+                updateMapLabels();
             }
             editorCloseBtn.addEventListener('click', closeEditorPanel);
 
@@ -4237,6 +4414,7 @@
                     clearTimeout(editorState._persistTimer);
                     editorState._persistTimer = setTimeout(() => persistTree(), 400);
                 }
+                updateMapLabels();
             }
 
             // ============ VERTICES ============
@@ -4486,6 +4664,7 @@
                     if (drawnItems.bringToFront) drawnItems.bringToFront();
                     renderTree();
                     await persistTreeNow();
+                    updateMapLabels();
                 }
 
                 editorBody.innerHTML = `
@@ -6828,6 +7007,7 @@
                         showToast(`Polygon: ${result.name}`, 'fa-draw-polygon');
                     }
                 }
+                updateMapLabels();
             }
 
             map.on('click', async (e) => {
@@ -7000,6 +7180,7 @@
                 if (restored && hasAnyPlaces()) setTimeout(fitToPlacesExtent, 200);
                 updateMapToolsVisibility();
                 syncProfilePanelLeft();
+                updateMapLabels();
                 setTimeout(() => showToast('Telco Earth ready', 'fa-tower-broadcast'), 700);
             })();
         })();
