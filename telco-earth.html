@@ -255,6 +255,11 @@
     .leaflet-bar { border: none !important; box-shadow: none !important; }
     .leaflet-marker-icon, .leaflet-interactive { cursor: pointer; }
 
+    /* Hide terrain tile tooltips unless the terrain panel is active */
+    body:not(.terrain-panel-active) .leaflet-tooltip.terrain-tile-tooltip {
+        display: none !important;
+    }
+
     .map-tools { position: absolute; top: 16px; left: 16px; display: flex; gap: 4px; z-index: 500; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px); padding: 5px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); transition: opacity 0.2s ease, transform 0.2s ease; }
     .map-tools.hidden { opacity: 0; pointer-events: none; transform: translateY(-8px); }
     .map-tool { padding: 8px 13px; border-radius: 8px; background: transparent; border: 1px solid transparent; color: var(--ink-1); font-size: 0.75rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit; white-space: nowrap; }
@@ -685,6 +690,10 @@
             } catch (e) {}
             function saveFlags() {
                 try { localStorage.setItem('telco-flags', JSON.stringify(FLAGS)); } catch (e) {}
+            }
+            function saveVisibleTilesState() {
+                FLAGS.visibleTiles = Array.from(visibleTiles);
+                saveFlags();
             }
 
             const fileInput = document.getElementById('file-input');
@@ -1353,7 +1362,7 @@
                             if (lngEl) lngEl.value = ll.lng.toFixed(6);
                         }
                     });
-                    layer.on('dragend', async () => { await persistTreeNow(); });
+                    layer.on('dragend', async () => { await persistTreeNow(); updateMapLabels(); });
                 } else if (['path','measure','polygon','measure-area'].includes(node.type) && layer) {
                     layer.on('mousedown', (ev) => {
                         if (!editorState || editorState.node !== node) return;
@@ -1395,7 +1404,7 @@
                             if (lngEl) lngEl.value = ll.lng.toFixed(6);
                         }
                     };
-                    const onDragEnd = async () => { await persistTreeNow(); };
+                    const onDragEnd = async () => { await persistTreeNow(); updateMapLabels(); };
                     node.layer.on('drag', onDrag);
                     node.layer.on('dragend', onDragEnd);
                     cleanups.push(() => {
@@ -1454,7 +1463,7 @@
                             if (lngEl) lngEl.value = ll.lng.toFixed(6);
                         }
                     };
-                    const onDragEnd = async () => { await persistTreeNow(); };
+                    const onDragEnd = async () => { await persistTreeNow(); updateMapLabels(); };
                     centerMarker.on('drag', onDrag);
                     centerMarker.on('dragend', onDragEnd);
                     cleanups.push(() => { map.removeLayer(centerMarker); });
@@ -1521,53 +1530,39 @@
                 const showDesc = FLAGS.mapLabelShowDesc;
                 const offX = FLAGS.mapLabelOffsetX || 10;
                 const offY = FLAGS.mapLabelOffsetY || 0;
+                function buildLabelHtml(name, desc, color) {
+                    return `<div style="
+                        position:absolute;
+                        left:${offX}px;
+                        top:${offY}px;
+                        transform:translateY(-50%);
+                        font-family:'${font}',sans-serif;
+                        font-size:${size}px;
+                        font-weight:500;
+                        color:${color};
+                        text-shadow:0 1px 3px rgba(255,255,255,0.95),0 0 3px rgba(255,255,255,0.9);
+                        white-space:nowrap;
+                        pointer-events:none;
+                        line-height:1.3;
+                    "><span style="font-weight:600;">${escapeHtml(name)}</span>${showDesc && desc ? `<br><span style="font-size:${Math.max(8, size-3)}px;font-weight:400;color:var(--ink-2);">${escapeHtml(desc)}</span>` : ''}</div>`;
+                }
+                function addLabelMarker(lat, lng, name, desc, color) {
+                    const inner = `<div style="position:relative;width:0;height:0;overflow:visible;">${buildLabelHtml(name, desc, color)}</div>`;
+                    const marker = L.marker([lat, lng], {
+                        icon: L.divIcon({ className: '', html: inner, iconSize: [0, 0], iconAnchor: [0, 0] }),
+                        interactive: false, zIndexOffset: 500, keyboard: false
+                    });
+                    mapLabelGroup.addLayer(marker);
+                }
                 function walk(nodes) {
                     for (const n of nodes) {
                         if (n.visible === false) continue;
                         if (n.type === 'placemark' && n.meta.lat != null) {
-                            const pos = map.latLngToContainerPoint([n.meta.lat, n.meta.lng]);
-                            const html = `<div style="
-                                position:absolute;
-                                left:${pos.x + offX}px;
-                                top:${pos.y + offY}px;
-                                transform:translateY(-50%);
-                                font-family:'${font}',sans-serif;
-                                font-size:${size}px;
-                                font-weight:500;
-                                color:${n.meta.color || '#4d7c0f'};
-                                text-shadow:0 1px 3px rgba(255,255,255,0.9),0 0 2px rgba(255,255,255,0.8);
-                                white-space:nowrap;
-                                pointer-events:none;
-                                line-height:1.3;
-                            "><span style="font-weight:600;">${escapeHtml(n.name)}</span>${showDesc && n.meta.desc ? `<br><span style="font-size:${Math.max(8, size-3)}px;font-weight:400;color:var(--ink-2);">${escapeHtml(n.meta.desc)}</span>` : ''}</div>`;
-                            const label = L.marker([n.meta.lat, n.meta.lng], {
-                                icon: L.divIcon({ className: '', html: `<div style="position:relative;width:0;height:0;overflow:visible;">${html}</div>`, iconSize: [0, 0], iconAnchor: [0, 0] }),
-                                interactive: false, zIndexOffset: 500
-                            });
-                            mapLabelGroup.addLayer(label);
+                            addLabelMarker(n.meta.lat, n.meta.lng, n.name, n.meta.desc, n.meta.color || '#4d7c0f');
                         }
                         if ((n.type === 'path' || n.type === 'measure' || n.type === 'polygon' || n.type === 'measure-area') && n.meta.points && n.meta.points.length > 0) {
                             const mid = n.meta.points[Math.floor(n.meta.points.length / 2)];
-                            const pos = map.latLngToContainerPoint(mid);
-                            const html = `<div style="
-                                position:absolute;
-                                left:${pos.x + offX}px;
-                                top:${pos.y + offY}px;
-                                transform:translateY(-50%);
-                                font-family:'${font}',sans-serif;
-                                font-size:${size}px;
-                                font-weight:500;
-                                color:${n.meta.color || '#4d7c0f'};
-                                text-shadow:0 1px 3px rgba(255,255,255,0.9),0 0 2px rgba(255,255,255,0.8);
-                                white-space:nowrap;
-                                pointer-events:none;
-                                line-height:1.3;
-                            "><span style="font-weight:600;">${escapeHtml(n.name)}</span>${showDesc && n.meta.desc ? `<br><span style="font-size:${Math.max(8, size-3)}px;font-weight:400;color:var(--ink-2);">${escapeHtml(n.meta.desc)}</span>` : ''}</div>`;
-                            const label = L.marker(mid, {
-                                icon: L.divIcon({ className: '', html: `<div style="position:relative;width:0;height:0;overflow:visible;">${html}</div>`, iconSize: [0, 0], iconAnchor: [0, 0] }),
-                                interactive: false, zIndexOffset: 500
-                            });
-                            mapLabelGroup.addLayer(label);
+                            addLabelMarker(mid[0], mid[1], n.name, n.meta.desc, n.meta.color || '#4d7c0f');
                         }
                         if (n.children) walk(n.children);
                     }
@@ -1575,7 +1570,6 @@
                 walk(treeNodes);
                 mapLabelGroup.addTo(map);
             }
-            map.on('moveend zoomend', () => { if (FLAGS.showMapLabels) updateMapLabels(); });
 
             // ==================== RENDER ====================
             const subrailBody = document.getElementById('subrail-body');
@@ -1620,6 +1614,7 @@
                 if (activeSection === 'places') renderPlacesSection();
                 else renderStaticSection(activeSection);
                 updateMapLabels();
+                document.body.classList.toggle('terrain-panel-active', activeSection === 'terrain');
             }
 
             function updateSubrailChrome() {
@@ -1807,7 +1802,7 @@
                             <input type="number" id="ml-offset-y" value="${FLAGS.mapLabelOffsetY}" min="-50" max="50" step="1" style="width:100%;padding:8px 12px;border:1px solid var(--border-hi);border-radius:8px;background:var(--paper);font-family:'IBM Plex Mono',monospace;">
                         </div>
                     </div>
-                    <div class="editor-hint">Labels appear at placemark and shape midpoints. Adjust offset to position relative to the icon.</div>
+                    <div class="editor-hint">Labels are attached to markers/shape midpoints and follow the map automatically. Adjust the offset to position them relative to the icon.</div>
                 `;
                 actions.innerHTML = `
                     <button class="btn btn-secondary" id="ml-cancel">Cancel</button>
@@ -2869,6 +2864,7 @@
                     recomputeGlobalScale();
                     redrawTerrainOverlays();
                     updateTerrainVisibility();
+                    saveVisibleTilesState();
                 }
                 removeNode(node.id);
                 if (selectedNodeId === node.id) selectedNodeId = null;
@@ -3129,9 +3125,8 @@
                             terrainStore.forEach((_t, k) => visibleTiles.add(k));
                             showToast('Showing all heatmaps', 'fa-eye');
                         }
-                        FLAGS.showAllHeatmaps = showAllHeatmaps;
-                        saveFlags();
                         syncShowAllState();
+                        saveVisibleTilesState();
                         redrawTerrainOverlays();
                         renderStaticSection('terrain');
                     });
@@ -3204,6 +3199,7 @@
                                 await dbDelete('terrain', key);
                                 recomputeGlobalScale();
                                 syncShowAllState();
+                                saveVisibleTilesState();
                                 redrawTerrainOverlays();
                                 updateTerrainVisibility();
                                 renderStaticSection('terrain');
@@ -3326,6 +3322,7 @@
                             treeNodes.forEach(n => setNodeVisible(n, false));
                             visibleTiles.clear();
                             syncShowAllState();
+                            saveVisibleTilesState();
                             redrawTerrainOverlays();
                             renderTree();
                             await persistTreeNow();
@@ -3344,6 +3341,8 @@
                             terrainStore.clear();
                             visibleTiles.clear();
                             heatmapCache.clear();
+                            FLAGS.visibleTiles = [];
+                            saveFlags();
                             updateTerrainVisibility();
                             redrawTerrainOverlays();
                             const tf = findNodeByName('Terrain (HGT)');
@@ -5918,6 +5917,7 @@
                     });
                     recomputeGlobalScale();
                     syncShowAllState();
+                    saveVisibleTilesState();
                     updateTerrainVisibility();
                     redrawTerrainOverlays();
                     if (activeSection === 'terrain') renderStaticSection('terrain');
@@ -5943,11 +5943,18 @@
                         } catch (e) { console.warn('Bad stored tile', rec.key); }
                     }
                     if (terrainStore.size) {
-                        terrainStore.forEach((_t, k) => visibleTiles.add(k));
-                        FLAGS.showAllHeatmaps = true;
-                        saveFlags();
+                        // Restore previously saved visibility state if available;
+                        // otherwise default to all visible (first run with tiles).
+                        if (Array.isArray(FLAGS.visibleTiles)) {
+                            FLAGS.visibleTiles.forEach(k => {
+                                if (terrainStore.has(k)) visibleTiles.add(k);
+                            });
+                        } else {
+                            terrainStore.forEach((_t, k) => visibleTiles.add(k));
+                        }
                         recomputeGlobalScale();
                         syncShowAllState();
+                        saveVisibleTilesState();
                         updateTerrainVisibility();
                         redrawTerrainOverlays();
                         showToast(`Restored ${terrainStore.size} HGT tile(s)`, 'fa-database');
@@ -5977,6 +5984,7 @@
                 if (visibleTiles.has(key)) visibleTiles.delete(key);
                 else visibleTiles.add(key);
                 syncShowAllState();
+                saveVisibleTilesState();
                 redrawTerrainOverlays();
             }
             function buildTileBorderLayers() {
@@ -6111,7 +6119,9 @@
                 const overlay = L.imageOverlay(heat.dataURL, tileBounds, {
                     opacity: 0.85, interactive: true, className: 'hgt-heat-canvas', zIndex: 400, pane: 'terrainPane'
                 });
-                overlay.bindTooltip(`<b>${escapeHtml(key)}</b><br>Tile: ${heat.min}–${heat.max} m<br>Shared scale: ${globalMin}–${globalMax} m`, { sticky: true, direction: 'top' });
+                overlay.bindTooltip(`<b>${escapeHtml(key)}</b><br>Tile: ${heat.min}–${heat.max} m<br>Shared scale: ${globalMin}–${globalMax} m`, {
+                    sticky: true, direction: 'top', className: 'terrain-tile-tooltip'
+                });
                 return [overlay];
             }
 
