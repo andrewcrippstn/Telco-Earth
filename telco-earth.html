@@ -1,10 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Telco Earth</title>
+<meta name="theme-color" content="#4d7c0f">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNGQ3YzBmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMzY1MzE0Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTciIGZpbGw9InVybCgjZykiLz48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMyAxNS4xKSBzY2FsZSgwLjA2NikiIGZpbGw9IiNmZmYiIGQ9Ik04MC4zIDQ0QzY5LjggNjkuOSA2NCA5OC4yIDY0IDEyOHM1LjggNTguMSAxNi4zIDg0YzYuNiAxNi40LTEuMyAzNS0xNy43IDQxLjdzLTM1LTEuMy00MS43LTE3LjdDNy40IDIwMi42IDAgMTY2LjEgMCAxMjhTNy40IDUzLjQgMjAuOSAyMEMyNy42IDMuNiA0Ni4yLTQuMyA2Mi42IDIuM1M4Ni45IDI3LjYgODAuMyA0NHpNNTU1LjEgMjBDNTY4LjYgNTMuNCA1NzYgODkuOSA1NzYgMTI4cy03LjQgNzQuNi0yMC45IDEwOGMtNi42IDE2LjQtMjUuMyAyNC4zLTQxLjcgMTcuN1M0ODkuMSAyMjguNCA0OTUuNyAyMTJjMTAuNS0yNS45IDE2LjMtNTQuMiAxNi4zLTg0cy01LjgtNTguMS0xNi4zLTg0QzQ4OS4xIDI3LjYgNDk3IDkgNTEzLjQgMi4zczM1IDEuMyA0MS43IDE3Ljd6TTM1MiAxMjhjMCAyMy43LTEyLjkgNDQuNC0zMiA1NS40VjQ4MGMwIDE3LjctMTQuMyAzMi0zMiAzMnMtMzItMTQuMy0zMi0zMlYxODMuNGMtMTkuMS0xMS4xLTMyLTMxLjctMzItNTUuNGMwLTM1LjMgMjguNy02NCA2NC02NHM2NCAyOC43IDY0IDY0ek0xNzAuNiA3Ni44QzE2My44IDkyLjQgMTYwIDEwOS43IDE2MCAxMjhzMy44IDM1LjYgMTAuNiA1MS4yYzcuMSAxNi4yLS4zIDM1LjEtMTYuNSA0Mi4xcy0zNS4xLS4zLTQyLjEtMTYuNWMtMTAuMy0yMy42LTE2LTQ5LjYtMTYtNzYuOHM1LjctNTMuMiAxNi03Ni44YzcuMS0xNi4yIDI1LjktMjMuNiA0Mi4xLTE2LjVzMjMuNiAyNS45IDE2LjUgNDIuMXpNNDY0IDUxLjJjMTAuMyAyMy42IDE2IDQ5LjYgMTYgNzYuOHMtNS43IDUzLjItMTYgNzYuOGMtNy4xIDE2LjItMjUuOSAyMy42LTQyLjEgMTYuNXMtMjMuNi0yNS45LTE2LjUtNDIuMWM2LjgtMTUuNiAxMC42LTMyLjkgMTAuNi01MS4ycy0zLjgtMzUuNi0xMC42LTUxLjJjLTcuMS0xNi4yIC4zLTM1LjEgMTYuNS00Mi4xczM1LjEgLjMgNDIuMSAxNi41eiIvPjwvc3ZnPg==">
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,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">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -16,7 +19,7 @@
         --sage-soft-hi: rgba(77, 124, 15, 0.16);
         --sage-border: rgba(77, 124, 15, 0.24);
         --paper: #ffffff; --paper-soft: #fafaf7; --paper-2: #f5f5f0; --paper-3: #edede8;
-        --ink: #1f261a; --ink-1: #3f4038; --ink-2: #6d7167; --ink-3: #7a7d74;
+        --ink: #1f261a; --ink-1: #3f4038; --ink-2: #5b5f55; --ink-3: #686c61;
         --border: rgba(0, 0, 0, 0.07); --border-hi: rgba(0, 0, 0, 0.1);
         --danger: #dc2626; --danger-soft: rgba(220, 38, 38, 0.1);
         --danger-border: rgba(220, 38, 38, 0.25);
@@ -476,6 +479,106 @@
         .editor-panel { width: 100%; }
         .minimap-wrap { display: none; }
     }
+
+    /* ---- Accessibility / readability overrides ---- */
+    /* single focus indicator (was outline + box-shadow) */
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { box-shadow: none; }
+    .subrail-resizer:focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; background: var(--sage-soft-hi); }
+    /* text floor of ~10.5px */
+    .fx-row .fx-subline, .fx-badge, .panel-tab .tab-count, .sort-popover .sp-title, .opts-popover .fp-label,
+    .places-search-row .sr-count, .places-count, .breadcrumb-sep { font-size: 0.66rem; }
+    .fx-row .fx-subline { line-height: 1.35; }
+    /* larger grab area for the splitter (stays inside the overflow:hidden sub-rail) */
+    .subrail-resizer { width: 8px; }
+    .subrail-resizer:hover, .subrail-resizer.dragging { background: linear-gradient(to left, var(--sage-soft-hi) 0 4px, transparent 4px); }
+    .h-icon:disabled { opacity: 0.35; cursor: default; }
+    .h-icon:disabled:hover { background: transparent; color: var(--ink-2); }
+    .fx-row[aria-current="true"] { outline-offset: -2px; }
+
+    /* ---- Phones: side panel becomes a bottom sheet above a bottom tab bar ---- */
+    @media (max-width: 700px) {
+        .workspace { flex-direction: column; }
+        .map-area { order: 1; min-height: 0; }
+        .subrail { order: 2; width: 100% !important; height: 0; border-right: none; border-top: 1px solid var(--border);
+                   transition: height 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+        .subrail.open { height: 46vh; width: 100% !important; }
+        .subrail-resizer { display: none; }
+        .rail { order: 3; width: 100%; height: 56px; flex-direction: row; justify-content: space-around; align-items: center;
+                padding: 6px 8px; border-right: none; border-top: 1px solid var(--border); gap: 2px; }
+        .rail-spacer { display: none; }
+        .rail-btn.active::before { left: 50%; top: -7px; transform: translateX(-50%); width: 22px; height: 3px; border-radius: 0 0 3px 3px; }
+        .rail-tooltip { display: none; }
+        .header-search { width: 130px; max-width: 36vw; }
+        .header-right { gap: 2px; }
+        .map-tools { flex-wrap: wrap; max-width: calc(100% - 32px); }
+        .profile-panel.open { height: 240px; }
+    }
+
+    /* ---- Round 2: header, history, search, menus ---- */
+    .header { gap: 10px; }
+    .header-search { position: relative; }
+    .h-sep { width: 1px; height: 20px; background: var(--border-hi); margin: 0 4px; flex-shrink: 0; }
+    .h-group { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 9px; background: var(--paper-soft); padding: 1px; }
+    .h-group .h-icon { width: 30px; height: 30px; border-radius: 7px; font-size: 0.78rem; }
+    .h-group .h-caret { width: 20px; border-left: 1px solid var(--border); border-radius: 0 7px 7px 0; font-size: 0.6rem; }
+    .h-group .h-icon:first-child { border-radius: 7px 0 0 7px; }
+    .h-group .h-icon[aria-expanded="true"] { background: var(--sage-soft); color: var(--sage); }
+
+    .hdr-icon-btn.accent { background: var(--sage); color: #fff; border-color: var(--sage); }
+    .hdr-icon-btn.accent:hover { background: var(--sage-hi); border-color: var(--sage-hi); color: #fff; }
+
+    .static-heading { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); font-weight: 500; padding: 16px 4px 8px; }
+    .static-heading:first-child { padding-top: 6px; }
+    .static-heading.danger { color: var(--danger); font-weight: 600; }
+    .empty-actions { display: flex; gap: 8px; justify-content: center; margin-top: 14px; }
+
+    .breadcrumb-more { margin-left: auto; width: 24px; height: 22px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: var(--ink-2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; flex-shrink: 0; }
+    .breadcrumb-more:hover { background: var(--paper-2); color: var(--ink); border-color: var(--border); }
+
+    /* history dropdown */
+    .history-popover { position: fixed; z-index: 7000; display: none; flex-direction: column; background: var(--paper); border: 1px solid var(--border-hi); border-radius: 10px; box-shadow: 0 16px 40px rgba(0,0,0,0.15); overflow: hidden; }
+    .history-popover.open { display: flex; }
+    .hp-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 8px; font-family: 'Fraunces', serif; font-weight: 600; font-size: 0.9rem; color: var(--ink); }
+    .hp-clear { border: none; background: transparent; color: var(--sage); font-size: 0.72rem; font-weight: 500; cursor: pointer; padding: 3px 6px; border-radius: 5px; }
+    .hp-clear:hover { background: var(--sage-soft); }
+    .hp-list { max-height: min(50vh, 360px); overflow-y: auto; padding: 0 6px 6px; display: flex; flex-direction: column; gap: 1px; }
+    .hp-item { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border: 1px solid transparent; border-radius: 7px; background: transparent; cursor: pointer; text-align: left; font-family: inherit; font-size: 0.78rem; color: var(--ink-1); width: 100%; }
+    .hp-item:hover { background: var(--paper-soft); border-color: var(--border); }
+    .hp-item.current { background: var(--sage-soft); border-color: var(--sage-border); color: var(--sage); font-weight: 500; }
+    .hp-item.future { color: var(--ink-3); }
+    .hp-dot { width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--ink-3); flex-shrink: 0; box-sizing: border-box; }
+    .hp-item.current .hp-dot { background: var(--sage); border-color: var(--sage); }
+    .hp-item.future .hp-dot { border-style: dashed; }
+    .hp-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hp-time { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; color: var(--ink-3); flex-shrink: 0; }
+    .hp-item.current .hp-time { color: var(--sage); }
+    .hp-foot { padding: 7px 12px 9px; border-top: 1px solid var(--border); font-size: 0.66rem; color: var(--ink-3); line-height: 1.4; }
+
+    /* place search results */
+    .geo-results { position: fixed; z-index: 7000; display: none; background: var(--paper); border: 1px solid var(--border-hi); border-radius: 10px; box-shadow: 0 16px 40px rgba(0,0,0,0.15); overflow: hidden; }
+    .geo-results.open { display: block; }
+    .geo-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; cursor: pointer; border-bottom: 1px solid var(--border); }
+    .geo-item > i { width: 18px; text-align: center; color: var(--sage); margin-top: 2px; font-size: 0.82rem; flex-shrink: 0; }
+    .geo-item.active { background: var(--sage-soft); }
+    .geo-item-text { min-width: 0; flex: 1; }
+    .geo-item-name { font-size: 0.82rem; font-weight: 500; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .geo-item-sub { font-size: 0.7rem; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .geo-msg { padding: 14px 14px; font-size: 0.78rem; color: var(--ink-1); line-height: 1.45; }
+    .geo-msg i { color: var(--sage); margin-right: 4px; }
+    .geo-foot { padding: 6px 12px; font-size: 0.64rem; color: var(--ink-3); background: var(--paper-soft); }
+    .geo-popup { min-width: 190px; font-size: 0.78rem; }
+    .geo-popup-sub { color: #555; margin: 2px 0 4px; max-width: 260px; }
+    .geo-popup-coords { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; margin-bottom: 8px; }
+    .geo-popup-actions { display: flex; gap: 6px; }
+    .geo-popup-actions .btn { padding: 5px 9px; font-size: 0.72rem; }
+
+    .context-menu .ctx-item:focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }
+    .static-item:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
+
+    @media (max-width: 700px) {
+        .h-sep { display: none; }
+        .h-group .h-icon { width: 28px; }
+    }
 </style>
 </head>
 <body>
@@ -486,13 +589,25 @@
             <span>Telco Earth</span>
         </div>
         <div class="header-spacer"></div>
-        <div class="header-search" id="gps-search">
-            <i class="fas fa-crosshairs"></i>
-            <input type="text" id="gps-search-input" placeholder="Go to lat, lng…" autocomplete="off" title="Enter coordinates e.g. 46.5, 8.0 or 46.5N 8.0E">
+        <div class="header-search" id="gps-search" role="search">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="text" id="gps-search-input" placeholder="Go to place or lat, lng…" autocomplete="off" spellcheck="false"
+                   role="combobox" aria-expanded="false" aria-controls="geo-results" aria-autocomplete="list" aria-label="Go to a place or coordinates"
+                   title="Type a place name and press Enter, or coordinates such as -42.88, 147.33 or 42°53′S 147°19′E">
             <button class="header-search-clear" id="gps-search-clear" title="Clear" aria-label="Clear"><i class="fas fa-times"></i></button>
-            <button class="header-search-go" id="gps-search-go" title="Go to coordinates" aria-label="Go to coordinates"><i class="fas fa-arrow-right"></i></button>
+            <button class="header-search-go" id="gps-search-go" title="Go" aria-label="Go"><i class="fas fa-arrow-right"></i></button>
+            <div class="geo-results" id="geo-results" role="listbox" aria-label="Place results"></div>
         </div>
-        <div class="header-right"></div>
+        <div class="header-spacer"></div>
+        <div class="header-right">
+            <button class="h-icon" id="btn-locate" title="Go to my location (L)" aria-label="Go to my location"><i class="fas fa-location-crosshairs"></i></button>
+            <span class="h-sep" aria-hidden="true"></span>
+            <div class="h-group" role="group" aria-label="History">
+                <button class="h-icon" id="btn-undo" title="Undo (Ctrl+Z)" aria-label="Undo" disabled><i class="fas fa-rotate-left"></i></button>
+                <button class="h-icon" id="btn-redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo" disabled><i class="fas fa-rotate-right"></i></button>
+                <button class="h-icon h-caret" id="btn-history" title="History" aria-label="Show history" aria-haspopup="dialog" aria-expanded="false" disabled><i class="fas fa-chevron-down"></i></button>
+            </div>
+        </div>
     </div>
 
     <div class="workspace">
@@ -502,19 +617,20 @@
             <button class="rail-btn" data-subrail="terrain" aria-label="Terrain (HGT)" data-tooltip="Terrain (HGT)"><i class="fas fa-mountain"></i></button>
             <button class="rail-btn" data-subrail="layers" aria-label="Layers" data-tooltip="Layers"><i class="fas fa-layer-group"></i></button>
             <div class="rail-spacer"></div>
-            <button class="rail-btn" data-subrail="settings" aria-label="Settings" data-tooltip="Settings"><i class="fas fa-sliders"></i></button>
+            <button class="rail-btn" data-subrail="settings" aria-label="Settings" data-tooltip="Settings"><i class="fas fa-gear"></i></button>
         </div>
 
         <div class="subrail open" id="subrail">
-            <div class="subrail-resizer" id="subrail-resizer" title="Drag to resize"></div>
+            <div class="subrail-resizer" id="subrail-resizer" title="Drag to resize (or use arrow keys)" role="separator" aria-orientation="vertical" aria-label="Resize side panel" tabindex="0"></div>
             <div class="subrail-inner">
                 <div class="subrail-header" id="subrail-header">
                     <div class="places-header-row">
                         <span class="places-title" id="subrail-title">Places</span>
                         <span class="places-count" id="subrail-count"></span>
+                        <button class="hdr-icon-btn" id="hdr-search" title="Search places" aria-label="Search places"><i class="fas fa-magnifying-glass"></i></button>
                         <button class="hdr-icon-btn" id="hdr-sort" title="Sort" aria-label="Sort"><i class="fas fa-arrow-down-wide-short"></i></button>
-                        <button class="hdr-icon-btn" id="hdr-search" title="Search" aria-label="Search"><i class="fas fa-magnifying-glass"></i></button>
-                        <button class="hdr-icon-btn" id="header-opts-btn" title="Options" aria-label="Options"><i class="fas fa-gear"></i></button>
+                        <button class="hdr-icon-btn" id="header-opts-btn" title="View options" aria-label="View options" aria-haspopup="true"><i class="fas fa-sliders"></i></button>
+                        <button class="hdr-icon-btn accent" id="hdr-new" title="New folder / import…" aria-label="New folder or import" aria-haspopup="true"><i class="fas fa-plus"></i></button>
                     </div>
                     <div class="places-search-row" id="places-search-row">
                         <i class="fas fa-magnifying-glass"></i>
@@ -661,7 +777,7 @@
 
     <div class="opts-popover" id="opts-popover"></div>
 
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <div class="rail-tooltip" id="rail-tooltip"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -705,7 +821,7 @@
             let toastTimer;
             function showToast(msg, icon, opts) {
                 opts = opts || {};
-                toast.innerHTML = (icon ? `<i class="fas ${icon}"></i>` : '') + msg;
+                toast.innerHTML = (icon ? `<i class="fas ${icon}"></i>` : '') + escapeHtml(msg);
                 toast.className = 'toast';
                 if (opts.error) toast.classList.add('error');
                 if (opts.detail) {
@@ -739,8 +855,45 @@
             function escapeXml(s) {
                 return String(s).replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
             }
+            // Values from imported files end up inside style="" / class="" attributes, so validate them.
+            function safeColor(c, fallback) {
+                fallback = fallback || '#4d7c0f';
+                if (typeof c !== 'string') return fallback;
+                c = c.trim();
+                if (/^#[0-9a-fA-F]{3,8}$/.test(c)) return c;
+                if (/^(rgb|hsl)a?\(\s*[0-9.,%\s\/-]+\)$/i.test(c)) return c;
+                if (/^[a-zA-Z]{3,20}$/.test(c)) return c;
+                return fallback;
+            }
+            function safeIconClass(s, fallback) {
+                return (typeof s === 'string' && /^fa-[a-z0-9-]+(\s+fa-[a-z0-9-]+)*$/.test(s)) ? s : fallback;
+            }
+            function sanitizeMeta(m) {
+                for (const k of Object.keys(m)) {
+                    if (/color$/i.test(k) && typeof m[k] === 'string' && m[k] !== '') m[k] = safeColor(m[k], '#4d7c0f');
+                }
+                if (typeof m.icon === 'string') m.icon = safeIconClass(m.icon, DEFAULT_ICON);
+                return m;
+            }
+            function numOr(v, d) { const n = parseFloat(v); return isFinite(n) ? n : d; }
+
+            async function writeClipboard(text) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    try { await navigator.clipboard.writeText(text); return; } catch (e) { /* fall through to the legacy path */ }
+                }
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.setAttribute('readonly', '');
+                ta.style.cssText = 'position:fixed;top:-1000px;opacity:0;';
+                document.body.appendChild(ta);
+                ta.select();
+                let ok = false;
+                try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+                document.body.removeChild(ta);
+                if (!ok) throw new Error('Clipboard unavailable');
+            }
             function copyToClipboard(text, label) {
-                navigator.clipboard.writeText(text)
+                writeClipboard(text)
                     .then(() => showToast((label || 'Copied') + ' to clipboard', 'fa-copy'))
                     .catch(() => showToast('Copy failed', 'fa-times'));
             }
@@ -919,6 +1072,17 @@
             const terrainOverlayGroup = L.featureGroup().addTo(map);
             const drawnItems = new L.FeatureGroup().addTo(map);
             const snapZoneGroup = L.featureGroup().addTo(map);
+
+            // Leaflet only notices window resizes; the sub-rail, editor and profile panels resize the map container.
+            (function watchMapSize() {
+                const el = document.getElementById('map');
+                if (!el || typeof ResizeObserver === 'undefined') return;
+                let raf = null;
+                new ResizeObserver(() => {
+                    if (raf) cancelAnimationFrame(raf);
+                    raf = requestAnimationFrame(() => { raf = null; map.invalidateSize({ pan: false }); });
+                }).observe(el);
+            })();
 
             const mouseTracker = { latlng: null, containerPoint: null };
             map.on('mousemove', (e) => {
@@ -1294,6 +1458,7 @@
                     };
                 }
                 try {
+                    _trackUndo();
                     await dbPut('places', { id: 'root', tree: treeNodes.map(toPlain), archive: archivedNodes.map(toPlain) });
                 } catch (e) { console.warn('persistTree failed', e); }
             }
@@ -1313,7 +1478,7 @@
                     id: p.id, name: p.name, type: p.type,
                     visible: p.visible !== false, expanded: p.expanded !== false,
                     archivedFrom: p.archivedFrom || null,
-                    meta: p.meta || {}, layer: null,
+                    meta: sanitizeMeta(p.meta || {}), layer: null,
                     children: (p.children || []).map(fromPlain)
                 };
             }
@@ -1625,6 +1790,8 @@
                 hdrSortBtn.style.display = showPlaceTools ? '' : 'none';
                 hdrSearchBtn.style.display = showPlaceTools ? '' : 'none';
                 headerOptsBtn.style.display = showPlaceTools ? '' : 'none';
+                const hdrNewBtn = document.getElementById('hdr-new');
+                if (hdrNewBtn) hdrNewBtn.style.display = showPlaceTools ? '' : 'none';
                 hdrSortBtn.classList.toggle('active', placesSortMode !== 'default');
 
                 const searchActive = showPlaceTools && (placesSearchQuery.length > 0 || placesSearchRow.classList.contains('user-open'));
@@ -1691,7 +1858,7 @@
             function renderOptsPopover() {
                 if (!optsPopover.classList.contains('open')) return;
                 const rows = [];
-                rows.push(`<div class="fp-label">Display</div>`);
+                rows.push(`<div class="fp-label">View</div>`);
                 rows.push(`
                     <div class="fp-row">
                         <span>Compact two-line rows</span>
@@ -1709,10 +1876,6 @@
                         <span style="color:var(--sage);font-size:0.72rem;"><i class="fas fa-sliders"></i> Label settings…</span>
                     </div>
                 `);
-                if (placesSortMode !== 'default') {
-                    rows.push(`<div class="fp-label" style="margin-top:6px;">Order</div>`);
-                    rows.push(`<button class="fp-apply" id="opts-apply-sort"><i class="fas fa-check"></i> Use current sort as default</button>`);
-                }
                 optsPopover.innerHTML = rows.join('');
                 const t = optsPopover.querySelector('#opts-two-line');
                 if (t) t.addEventListener('click', () => {
@@ -1906,6 +2069,7 @@
 
             function renderBreadcrumb() {
                 breadcrumbEl.innerHTML = '';
+                breadcrumbEl.setAttribute('aria-label', 'Folder path');
                 const chain = [];
                 let node = currentFolderId ? findNode(currentFolderId) : null;
                 while (node) {
@@ -1931,7 +2095,8 @@
 
                 const rootCrumb = document.createElement('button');
                 rootCrumb.className = 'breadcrumb-crumb' + (currentFolderId ? '' : ' current');
-                rootCrumb.innerHTML = '<i class="fas fa-map-location-dot"></i> Root';
+                rootCrumb.innerHTML = '<i class="fas fa-map-location-dot"></i> All places';
+                if (!currentFolderId) rootCrumb.setAttribute('aria-current', 'page');
                 rootCrumb.addEventListener('click', () => {
                     if (currentFolderId) { currentFolderId = null; multiSelection.clear(); renderTree(); }
                 });
@@ -1953,6 +2118,19 @@
                     if (n.id !== currentFolderId) attachBreadcrumbDrop(crumb, n.id);
                     breadcrumbEl.appendChild(crumb);
                 });
+
+                const moreBtn = document.createElement('button');
+                moreBtn.className = 'breadcrumb-more';
+                moreBtn.title = currentFolderId ? 'Folder actions' : 'Actions for all places';
+                moreBtn.setAttribute('aria-label', moreBtn.title);
+                moreBtn.setAttribute('aria-haspopup', 'true');
+                moreBtn.innerHTML = '<i class="fas fa-ellipsis"></i>';
+                moreBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const r = moreBtn.getBoundingClientRect();
+                    showPanelContextMenu(Math.max(8, r.right - 240), r.bottom + 4, currentFolderId);
+                });
+                breadcrumbEl.appendChild(moreBtn);
 
                 breadcrumbEl.ondragover = (e) => {
                     if (e.target === breadcrumbEl) {
@@ -2062,8 +2240,15 @@
                                 <i class="fas fa-folder-open" style="color: var(--sage); font-size: 1.3rem;"></i>
                             </div>
                             <div style="font-family: 'Fraunces', serif; font-weight: 600; font-size: 0.95rem; color: var(--ink); margin-bottom: 6px;">This folder is empty</div>
-                            <div>Right-click to add a folder or import data.</div>
+                            <div>Nothing here yet.</div>
+                            <div class="empty-actions">
+                                <button class="btn btn-secondary" id="empty-new-folder"><i class="fas fa-folder-plus"></i> New folder</button>
+                                <button class="btn btn-primary" id="empty-import"><i class="fas fa-file-import"></i> Import</button>
+                            </div>
                         </div>`;
+                    const _enf = subrailBody.querySelector('#empty-new-folder'), _eim = subrailBody.querySelector('#empty-import');
+                    if (_enf) _enf.addEventListener('click', () => promptNewFolder(folder));
+                    if (_eim) _eim.addEventListener('click', () => openImportScreen(currentFolderId));
                     return;
                 }
 
@@ -2158,6 +2343,8 @@
                 if (node.visible === false) row.classList.add('hidden-item');
                 row.dataset.nodeId = node.id;
                 row.tabIndex = 0;
+                row.setAttribute('role', 'button');
+                if (selectedNodeId === node.id) row.setAttribute('aria-current', 'true');
 
                 const icon = document.createElement('div');
                 icon.className = 'fx-icon';
@@ -2630,46 +2817,28 @@
             // ==================== CONTEXT MENUS ====================
             const ctxMenu = document.getElementById('context-menu');
             function showContextMenu(x, y, node) {
-                const items = [];
-                items.push({ label: 'Edit…', icon: 'fa-pen', action: () => openEditorPanel(node) });
-                items.push({ label: 'Zoom to', icon: 'fa-crosshairs', action: () => zoomToNode(node) });
-                if (['placemark','path','polygon','measure','measure-area','los','folder','kml'].includes(node.type)) {
-                    items.push({ label: 'Copy as GeoJSON', icon: 'fa-code', action: async () => {
-                        try {
-                            const gj = nodeToGeoJSON(node);
-                            await navigator.clipboard.writeText(JSON.stringify(gj, null, 2));
-                            showToast('GeoJSON copied to clipboard', 'fa-code');
-                        } catch (err) {
-                            showToast('Copy failed', 'fa-times', { error: true, detail: err });
-                        }
-                    }});
+                const t = node.type;
+                const isFolder = (t === 'folder' || t === 'kml');
+                const isShape = ['path', 'measure', 'polygon', 'measure-area'].includes(t);
+                const isPoint = (t === 'placemark' || t === 'los') && node.meta && node.meta.lat != null && node.meta.lng != null;
+                const canGeoJSON = ['placemark', 'path', 'polygon', 'measure', 'measure-area', 'los', 'folder', 'kml'].includes(t);
+                const groups = [];
+
+                // 1 - open / find
+                groups.push([
+                    { label: 'Edit…', icon: 'fa-pen', action: () => openEditorPanel(node) },
+                    { label: 'Zoom to', icon: 'fa-crosshairs', action: () => zoomToNode(node) }
+                ]);
+
+                // 2 - analysis tools for this kind of item
+                const tools = [];
+                if (t === 'los') {
+                    tools.push({ label: 'LOS profile', icon: 'fa-chart-area', action: () => openLOSProfile(node) });
+                    tools.push({ label: 'Recalculate LOS', icon: 'fa-rotate', action: async () => { rebuildLOSLayer(node); showToast('LOS recalculated', 'fa-satellite-dish'); }});
                 }
-                if (node.type === 'placemark') {
-                    items.push({ label: 'Copy placemark', icon: 'fa-clone', action: () => {
-                        clipboard = { type: 'placemark', meta: JSON.parse(JSON.stringify(node.meta)), name: node.name };
-                        showToast('Placemark copied', 'fa-clone');
-                    }});
-                }
-                items.push({ sep: true });
-                if (node.visible === false) {
-                    items.push({ label: 'Show', icon: 'fa-eye', action: async () => { setNodeVisible(node, true); renderTree(); await persistTreeNow(); }});
-                } else {
-                    items.push({ label: 'Hide', icon: 'fa-eye-slash', action: async () => { setNodeVisible(node, false); renderTree(); await persistTreeNow(); }});
-                }
-                items.push({ label: 'Archive', icon: 'fa-box-archive', action: () => archiveNode(node) });
-                const insertTargetFolder = (node.type === 'folder' || node.type === 'kml') ? node : (() => {
-                    const loc = findParent(node.id);
-                    return loc && loc.parent ? loc.parent : null;
-                })();
-                items.push({ sep: true });
-                items.push({ label: 'New folder here', icon: 'fa-folder-plus', action: () => promptNewFolder(insertTargetFolder) });
-                items.push({ label: 'Import here…', icon: 'fa-file-import', action: () => openImportScreen(insertTargetFolder ? insertTargetFolder.id : null) });
-                if ((node.type === 'folder' || node.type === 'kml') && clipboard && clipboard.type === 'placemark') {
-                    items.push({ label: `Paste "${clipboard.name}" here`, icon: 'fa-paste', action: () => pastePlacemarkInto(node) });
-                }
-                if ((node.type === 'path' || node.type === 'measure' || node.type === 'polygon' || node.type === 'measure-area') && node.meta.points) {
-                    items.push({ sep: true });
-                    items.push({ label: 'Reverse direction', icon: 'fa-right-left', action: async () => {
+                if (isShape && node.meta.points) {
+                    tools.push({ label: 'Path profile', icon: 'fa-chart-area', action: () => openProfilePanel(node) });
+                    tools.push({ label: 'Reverse direction', icon: 'fa-right-left', action: async () => {
                         node.meta.points = node.meta.points.slice().reverse();
                         if (node.layer) node.layer.setLatLngs(node.meta.points);
                         renderTree();
@@ -2677,30 +2846,72 @@
                         showToast('Direction reversed', 'fa-right-left');
                     }});
                 }
-                if (['path','measure','polygon','measure-area'].includes(node.type) && node.meta.points) {
-                    items.push({ sep: true });
-                    items.push({ label: 'Path profile', icon: 'fa-chart-area', action: () => openProfilePanel(node) });
+                groups.push(tools);
+
+                // 3 - organise
+                const organise = [];
+                if (node.visible === false) {
+                    organise.push({ label: 'Show', icon: 'fa-eye', action: async () => { setNodeVisible(node, true); renderTree(); await persistTreeNow(); }});
+                } else {
+                    organise.push({ label: 'Hide', icon: 'fa-eye-slash', action: async () => { setNodeVisible(node, false); renderTree(); await persistTreeNow(); }});
                 }
-                if (node.type === 'los') {
-                    items.push({ sep: true });
-                    items.push({ label: 'LOS profile', icon: 'fa-chart-area', action: () => openLOSProfile(node) });
-                    items.push({ label: 'Recalculate LOS', icon: 'fa-rotate', action: async () => { rebuildLOSLayer(node); showToast('LOS recalculated', 'fa-satellite-dish'); }});
+                organise.push({ label: 'Move to…', icon: 'fa-folder-tree', action: () => { const px = x, py = y; setTimeout(() => showMoveToMenu(node, px, py), 0); } });
+                organise.push({ label: 'Archive', icon: 'fa-box-archive', action: () => archiveNode(node) });
+                if (isFolder) {
+                    organise.push({ label: 'New folder inside…', icon: 'fa-folder-plus', action: () => promptNewFolder(node) });
+                    organise.push({ label: 'Import into folder…', icon: 'fa-file-import', action: () => openImportScreen(node.id) });
+                    if (clipboard && clipboard.type === 'placemark') {
+                        organise.push({ label: `Paste "${clipboard.name}" inside`, icon: 'fa-paste', action: () => pastePlacemarkInto(node) });
+                    }
                 }
-                if (['placemark','path','polygon','measure','measure-area','folder','kml','los'].includes(node.type)) {
-                    items.push({ sep: true });
-                    items.push({ label: 'Export as KML…', icon: 'fa-file-code', action: () => exportKMLNode(node) });
+                groups.push(organise);
+
+                // 4 - clipboard
+                const clip = [];
+                if (isPoint) clip.push({ label: 'Copy coordinates', icon: 'fa-location-dot', action: () => copyCoords(node.meta.lat, node.meta.lng) });
+                if (t === 'placemark') {
+                    clip.push({ label: 'Copy placemark', icon: 'fa-clone', action: () => {
+                        clipboard = { type: 'placemark', meta: JSON.parse(JSON.stringify(node.meta)), name: node.name };
+                        showToast('Placemark copied', 'fa-clone');
+                    }});
                 }
-                if (['placemark','path','polygon','measure','measure-area'].includes(node.type)) {
-                    items.push({ label: 'Export as GPX…', icon: 'fa-file-export', action: () => exportGPX(node) });
+                if (canGeoJSON) {
+                    clip.push({ label: 'Copy as GeoJSON', icon: 'fa-code', action: async () => {
+                        try {
+                            await writeClipboard(JSON.stringify(nodeToGeoJSON(node), null, 2));
+                            showToast('GeoJSON copied to clipboard', 'fa-code');
+                        } catch (err) {
+                            showToast('Copy failed', 'fa-times', { error: true, detail: err });
+                        }
+                    }});
                 }
-                items.push({ sep: true });
-                items.push({ label: 'Delete', icon: 'fa-trash', danger: true, action: async () => {
+                groups.push(clip);
+
+                // 5 - export
+                const exp = [];
+                if (['placemark', 'path', 'polygon', 'measure', 'measure-area', 'folder', 'kml', 'los'].includes(t)) {
+                    exp.push({ label: 'Export as KML…', icon: 'fa-file-code', action: () => exportKMLNode(node) });
+                }
+                if (['placemark', 'path', 'polygon', 'measure', 'measure-area'].includes(t)) {
+                    exp.push({ label: 'Export as GPX…', icon: 'fa-file-export', action: () => exportGPX(node) });
+                }
+                groups.push(exp);
+
+                // 6 - destructive, always last
+                groups.push([{ label: 'Delete', icon: 'fa-trash', danger: true, action: async () => {
                     if (!confirm(`Delete "${node.name}"${node.children && node.children.length ? ' and all its children' : ''}?`)) return;
                     await deleteNodeWithChildren(node);
                     renderTree();
                     await persistTreeNow();
                     showToast('Deleted ' + node.name, 'fa-trash');
-                }});
+                }}]);
+
+                const items = [];
+                groups.forEach(g => {
+                    if (!g.length) return;
+                    if (items.length) items.push({ sep: true });
+                    g.forEach(i => items.push(i));
+                });
                 buildContextMenu(x, y, node.name, items);
             }
             function showBulkContextMenu(x, y) {
@@ -2777,6 +2988,7 @@
                     items.push({ sep: true });
                     items.push({ label: 'Export all as KML…', icon: 'fa-file-code', action: () => exportKMLAll() });
                     items.push({ label: 'Export all as GPX…', icon: 'fa-file-export', action: () => exportGPXAll() });
+                    items.push({ label: 'Export site list as CSV…', icon: 'fa-file-csv', action: () => exportSitesCSV() });
                 }
                 buildContextMenu(x, y, title, items);
             }
@@ -2796,7 +3008,7 @@
                 ctxMenu.innerHTML = `<div class="ctx-title">${escapeHtml(title)}</div>` +
                     items.map((it, i) => {
                         if (it.sep) return '<div class="ctx-sep"></div>';
-                        return `<div class="ctx-item ${it.danger ? 'danger' : ''}" data-i="${i}"><i class="fas ${it.icon}"></i><span>${it.label}</span></div>`;
+                        return `<div class="ctx-item ${it.danger ? 'danger' : ''}" data-i="${i}"><i class="fas ${it.icon}"></i><span>${escapeHtml(it.label)}</span></div>`;
                     }).join('');
                 ctxMenu.classList.add('open');
                 const mw = 240;
@@ -3079,10 +3291,11 @@
                         { icon: 'fa-ruler', label: 'Measure distance', desc: 'Multi-point measure', action: () => beginDraw('measure') },
                         { icon: 'fa-vector-square', label: 'Measure area', desc: 'Polygon area', action: () => beginDraw('measure-area') },
                         { icon: 'fa-satellite-dish', label: 'Add LOS radius', desc: 'Line-of-sight analysis from a point', action: () => beginLOS() },
-                        { icon: 'fa-eraser', label: 'Clear all drawings', desc: 'Remove all objects', action: () => clearAllDrawings() }
+                        { icon: 'fa-eraser', label: 'Clear all drawings', desc: 'Remove all objects', danger: true, action: () => clearAllDrawings() }
                     ];
                     subrailBody.innerHTML = items.map((it, i) => `
-                        <div class="static-item" data-action="${i}">
+                        ${it.danger ? '<div class="static-heading danger"><i class="fas fa-triangle-exclamation"></i> Clear</div>' : ''}
+                        <div class="static-item${it.danger ? ' danger' : ''}" data-action="${i}" role="button" tabindex="0">
                             <div class="static-item-icon"><i class="fas ${it.icon}"></i></div>
                             <div class="static-item-body">
                                 <div class="static-item-label">${it.label}</div>
@@ -3090,7 +3303,10 @@
                             </div>
                         </div>
                     `).join('');
-                    subrailBody.querySelectorAll('.static-item').forEach((el, i) => el.addEventListener('click', () => items[i].action()));
+                    subrailBody.querySelectorAll('.static-item').forEach((el, i) => {
+                        el.addEventListener('click', () => items[i].action());
+                        el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); items[i].action(); } });
+                    });
                 } else if (section === 'terrain') {
                     const topItems = [
                         { icon: 'fa-upload', label: 'Upload HGT files', desc: 'SRTM .hgt format', action: () => fileInput.click() },
@@ -3272,21 +3488,48 @@
                             </div>
                         </div>
                     `;
-                    const actions = [
-                        { icon: 'fa-database', label: 'Storage info', desc: 'IndexedDB usage estimate', action: async () => {
-                            if (navigator.storage && navigator.storage.estimate) {
-                                const est = await navigator.storage.estimate();
-                                showToast(`Used ${(est.usage / 1048576).toFixed(1)} MB of ${(est.quota / 1048576).toFixed(0)} MB`, 'fa-database');
-                            } else showToast('Storage estimate unavailable', 'fa-info-circle');
-                        }},
-                        { icon: 'fa-database', label: 'Tile cache', desc: 'Show in-memory tile cache stats', action: () => {
-                            showToast(`Cache: ${tileCache.size} tiles · ${cacheHits} hits / ${cacheMisses} misses`, 'fa-database');
-                        }},
-                        { icon: 'fa-location-dot', label: 'Go to my location', desc: 'GPS / network location', action: () => locateMe() },
-                        { icon: 'fa-file-export', label: 'Export all as KML', desc: 'Download KML of all places', action: () => exportKMLAll() },
-                        { icon: 'fa-route', label: 'Export all as GPX', desc: 'GPS Exchange Format', action: () => exportGPXAll() }
+                    const settingsHeading = (text) => {
+                        const h = document.createElement('div');
+                        h.className = 'static-heading';
+                        h.textContent = text;
+                        return h;
+                    };
+                    const settingsItem = (it) => {
+                        const el = document.createElement('div');
+                        el.className = 'static-item';
+                        el.setAttribute('role', 'button');
+                        el.tabIndex = 0;
+                        el.innerHTML = `
+                            <div class="static-item-icon"><i class="fas ${it.icon}"></i></div>
+                            <div class="static-item-body">
+                                <div class="static-item-label">${it.label}</div>
+                                <div class="static-item-desc">${it.desc}</div>
+                            </div>
+                        `;
+                        el.addEventListener('click', () => it.action());
+                        el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); it.action(); } });
+                        return el;
+                    };
+                    const settingsGroups = [
+                        { title: 'Export', items: [
+                            { icon: 'fa-file-code', label: 'Export all as KML', desc: 'Google Earth format, all places', action: () => exportKMLAll() },
+                            { icon: 'fa-route', label: 'Export all as GPX', desc: 'GPS Exchange Format', action: () => exportGPXAll() },
+                            { icon: 'fa-file-csv', label: 'Export site list as CSV', desc: 'Placemarks and LOS sites with elevation and link status', action: () => exportSitesCSV() }
+                        ]},
+                        { title: 'Storage', items: [
+                            { icon: 'fa-database', label: 'Storage info', desc: 'IndexedDB usage estimate', action: async () => {
+                                if (navigator.storage && navigator.storage.estimate) {
+                                    const est = await navigator.storage.estimate();
+                                    showToast(`Used ${(est.usage / 1048576).toFixed(1)} MB of ${(est.quota / 1048576).toFixed(0)} MB`, 'fa-database');
+                                } else showToast('Storage estimate unavailable', 'fa-info-circle');
+                            }},
+                            { icon: 'fa-database', label: 'Tile cache', desc: 'Show in-memory tile cache stats', action: () => {
+                                showToast(`Cache: ${tileCache.size} tiles · ${cacheHits} hits / ${cacheMisses} misses`, 'fa-database');
+                            }}
+                        ]}
                     ];
                     subrailBody.innerHTML = '';
+                    subrailBody.appendChild(settingsHeading('Editing'));
                     subrailBody.appendChild(snapToggle);
                     subrailBody.appendChild(snapDistRow);
                     snapDistRow.querySelector('#snap-dist-save').addEventListener('click', async () => {
@@ -3299,18 +3542,9 @@
                             renderStaticSection('settings');
                         }
                     });
-                    actions.forEach(it => {
-                        const el = document.createElement('div');
-                        el.className = 'static-item';
-                        el.innerHTML = `
-                            <div class="static-item-icon"><i class="fas ${it.icon}"></i></div>
-                            <div class="static-item-body">
-                                <div class="static-item-label">${it.label}</div>
-                                <div class="static-item-desc">${it.desc}</div>
-                            </div>
-                        `;
-                        el.addEventListener('click', () => it.action());
-                        subrailBody.appendChild(el);
+                    settingsGroups.forEach(g => {
+                        subrailBody.appendChild(settingsHeading(g.title));
+                        g.items.forEach(it => subrailBody.appendChild(settingsItem(it)));
                     });
                     const dangerHeading = document.createElement('div');
                     dangerHeading.style.cssText = 'font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--danger); font-weight: 600; padding: 22px 4px 8px; display: flex; align-items: center; gap: 6px;';
@@ -3361,6 +3595,7 @@
                             drawnItems.clearLayers();
                             selectedNodeId = null;
                             renderTree();
+                            resetHistory(true, 'Places cleared');
                             showToast('Places data cleared', 'fa-trash-alt');
                         }}
                     ];
@@ -4089,18 +4324,30 @@
                     <div class="editor-field"><label>Description</label><textarea id="ed-desc" rows="3" placeholder="Optional description…">${escapeHtml(node.meta.desc || '')}</textarea></div>
                     ${coordHTML}
                     ${editorState.isLOS ? `
-                        <div class="editor-section-label">LOS parameters</div>
+                        <div class="editor-section-label">Coverage</div>
                         <div class="editor-field-row">
                             <div class="editor-field"><label>Radius (m)</label><input type="number" id="los-radius" value="${node.meta.radius || 10000}" min="100" step="100"></div>
                             <div class="editor-field"><label>Lines</label><input type="number" id="los-lines" value="${node.meta.numLines || 36}" min="4" max="180" step="2"></div>
                         </div>
-                        <div class="editor-field-row">
-                            <div class="editor-field"><label>Antenna height (m)</label><input type="number" id="los-ch" value="${node.meta.centerHeight || 30}" min="0" step="1"></div>
-                            <div class="editor-field"><label>Target height (m)</label><input type="number" id="los-th" value="${node.meta.targetHeight || 2}" min="0" step="1"></div>
-                        </div>
                         <div class="editor-field"><label>Contour interval (m)</label><input type="number" id="los-contour" value="${node.meta.contourInterval || 500}" min="0" step="50"></div>
                         <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-boundary" ${node.meta.showBoundary !== false ? 'checked' : ''}> Show boundary polygon</label>
-                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-curvature" ${node.meta.earthCurvature ? 'checked' : ''}> Earth curvature (4/3 R)</label>
+
+                        <div class="editor-section-label">Antennas</div>
+                        <div class="editor-field-row">
+                            <div class="editor-field"><label>This antenna (m)</label><input type="number" id="los-ch" value="${numOr(node.meta.centerHeight, 30)}" min="0" step="1"></div>
+                            <div class="editor-field"><label>Coverage target (m)</label><input type="number" id="los-th" value="${numOr(node.meta.targetHeight, 2)}" min="0" step="1"></div>
+                        </div>
+                        <div class="editor-field-row">
+                            <div class="editor-field"><label>Remote antenna (m)</label><input type="number" id="los-rh" value="${node.meta.remoteHeight != null ? node.meta.remoteHeight : ''}" placeholder="= target" min="0" step="1"></div>
+                            <div class="editor-field"><label>Frequency (GHz)</label><input type="number" id="los-freq" value="${node.meta.freqGHz || ''}" placeholder="for Fresnel" min="0" step="0.1"></div>
+                        </div>
+
+                        <div class="editor-section-label">Propagation</div>
+                        <div class="editor-field-row">
+                            <div class="editor-field"><label>k-factor</label><input type="number" id="los-k" value="${node.meta.kFactor || (4 / 3).toFixed(3)}" min="0.3" max="3" step="0.01"></div>
+                            <div class="editor-field"><label>Clutter (m)</label><input type="number" id="los-clutter" value="${node.meta.clutter || 0}" min="0" step="1"></div>
+                        </div>
+                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-curvature" ${node.meta.earthCurvature ? 'checked' : ''}> Earth curvature (uses k-factor)</label>
                         ${losP2PHTML}
                     ` : ''}
                     <div class="editor-section-label">Attributes</div>
@@ -4131,7 +4378,7 @@
                     });
                 }
                 if (editorState.isLOS) {
-                    ['#los-radius', '#los-lines', '#los-ch', '#los-th', '#los-contour'].forEach(sel => {
+                    ['#los-radius', '#los-lines', '#los-ch', '#los-th', '#los-contour', '#los-rh', '#los-freq', '#los-k', '#los-clutter'].forEach(sel => {
                         const inp = editorBody.querySelector(sel);
                         if (inp) inp.addEventListener('input', scheduleLivePropertiesApply);
                     });
@@ -4196,17 +4443,30 @@
                     const chEl = editorBody.querySelector('#los-ch');
                     const thEl = editorBody.querySelector('#los-th');
                     const ciEl = editorBody.querySelector('#los-contour');
+                    const rhEl = editorBody.querySelector('#los-rh');
+                    const freqEl = editorBody.querySelector('#los-freq');
+                    const kEl = editorBody.querySelector('#los-k');
+                    const clEl = editorBody.querySelector('#los-clutter');
                     if (radiusEl) node.meta.radius = parseFloat(radiusEl.value) || 10000;
                     if (linesEl) node.meta.numLines = parseInt(linesEl.value, 10) || 36;
                     if (chEl) node.meta.centerHeight = parseFloat(chEl.value) || 0;
                     if (thEl) node.meta.targetHeight = parseFloat(thEl.value) || 0;
                     if (ciEl) node.meta.contourInterval = parseFloat(ciEl.value) || 0;
+                    if (rhEl) { const v = parseFloat(rhEl.value); node.meta.remoteHeight = (isFinite(v) && v >= 0) ? v : null; }
+                    if (freqEl) { const v = parseFloat(freqEl.value); node.meta.freqGHz = (isFinite(v) && v > 0) ? v : null; }
+                    if (kEl) { const v = parseFloat(kEl.value); node.meta.kFactor = (isFinite(v) && v > 0) ? v : null; }
+                    if (clEl) node.meta.clutter = Math.max(0, parseFloat(clEl.value) || 0);
                     const boundaryEl = editorBody.querySelector('#los-boundary');
                     const curvatureEl = editorBody.querySelector('#los-curvature');
                     if (boundaryEl) node.meta.showBoundary = boundaryEl.checked;
                     if (curvatureEl) node.meta.earthCurvature = curvatureEl.checked;
                     if (!node.meta.persistedP2P) node.meta.trackMouse = true;
                     rebuildLOSLayer(node);
+                    if (profileData && profileData.node === node && profilePanel.classList.contains('open')) {
+                        if (profileData.type === 'p2p' && node.meta.persistedP2P && node.meta.persistedP2P.lat != null) renderP2PProfile(node);
+                        else if (profileData.type === 'los') renderRadialLOSProfile(node, profileData.bearing);
+                        drawProfileChart();
+                    }
                 } else if (node.type === 'placemark' && node.layer && node.layer.getPopup && node.layer.getPopup()) {
                     const d = node.meta.desc ? '<br>' + escapeHtml(node.meta.desc) : '';
                     try { node.layer.setPopupContent(`<b>${escapeHtml(node.name)}</b>${d}`); } catch(e){}
@@ -5313,20 +5573,20 @@
                         const desc = props.description || props.desc || '';
                         if (geom.type === 'Point') {
                             const [lng, lat] = geom.coordinates;
-                            const marker = L.marker([lat, lng], { icon: makeLeafletIcon(DEFAULT_ICON, props.color || '#4d7c0f') });
+                            const marker = L.marker([lat, lng], { icon: makeLeafletIcon(DEFAULT_ICON, safeColor(props.color)) });
                             marker.bindPopup(`<b>${escapeHtml(name)}</b>${desc ? '<br>' + escapeHtml(desc) : ''}`);
                             drawnItems.addLayer(marker);
-                            const n = createNode({ type: 'placemark', name, layer: marker, meta: { desc, lat, lng, icon: DEFAULT_ICON, color: props.color || '#4d7c0f' } });
+                            const n = createNode({ type: 'placemark', name, layer: marker, meta: { desc, lat, lng, icon: DEFAULT_ICON, color: safeColor(props.color) } });
                             bindLayerFocus(n, marker);
                             attachLayerDrag(n, marker);
                             (target || geojsonFolder).children.push(n);
                             count++;
                         } else if (geom.type === 'LineString') {
                             const latlngs = geom.coordinates.map(c => [c[1], c[0]]);
-                            const line = L.polyline(latlngs, { color: props.color || '#4d7c0f', weight: 3 });
+                            const line = L.polyline(latlngs, { color: safeColor(props.color), weight: 3 });
                             line.bindPopup(`<b>${escapeHtml(name)}</b>`);
                             drawnItems.addLayer(line);
-                            const n = createNode({ type: 'path', name, layer: line, meta: { desc, points: latlngs, color: props.color || '#4d7c0f', lineThickness: 3, distance: pathDistance(latlngs.map(p => L.latLng(p[0], p[1]))) } });
+                            const n = createNode({ type: 'path', name, layer: line, meta: { desc, points: latlngs, color: safeColor(props.color), lineThickness: 3, distance: pathDistance(latlngs.map(p => L.latLng(p[0], p[1]))) } });
                             bindLayerFocus(n, line);
                             attachLayerDrag(n, line);
                             (target || geojsonFolder).children.push(n);
@@ -5334,10 +5594,10 @@
                         } else if (geom.type === 'Polygon' && geom.coordinates && geom.coordinates[0]) {
                             const ring = geom.coordinates[0];
                             const latlngs = ring.map(c => [c[1], c[0]]);
-                            const poly = L.polygon(latlngs, { color: props.color || '#4d7c0f', weight: 2, fillOpacity: 0.2 });
+                            const poly = L.polygon(latlngs, { color: safeColor(props.color), weight: 2, fillOpacity: 0.2 });
                             poly.bindPopup(`<b>${escapeHtml(name)}</b>`);
                             drawnItems.addLayer(poly);
-                            const n = createNode({ type: 'polygon', name, layer: poly, meta: { desc, points: latlngs, color: props.color || '#4d7c0f', lineThickness: 2, area: polygonArea(latlngs.map(p => L.latLng(p[0], p[1]))) } });
+                            const n = createNode({ type: 'polygon', name, layer: poly, meta: { desc, points: latlngs, color: safeColor(props.color), lineThickness: 2, area: polygonArea(latlngs.map(p => L.latLng(p[0], p[1]))) } });
                             bindLayerFocus(n, poly);
                             attachLayerDrag(n, poly);
                             (target || geojsonFolder).children.push(n);
@@ -5346,10 +5606,10 @@
                             geom.coordinates.forEach((polyCoords, idx) => {
                                 if (!polyCoords[0]) return;
                                 const latlngs = polyCoords[0].map(c => [c[1], c[0]]);
-                                const poly = L.polygon(latlngs, { color: props.color || '#4d7c0f', weight: 2, fillOpacity: 0.2 });
+                                const poly = L.polygon(latlngs, { color: safeColor(props.color), weight: 2, fillOpacity: 0.2 });
                                 poly.bindPopup(`<b>${escapeHtml(name)} #${idx + 1}</b>`);
                                 drawnItems.addLayer(poly);
-                                const n = createNode({ type: 'polygon', name: name + ' #' + (idx + 1), layer: poly, meta: { desc, points: latlngs, color: props.color || '#4d7c0f', lineThickness: 2 } });
+                                const n = createNode({ type: 'polygon', name: name + ' #' + (idx + 1), layer: poly, meta: { desc, points: latlngs, color: safeColor(props.color), lineThickness: 2 } });
                                 bindLayerFocus(n, poly);
                                 attachLayerDrag(n, poly);
                                 (target || geojsonFolder).children.push(n);
@@ -5390,46 +5650,124 @@
             });
 
             // ==================== LOS ENGINE ====================
-            function earthBulge(d1, d2) {
-                const Re_eff = 6371000 * 4 / 3;
-                return (d1 * d2) / (2 * Re_eff);
+            function kFactorOf(node) {
+                const k = parseFloat(node && node.meta && node.meta.kFactor);
+                return (isFinite(k) && k > 0) ? k : 4 / 3;
+            }
+            // Point-to-point: bulge of the earth above the chord, d1 from one end, d2 from the other.
+            function earthBulge(d1, d2, k) {
+                return (d1 * d2) / (2 * 6371000 * (k || 4 / 3));
+            }
+            // Coverage fan: how far the surface falls below the observer's horizontal plane at distance d.
+            function earthDrop(d, k) {
+                return (d * d) / (2 * 6371000 * (k || 4 / 3));
+            }
+            function linkRemoteHeight(node) {
+                const v = parseFloat(node.meta.remoteHeight);
+                return (isFinite(v) && v >= 0) ? v : numOr(node.meta.targetHeight, 2);
+            }
+            function fresnelRadius(freqGHz, d, D) {
+                if (!(freqGHz > 0) || !(D > 0) || d <= 0 || d >= D) return 0;
+                const lambda = 0.299792458 / freqGHz;
+                return Math.sqrt(lambda * d * (D - d) / D);
             }
 
-            function losLineGeometry(node, bearingDeg, stepMeters) {
+            // opts.mode 'ray'      : point-to-point link from the node to opts.end (a LatLng). The samples run exactly
+            //                        to the far end, so map colouring and the profile panel always agree.
+            // default (viewshed)   : coverage along a bearing out to node.meta.radius. A point is visible when the angle
+            //                        to its target top is at least the highest ground angle seen so far (running maximum),
+            //                        so the result no longer depends on whatever sits at the edge of the radius.
+            function losLineGeometry(node, bearingDeg, stepMeters, opts) {
+                opts = opts || {};
                 stepMeters = stepMeters || 10;
+                const ray = opts.mode === 'ray';
                 const center = L.latLng(node.meta.lat, node.meta.lng);
-                const radius = node.meta.radius || 10000;
-                const centerHeight = node.meta.centerHeight || 30;
-                const targetHeight = node.meta.targetHeight || 2;
+                const total = ray ? opts.maxDist : (node.meta.radius || 10000);
+                const centerHeight = numOr(node.meta.centerHeight, 30);
+                const targetHeight = ray ? linkRemoteHeight(node) : numOr(node.meta.targetHeight, 2);
                 const curvature = !!node.meta.earthCurvature;
+                const k = kFactorOf(node);
+                const clutter = Math.max(0, numOr(node.meta.clutter, 0));
+                const freq = parseFloat(node.meta.freqGHz) > 0 ? parseFloat(node.meta.freqGHz) : null;
                 const centerElev = getElevation(center.lat, center.lng);
                 const antennaElev = centerElev !== null ? centerElev + centerHeight : centerHeight;
+                const empty = { pts: [], lostAt: null, antennaElev, targetElevEnd: null, centerElev, totalD: 0, minClearRatio: null, freqGHz: freq };
+                if (!(total > 0)) return empty;
+
                 const bearingRad = bearingDeg * Math.PI / 180;
-                const pts = [];
                 const cosLat = Math.cos(center.lat * Math.PI / 180);
-                for (let d = 0; d <= radius; d += stepMeters) {
-                    const lat = center.lat + (d * Math.cos(bearingRad)) / 111320;
-                    const lng = center.lng + (d * Math.sin(bearingRad)) / (111320 * cosLat);
-                    let groundElev = getElevation(lat, lng);
-                    if (groundElev === null) {
-                        if (d === 0) return { pts: [], lostAt: null, antennaElev, targetElevEnd: null, centerElev };
-                        break;
+                const at = (d) => {
+                    if (ray) {
+                        const f = d / total;
+                        return { lat: center.lat + (opts.end.lat - center.lat) * f, lng: center.lng + (opts.end.lng - center.lng) * f };
                     }
-                    if (curvature) groundElev -= earthBulge(d, radius - d);
-                    pts.push({ lat, lng, d, groundElev, targetElev: groundElev + targetHeight });
+                    return {
+                        lat: center.lat + (d * Math.cos(bearingRad)) / 111320,
+                        lng: center.lng + (d * Math.sin(bearingRad)) / (111320 * cosLat)
+                    };
+                };
+
+                const n = Math.max(1, Math.ceil(total / stepMeters));
+                const pts = [];
+                for (let i = 0; i <= n; i++) {
+                    const d = Math.min(total, i * stepMeters);
+                    const ll = at(d);
+                    const raw = getElevation(ll.lat, ll.lng);
+                    if (raw === null) {
+                        if (i === 0 || (ray && i === n)) return empty;
+                        if (ray) continue;   // hole in the data along a link: skip the sample
+                        break;               // coverage fan: stop at the edge of the loaded terrain
+                    }
+                    pts.push({ lat: ll.lat, lng: ll.lng, d, raw });
                 }
-                if (pts.length < 2) return { pts, lostAt: null, antennaElev, targetElevEnd: null, centerElev };
-                const endPt = pts[pts.length - 1];
-                const targetElevEnd = endPt.targetElev;
-                const totalD = endPt.d;
-                const raySlope = (targetElevEnd - antennaElev) / totalD;
-                let lostAt = null;
-                for (const p of pts) {
-                    if (p.d === 0) continue;
-                    const rayElev = antennaElev + raySlope * p.d;
-                    if (p.groundElev > rayElev) { lostAt = p.d; break; }
+                if (pts.length < 2) return Object.assign({}, empty, { pts });
+                const last = pts[pts.length - 1];
+                const totalD = last.d;
+
+                if (ray) {
+                    const targetElevEnd = last.raw + targetHeight;
+                    const slope = (targetElevEnd - antennaElev) / totalD;
+                    let lostAt = null, minClear = Infinity;
+                    for (let i = 0; i < pts.length; i++) {
+                        const p = pts[i];
+                        const edge = (i === 0 || i === pts.length - 1);
+                        let g = p.raw;
+                        if (curvature) g += earthBulge(p.d, totalD - p.d, k);   // the surface bulges up into the path
+                        if (!edge) g += clutter;
+                        p.groundElev = g;
+                        p.targetElev = g + targetHeight;
+                        const rayElev = antennaElev + slope * p.d;
+                        p.rayElev = rayElev;
+                        p.visible = edge || g <= rayElev;
+                        if (!p.visible && lostAt === null) lostAt = p.d;
+                        if (freq && !edge) {
+                            const F = fresnelRadius(freq, p.d, totalD);
+                            p.fresnelR = F;
+                            if (F > 0.01) {
+                                p.clearRatio = (rayElev - g) / F;
+                                if (p.clearRatio < minClear) minClear = p.clearRatio;
+                            }
+                        }
+                    }
+                    return { pts, lostAt, antennaElev, targetElevEnd, centerElev, totalD,
+                             minClearRatio: isFinite(minClear) ? minClear : null, freqGHz: freq };
                 }
-                return { pts, lostAt, antennaElev, targetElevEnd, centerElev };
+
+                let maxAng = -Infinity, lostAt = null;
+                for (let i = 0; i < pts.length; i++) {
+                    const p = pts[i];
+                    const g = p.raw - (curvature ? earthDrop(p.d, k) : 0);
+                    p.groundElev = g;
+                    p.targetElev = g + targetHeight;
+                    if (i === 0) { p.visible = true; continue; }
+                    const targetAng = (p.targetElev - antennaElev) / p.d;
+                    p.visible = targetAng >= maxAng;
+                    if (!p.visible && lostAt === null) lostAt = p.d;
+                    const obstructAng = (g + clutter - antennaElev) / p.d;
+                    if (obstructAng > maxAng) maxAng = obstructAng;
+                }
+                return { pts, lostAt, antennaElev, targetElevEnd: last.targetElev, centerElev, totalD,
+                         minClearRatio: null, freqGHz: null };
             }
 
             function truncateLOSPoints(pts, lostAt) {
@@ -5483,17 +5821,26 @@
                 return points;
             }
 
+            function linkColorFor(p) {
+                if (!p.visible) return '#dc2626';
+                if (p.clearRatio !== undefined && p.clearRatio < 0.6) return '#f59e0b';
+                return '#22c55e';
+            }
+            function linkEndColor(geo) {
+                if (geo.lostAt !== null) return '#dc2626';
+                if (geo.minClearRatio !== null && geo.minClearRatio < 0.6) return '#f59e0b';
+                return '#22c55e';
+            }
             function buildLinkSegments(node, start, end) {
+                const D = haversine(start, end);
+                if (!(D > 0)) return null;
                 const bearing = bearingDegBetween(start, end);
-                const geo = losLineGeometry(node, bearing);
+                const geo = losLineGeometry(node, bearing, Math.max(10, D / 600), { mode: 'ray', maxDist: D, end });
                 if (!geo.pts || geo.pts.length < 2) return null;
-                const totalD = geo.pts[geo.pts.length - 1].d;
-                const raySlope = (geo.targetElevEnd - geo.antennaElev) / totalD;
                 const segments = [];
                 let curPts = [], curColor = null;
                 for (const p of geo.pts) {
-                    const rayElev = geo.antennaElev + raySlope * p.d;
-                    const color = p.groundElev > rayElev ? '#dc2626' : '#22c55e';
+                    const color = linkColorFor(p);
                     if (curColor === null) {
                         curColor = color;
                         curPts = [[p.lat, p.lng]];
@@ -5527,7 +5874,7 @@
                         }
                         layers.push(L.circleMarker([node.meta.persistedP2P.lat, node.meta.persistedP2P.lng], {
                             radius: 6, color: 'white', weight: 2,
-                            fillColor: link.geo.lostAt !== null ? '#dc2626' : '#22c55e', fillOpacity: 1
+                            fillColor: linkEndColor(link.geo), fillOpacity: 1
                         }));
                     }
                 } else {
@@ -5827,14 +6174,25 @@
             function getElevationFromTile(tile, lat, lng) {
                 const { data, width, height } = tile;
                 const { lat: swLat, lng: swLng } = parseKey(tile.key);
-                let fLat = lat - swLat, fLng = lng - swLng;
+                const fLat = lat - swLat, fLng = lng - swLng;
                 if (fLat < 0 || fLat > 1 || fLng < 0 || fLng > 1) return null;
-                const row = Math.round((1 - fLat) * (height - 1));
-                const col = Math.round(fLng * (width - 1));
-                if (row < 0 || row >= height || col < 0 || col >= width) return null;
-                const v = data[row * width + col];
-                if (v === -32768 || v < -1000 || v > 9000) return null;
-                return v;
+                const rowF = (1 - fLat) * (height - 1);
+                const colF = fLng * (width - 1);
+                const r0 = Math.min(height - 1, Math.max(0, Math.floor(rowF)));
+                const c0 = Math.min(width - 1, Math.max(0, Math.floor(colF)));
+                const r1 = Math.min(height - 1, r0 + 1);
+                const c1 = Math.min(width - 1, c0 + 1);
+                const tr = rowF - r0, tc = colF - c0;
+                const post = (r, c) => {
+                    const v = data[r * width + c];
+                    return (v === -32768 || v < -1000 || v > 9000) ? null : v;
+                };
+                const v00 = post(r0, c0), v01 = post(r0, c1), v10 = post(r1, c0), v11 = post(r1, c1);
+                if (v00 !== null && v01 !== null && v10 !== null && v11 !== null) {
+                    return (v00 * (1 - tc) + v01 * tc) * (1 - tr) + (v10 * (1 - tc) + v11 * tc) * tr;
+                }
+                // Void nearby: fall back to the nearest valid post rather than inventing a value.
+                return post(tr < 0.5 ? r0 : r1, tc < 0.5 ? c0 : c1);
             }
             function getElevation(lat, lng) {
                 if (terrainStore.size === 0) return null;
@@ -6235,31 +6593,51 @@
 
                 const D = haversine(startPt, endPt);
                 if (D < 1) return;
-                const A = startElev + (node.meta.centerHeight || 30);
-                const B = endElev + (node.meta.targetHeight || 2);
+                const hA = numOr(node.meta.centerHeight, 30);
+                const hB = linkRemoteHeight(node);
+                const A = startElev + hA;
+                const B = endElev + hB;
                 const curvature = !!node.meta.earthCurvature;
+                const k = kFactorOf(node);
+                const clutter = Math.max(0, numOr(node.meta.clutter, 0));
+                const freq = parseFloat(node.meta.freqGHz) > 0 ? parseFloat(node.meta.freqGHz) : null;
 
                 const samples = [];
                 const stepM = Math.max(20, D / 300);
-                for (let d = 0; d <= D; d += stepM) {
+                const n = Math.max(1, Math.ceil(D / stepM));
+                for (let i = 0; i <= n; i++) {
+                    const d = Math.min(D, i * stepM);
                     const t = d / D;
                     const lat = startPt.lat + (endPt.lat - startPt.lat) * t;
                     const lng = startPt.lng + (endPt.lng - startPt.lng) * t;
                     let terr = getElevation(lat, lng);
                     if (terr === null) continue;
-                    if (curvature) terr -= earthBulge(d, D - d);
+                    const edge = (i === 0 || i === n);
+                    if (curvature) terr += earthBulge(d, D - d, k);   // the surface bulges up into the path
+                    if (!edge && clutter) terr += clutter;
                     const rayElev = A + (B - A) * t;
-                    samples.push({ d, lat, lng, terr, rayElev, blocked: terr > rayElev });
+                    const s = { d, lat, lng, terr, rayElev, blocked: !edge && terr > rayElev };
+                    if (freq && !edge) {
+                        const F = fresnelRadius(freq, d, D);
+                        s.fresnelR = F;
+                        if (F > 0.01) s.clearRatio = (rayElev - terr) / F;
+                    }
+                    samples.push(s);
                 }
                 if (samples.length < 2) return;
 
-                let minE = Infinity, maxE = -Infinity, lostAt = null;
+                let minE = Infinity, maxE = -Infinity, lostAt = null, minClear = null;
                 samples.forEach(s => {
                     if (s.terr < minE) minE = s.terr;
                     if (s.terr > maxE) maxE = s.terr;
                     if (s.rayElev < minE) minE = s.rayElev;
                     if (s.rayElev > maxE) maxE = s.rayElev;
+                    if (s.fresnelR) {
+                        if (s.rayElev - s.fresnelR < minE) minE = s.rayElev - s.fresnelR;
+                        if (s.rayElev + s.fresnelR > maxE) maxE = s.rayElev + s.fresnelR;
+                    }
                     if (s.blocked && lostAt === null) lostAt = s.d;
+                    if (s.clearRatio !== undefined && (minClear === null || s.clearRatio < minClear)) minClear = s.clearRatio;
                 });
                 const pad = Math.max(20, (maxE - minE) * 0.1);
                 minE -= pad; maxE += pad;
@@ -6270,27 +6648,33 @@
                     type: 'p2p', node, samples,
                     minE, maxE, totalDist: D,
                     antennaElev: A, targetElevAtEnd: B,
-                    antennaHeight: node.meta.centerHeight || 30,
-                    targetHeight: node.meta.targetHeight || 2,
+                    antennaHeight: hA,
+                    targetHeight: hB,
                     lostAt, bearing, curvature,
+                    freqGHz: freq, minClearRatio: minClear,
                     previewP2P: endPtOverride || null
                 };
 
+                const clearHTML = (freq && minClear !== null)
+                    ? `<span>F1 clearance <strong style="color:${minClear < 0.6 ? '#b45309' : 'inherit'}">${minClear.toFixed(2)}×</strong></span><span>${freq} GHz</span>`
+                    : '';
                 profileStats.innerHTML = `
                     <span>Bearing <strong>${bearing.toFixed(0)}°</strong></span>
                     <span>Distance <strong>${formatDistance(D)}</strong></span>
                     <span>Start <strong>${Math.round(A)} m</strong></span>
                     <span>End <strong>${Math.round(B)} m</strong></span>
                     <span>LOS lost <strong>${lostAt !== null ? formatDistance(lostAt) : 'clear'}</strong></span>
-                    ${curvature ? '<span style="color:var(--sage)"><strong>Curvature ON</strong></span>' : ''}
+                    ${clearHTML}
+                    ${curvature ? `<span style="color:var(--sage)"><strong>k = ${k.toFixed(2)}</strong></span>` : ''}
                 `;
             }
 
             function renderRadialLOSProfile(node, bearingDeg) {
                 const geo = losLineGeometry(node, bearingDeg);
                 if (!geo.pts || geo.pts.length < 2) { showToast('No terrain data along this bearing', 'fa-exclamation-circle'); return; }
-                const samples = geo.pts.map(p => ({ d: p.d, lat: p.lat, lng: p.lng, terr: p.groundElev, rayElev: p.targetElev, blocked: p.groundElev > p.targetElev }));
-                let minE = Infinity, maxE = -Infinity;
+                // The dashed line is the target-top height at each distance, coloured by whether that point is visible.
+                const samples = geo.pts.map(p => ({ d: p.d, lat: p.lat, lng: p.lng, terr: p.groundElev, rayElev: p.targetElev, blocked: !p.visible }));
+                let minE = geo.antennaElev, maxE = geo.antennaElev;
                 samples.forEach(s => {
                     if (s.terr < minE) minE = s.terr;
                     if (s.terr > maxE) maxE = s.terr;
@@ -6301,15 +6685,14 @@
                 const pad = Math.max(20, (maxE - minE) * 0.1);
                 minE -= pad; maxE += pad;
                 const totalDist = samples.length > 0 ? samples[samples.length - 1].d : 0;
-                let lostAt = null;
-                samples.forEach(s => { if (s.blocked && lostAt === null) lostAt = s.d; });
+                const lostAt = geo.lostAt;
                 profileData = {
                     type: 'los', node, bearing: bearingDeg, samples,
                     minE, maxE, totalDist,
                     antennaElev: geo.antennaElev,
                     targetElevAtEnd: geo.targetElevEnd,
-                    antennaHeight: node.meta.centerHeight || 30,
-                    targetHeight: node.meta.targetHeight || 2,
+                    antennaHeight: numOr(node.meta.centerHeight, 30),
+                    targetHeight: numOr(node.meta.targetHeight, 2),
                     lostAt, curvature: !!node.meta.earthCurvature
                 };
                 const lossText = lostAt !== null ? `${Math.round(lostAt)} m` : 'clear to edge';
@@ -6393,6 +6776,24 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
+                if (profileData.type === 'p2p' && profileData.freqGHz) {
+                    const fs = samples.filter(s => s.fresnelR > 0);
+                    if (fs.length > 1) {
+                        ctx.save();
+                        ctx.beginPath(); ctx.rect(padL, padT, plotW, plotH); ctx.clip();
+                        ctx.beginPath();
+                        fs.forEach((s, i) => { const x = xOf(s.d), y = yOf(s.rayElev + s.fresnelR); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
+                        for (let i = fs.length - 1; i >= 0; i--) ctx.lineTo(xOf(fs[i].d), yOf(fs[i].rayElev - fs[i].fresnelR));
+                        ctx.closePath();
+                        ctx.fillStyle = 'rgba(59,130,246,0.10)'; ctx.fill();
+                        ctx.strokeStyle = 'rgba(59,130,246,0.45)'; ctx.lineWidth = 1; ctx.stroke();
+                        ctx.beginPath(); ctx.setLineDash([3, 3]);
+                        fs.forEach((s, i) => { const x = xOf(s.d), y = yOf(s.rayElev - 0.6 * s.fresnelR); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
+                        ctx.strokeStyle = 'rgba(37,99,235,0.85)'; ctx.stroke(); ctx.setLineDash([]);
+                        ctx.restore();
+                    }
+                }
+
                 if (profileData.type === 'p2p' || profileData.type === 'los') {
                     ctx.lineWidth = 2;
                     ctx.setLineDash([6, 4]);
@@ -6404,7 +6805,7 @@
                             ctx.beginPath();
                             ctx.moveTo(prev.x, prev.y);
                             ctx.lineTo(x, y);
-                            ctx.strokeStyle = s.blocked ? '#dc2626' : '#22c55e';
+                            ctx.strokeStyle = s.blocked ? '#dc2626' : ((s.clearRatio !== undefined && s.clearRatio < 0.6) ? '#f59e0b' : '#22c55e');
                             ctx.stroke();
                         }
                         prev = { x, y };
@@ -6450,8 +6851,15 @@
                         ctx.fillStyle = 'rgba(77,124,15,0.7)';
                         ctx.font = '9px "IBM Plex Mono", monospace';
                         ctx.textAlign = 'left';
-                        ctx.fillText('↓ curvature applied', padL + 4, padT + 12);
+                        ctx.fillText('↑ earth bulge added to terrain', padL + 4, padT + 12);
                     }
+                }
+
+                if (profileData.type === 'p2p' && profileData.freqGHz) {
+                    ctx.font = '9px "IBM Plex Mono", monospace';
+                    ctx.fillStyle = 'rgba(37,99,235,0.9)';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('1st Fresnel zone · dashed = 60% clearance · ' + profileData.freqGHz + ' GHz', padL + 4, padT + (profileData.curvature ? 24 : 12));
                 }
 
                 if (profileHoverSample) {
@@ -6577,10 +6985,15 @@
             }
 
             document.addEventListener('keydown', (e) => {
-                if ((e.key === 'l' || e.key === 'L') && !e.target.matches('input, textarea')) locateMe();
-                if ((e.key === 't' || e.key === 'T') && !e.target.matches('input, textarea')) {
-                    map.flyTo([-42.0, 146.6], 7, { duration: 1.2 });
-                    showToast('Centered on Tasmania', 'fa-map');
+                const _typing = e.target && e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]');
+                const _mod = e.ctrlKey || e.metaKey || e.altKey;
+                if (!_typing && !_mod) {
+                    if (e.key === 'l' || e.key === 'L') locateMe();
+                    else if (e.key === 't' || e.key === 'T') {
+                        map.flyTo([-42.0, 146.6], 7, { duration: 1.2 });
+                        showToast('Centered on Tasmania', 'fa-map');
+                    }
+                    else if (e.key === 'c' || e.key === 'C') copyMouseCoords();
                 }
                 if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !e.target.matches('input, textarea')) {
                     if (selectedNodeId) {
@@ -6612,6 +7025,24 @@
                 if (!str) return null;
                 str = String(str).trim();
                 if (!str) return null;
+                const valid = (lat, lng) => lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+
+                // degrees / minutes / seconds with hemisphere letters, e.g. 42°53′10″S 147°19′30″E
+                const dms = Array.from(str.matchAll(/(\d{1,3}(?:\.\d+)?)\s*[°º]\s*(?:(\d{1,2}(?:\.\d+)?)\s*['′’]\s*)?(?:(\d{1,2}(?:\.\d+)?)\s*(?:"|″|”|''|’’)\s*)?([NSEW])/gi));
+                if (dms.length === 2) {
+                    const val = (m) => {
+                        let v = parseFloat(m[1]) + (m[2] ? parseFloat(m[2]) / 60 : 0) + (m[3] ? parseFloat(m[3]) / 3600 : 0);
+                        const h = m[4].toUpperCase();
+                        if (h === 'S' || h === 'W') v = -v;
+                        return { v, lat: (h === 'N' || h === 'S') };
+                    };
+                    const a = val(dms[0]), b = val(dms[1]);
+                    if (a.lat === b.lat) return null;
+                    const lat = a.lat ? a.v : b.v, lng = a.lat ? b.v : a.v;
+                    return valid(lat, lng) ? { lat, lng } : null;
+                }
+
+                // decimal degrees with hemisphere letters, e.g. 46.5N 8.0E
                 const upper = str.toUpperCase();
                 const nsMatch = upper.match(/(-?\d+(?:\.\d+)?)\s*°?\s*([NS])/);
                 const ewMatch = upper.match(/(-?\d+(?:\.\d+)?)\s*°?\s*([EW])/);
@@ -6620,16 +7051,19 @@
                     let lng = parseFloat(ewMatch[1]);
                     if (nsMatch[2] === 'S') lat = -Math.abs(lat);
                     if (ewMatch[2] === 'W') lng = -Math.abs(lng);
-                    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+                    if (valid(lat, lng)) return { lat, lng };
                 }
+
+                // exactly two plain numbers ("lat, lng"); anything with words in it is a place name, not coordinates
                 const parts = str.split(/[,;\s]+/).filter(p => p.length > 0);
-                if (parts.length < 2) return null;
+                if (parts.length !== 2) return null;
+                const num = /^[+-]?\d+(?:\.\d+)?°?$/;
+                if (!num.test(parts[0]) || !num.test(parts[1])) return null;
                 const lat = parseFloat(parts[0]);
                 const lng = parseFloat(parts[1]);
-                if (isNaN(lat) || isNaN(lng)) return null;
-                if (lat < -90 || lat > 90) return null;
-                if (lng < -180 || lng > 180) return null;
-                return { lat, lng };
+                if (valid(lat, lng)) return { lat, lng };
+                if (valid(lng, lat)) return { lat: lng, lng: lat, swapped: true };   // typed as lng, lat
+                return null;
             }
             function goToCoords(coord) {
                 const zoom = Math.max(map.getZoom(), 14);
@@ -6646,35 +7080,337 @@
                 }, 200);
                 showToast(`Go to ${coord.lat.toFixed(5)}, ${coord.lng.toFixed(5)}`, 'fa-crosshairs');
             }
-            const gpsInput = document.getElementById('gps-search-input');
-            const gpsBtn = document.getElementById('gps-search-go');
-            const gpsClear = document.getElementById('gps-search-clear');
-            if (gpsInput && gpsBtn) {
-                const submit = () => {
-                    const coord = parseCoordString(gpsInput.value);
-                    if (!coord) {
-                        showToast('Invalid coordinates. Try "46.5, 8.0"', 'fa-exclamation-circle');
-                        return;
+            // ==================== PLACE SEARCH ====================
+            // OpenStreetMap Nominatim (no key). Policy: max 1 request/second, results cached, no search-as-you-type,
+            // so a search only runs on Enter / the Go button. Photon (komoot, also keyless, OSM data) is the fallback.
+            const geoInput = document.getElementById('gps-search-input');
+            const geoGo = document.getElementById('gps-search-go');
+            const geoClear = document.getElementById('gps-search-clear');
+            const geoList = document.getElementById('geo-results');
+            const geoBox = document.getElementById('gps-search');
+            const GEO = { cache: new Map(), last: 0, ctl: null, items: [], active: -1, marker: null };
+            const GEO_MIN_GAP_MS = 1100;
+
+            function geoIcon(cat, type) {
+                const c = String(cat || ''), ty = String(type || '');
+                if (c === 'highway') return 'fa-road';
+                if (c === 'natural' && /peak|volcano|hill|ridge|saddle|cliff/.test(ty)) return 'fa-mountain';
+                if (c === 'natural' && /water|bay|beach|coastline|cape/.test(ty)) return 'fa-water';
+                if (c === 'waterway') return 'fa-water';
+                if (c === 'boundary' || (c === 'place' && /city|town|village|suburb|hamlet|locality|neighbourhood|quarter|municipality/.test(ty))) return 'fa-city';
+                if (c === 'place' && /state|region|county|province|country/.test(ty)) return 'fa-earth-oceania';
+                if (c === 'building' || c === 'office' || /house|residential|apartments/.test(ty)) return 'fa-building';
+                if (c === 'aeroway') return 'fa-plane';
+                if (c === 'railway') return 'fa-train';
+                return 'fa-location-dot';
+            }
+            async function geoFetchNominatim(q, signal) {
+                const params = { q, format: 'jsonv2', limit: '6', dedupe: '1' };
+                if (map.getZoom() >= 5) {
+                    const b = map.getBounds();
+                    params.viewbox = [b.getWest(), b.getNorth(), b.getEast(), b.getSouth()].map(n => n.toFixed(4)).join(',');   // prefer, not restrict
+                }
+                const res = await fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams(params), { signal });
+                if (!res.ok) throw new Error('Nominatim HTTP ' + res.status);
+                const arr = await res.json();
+                return (Array.isArray(arr) ? arr : []).map(o => ({
+                    lat: parseFloat(o.lat), lng: parseFloat(o.lon),
+                    name: o.name || String(o.display_name || '').split(',')[0] || q,
+                    label: o.display_name || '',
+                    icon: geoIcon(o.category, o.type),
+                    bbox: Array.isArray(o.boundingbox) && o.boundingbox.length === 4
+                        ? [[parseFloat(o.boundingbox[0]), parseFloat(o.boundingbox[2])], [parseFloat(o.boundingbox[1]), parseFloat(o.boundingbox[3])]] : null,
+                    source: 'Nominatim'
+                })).filter(r => isFinite(r.lat) && isFinite(r.lng));
+            }
+            async function geoFetchPhoton(q, signal) {
+                const c = map.getCenter();
+                const res = await fetch('https://photon.komoot.io/api/?' + new URLSearchParams({ q, limit: '6', lat: c.lat.toFixed(4), lon: c.lng.toFixed(4) }), { signal });
+                if (!res.ok) throw new Error('Photon HTTP ' + res.status);
+                const gj = await res.json();
+                return ((gj && gj.features) || []).map(f => {
+                    const p = f.properties || {};
+                    const co = (f.geometry && f.geometry.coordinates) || [];
+                    const parts = [p.name, [p.street, p.housenumber].filter(Boolean).join(' '), p.city || p.town || p.village || p.district, p.state, p.country].filter(Boolean);
+                    const uniq = parts.filter((v, i) => parts.indexOf(v) === i);
+                    const ext = p.extent;   // [minLon, maxLat, maxLon, minLat]
+                    return {
+                        lat: parseFloat(co[1]), lng: parseFloat(co[0]),
+                        name: p.name || uniq[0] || q, label: uniq.join(', '),
+                        icon: geoIcon(p.osm_key, p.osm_value),
+                        bbox: Array.isArray(ext) && ext.length === 4 ? [[ext[3], ext[0]], [ext[1], ext[2]]] : null,
+                        source: 'Photon'
+                    };
+                }).filter(r => isFinite(r.lat) && isFinite(r.lng));
+            }
+            async function geocodePlace(q) {
+                const key = q.trim().toLowerCase();
+                if (GEO.cache.has(key)) return GEO.cache.get(key);
+                const wait = Math.max(0, GEO.last + GEO_MIN_GAP_MS - Date.now());
+                GEO.last = Date.now() + wait;                 // reserve the slot so rapid Enters can't exceed 1 req/s
+                if (wait) await new Promise(r => setTimeout(r, wait));
+                if (GEO.ctl) GEO.ctl.abort();
+                const ctl = new AbortController();
+                GEO.ctl = ctl;
+                let results = null, firstErr = null;
+                try { results = await geoFetchNominatim(q, ctl.signal); }
+                catch (e) { if (e.name === 'AbortError') throw e; firstErr = e; }
+                if (!results || results.length === 0) {
+                    try {
+                        const alt = await geoFetchPhoton(q, ctl.signal);
+                        if (alt.length || !results) results = alt;
+                    } catch (e2) {
+                        if (e2.name === 'AbortError') throw e2;
+                        if (!results) throw firstErr || e2;
                     }
-                    goToCoords(coord);
-                };
-                gpsInput.addEventListener('input', () => {
-                    if (gpsInput.value.trim()) gpsClear.classList.add('show');
-                    else gpsClear.classList.remove('show');
+                }
+                GEO.cache.set(key, results);
+                if (GEO.cache.size > 50) GEO.cache.delete(GEO.cache.keys().next().value);
+                return results;
+            }
+
+            function hideGeo() {
+                geoList.classList.remove('open');
+                geoList.innerHTML = '';
+                geoInput.setAttribute('aria-expanded', 'false');
+                geoInput.removeAttribute('aria-activedescendant');
+                GEO.items = []; GEO.active = -1;
+            }
+            function placeGeoList() {
+                const r = geoBox.getBoundingClientRect();
+                const w = Math.min(400, window.innerWidth - 16);
+                geoList.style.width = w + 'px';
+                geoList.style.left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8)) + 'px';
+                geoList.style.top = (r.bottom + 6) + 'px';
+            }
+            function geoMessage(icon, text, spin) {
+                geoList.innerHTML = '';
+                const d = document.createElement('div');
+                d.className = 'geo-msg';
+                d.setAttribute('role', 'status');
+                d.innerHTML = `<i class="fas ${icon}${spin ? ' fa-spin' : ''}"></i>`;
+                d.appendChild(document.createTextNode(' ' + text));
+                geoList.appendChild(d);
+                placeGeoList();
+                geoList.classList.add('open');
+                geoInput.setAttribute('aria-expanded', 'true');
+            }
+            function geoSetActive(i) {
+                const opts = geoList.querySelectorAll('.geo-item');
+                if (!opts.length) return;
+                GEO.active = (i + opts.length) % opts.length;
+                opts.forEach((o, k) => { o.classList.toggle('active', k === GEO.active); o.setAttribute('aria-selected', k === GEO.active ? 'true' : 'false'); });
+                geoInput.setAttribute('aria-activedescendant', 'geo-opt-' + GEO.active);
+                if (opts[GEO.active].scrollIntoView) opts[GEO.active].scrollIntoView({ block: 'nearest' });
+            }
+            function geoRenderResults(items, q) {
+                GEO.items = items;
+                geoList.innerHTML = '';
+                items.forEach((it, i) => {
+                    const row = document.createElement('div');
+                    row.className = 'geo-item';
+                    row.id = 'geo-opt-' + i;
+                    row.setAttribute('role', 'option');
+                    const ic = document.createElement('i'); ic.className = 'fas ' + it.icon;
+                    const txt = document.createElement('div'); txt.className = 'geo-item-text';
+                    const nm = document.createElement('div'); nm.className = 'geo-item-name'; nm.textContent = it.name;
+                    const sb = document.createElement('div'); sb.className = 'geo-item-sub'; sb.textContent = it.label;
+                    txt.appendChild(nm); txt.appendChild(sb);
+                    row.appendChild(ic); row.appendChild(txt);
+                    row.addEventListener('mousedown', (e) => { e.preventDefault(); geoChoose(it); });
+                    row.addEventListener('mousemove', () => { if (GEO.active !== i) geoSetActive(i); });
+                    geoList.appendChild(row);
                 });
-                gpsInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') { e.preventDefault(); submit(); }
-                    else if (e.key === 'Escape') { gpsInput.value = ''; gpsClear.classList.remove('show'); gpsInput.blur(); }
-                });
-                gpsBtn.addEventListener('click', submit);
-                if (gpsClear) {
-                    gpsClear.addEventListener('click', () => {
-                        gpsInput.value = '';
-                        gpsClear.classList.remove('show');
-                        gpsInput.focus();
-                    });
+                const foot = document.createElement('div');
+                foot.className = 'geo-foot';
+                foot.textContent = '© OpenStreetMap contributors · ' + (items[0] ? items[0].source : 'Nominatim');
+                geoList.appendChild(foot);
+                placeGeoList();
+                geoList.classList.add('open');
+                geoInput.setAttribute('aria-expanded', 'true');
+                geoSetActive(0);
+            }
+
+            async function addPlacemarkAt(latlng, suggestedName) {
+                const result = await openNewNodeModal({ type: 'placemark', name: suggestedName || 'New placemark', meta: { icon: DEFAULT_ICON, color: '#4d7c0f', desc: '', lat: latlng.lat, lng: latlng.lng } });
+                if (!result) return;
+                const finalLat = (result.lat !== undefined && result.lat !== null) ? result.lat : latlng.lat;
+                const finalLng = (result.lng !== undefined && result.lng !== null) ? result.lng : latlng.lng;
+                const marker = L.marker([finalLat, finalLng], { icon: makeLeafletIcon(result.icon || DEFAULT_ICON, result.color) });
+                marker.bindPopup(`<b>${escapeHtml(result.name)}</b>${result.desc ? '<br>' + escapeHtml(result.desc) : ''}`);
+                drawnItems.addLayer(marker);
+                const n = createNode({ type: 'placemark', name: result.name, layer: marker, meta: { desc: result.desc, lat: finalLat, lng: finalLng, icon: result.icon || DEFAULT_ICON, color: result.color || '#4d7c0f' } });
+                bindLayerFocus(n, marker);
+                attachLayerDrag(n, marker);
+                if (currentFolderId) addNodeToTree(n, findNode(currentFolderId)); else addNodeToTree(n);
+                await persistTreeNow();
+                marker.openPopup();
+                showToast(`Placemark: ${result.name}`, 'fa-map-pin');
+            }
+
+            function geoChoose(item) {
+                hideGeo();
+                geoInput.value = item.name;
+                geoClear.classList.add('show');
+                if (GEO.marker) { map.removeLayer(GEO.marker); GEO.marker = null; }
+                const ll = L.latLng(item.lat, item.lng);
+                const span = item.bbox ? Math.abs(item.bbox[1][0] - item.bbox[0][0]) + Math.abs(item.bbox[1][1] - item.bbox[0][1]) : 0;
+                if (span > 0.002) map.flyToBounds(item.bbox, Object.assign({ maxZoom: 16, duration: 1.2 }, availableMapPadding()));
+                else map.flyTo(ll, Math.max(map.getZoom(), 15), { duration: 1.2 });
+
+                const m = L.circleMarker(ll, { radius: 9, color: '#4d7c0f', weight: 3, fillColor: '#65a30d', fillOpacity: 0.5 }).addTo(map);
+                const box = document.createElement('div');
+                box.className = 'geo-popup';
+                const h = document.createElement('b'); h.textContent = item.name;
+                const sub = document.createElement('div'); sub.className = 'geo-popup-sub'; sub.textContent = item.label;
+                const co = document.createElement('div'); co.className = 'geo-popup-coords'; co.textContent = fmtCoord(ll.lat) + ', ' + fmtCoord(ll.lng);
+                const row = document.createElement('div'); row.className = 'geo-popup-actions';
+                const b1 = document.createElement('button'); b1.className = 'btn btn-secondary'; b1.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                b1.addEventListener('click', () => copyCoords(ll.lat, ll.lng));
+                const b2 = document.createElement('button'); b2.className = 'btn btn-primary'; b2.innerHTML = '<i class="fas fa-map-pin"></i> Add placemark';
+                b2.addEventListener('click', () => { m.closePopup(); addPlacemarkAt(ll, item.name); });
+                row.appendChild(b1); row.appendChild(b2);
+                box.appendChild(h); box.appendChild(sub); box.appendChild(co); box.appendChild(row);
+                m.bindPopup(box);
+                m.on('popupclose', () => setTimeout(() => { if (GEO.marker === m) { map.removeLayer(m); GEO.marker = null; } }, 0));
+                GEO.marker = m;
+                setTimeout(() => { if (GEO.marker === m) m.openPopup(); }, 1300);
+            }
+
+            async function runPlaceSearch(q) {
+                geoMessage('fa-circle-notch', 'Searching…', true);
+                try {
+                    const results = await geocodePlace(q);
+                    if (geoInput.value.trim() !== q) return;          // the user changed the text meanwhile
+                    if (!results.length) { geoMessage('fa-circle-info', 'No places found for “' + q + '”'); return; }
+                    if (results.length === 1) { geoChoose(results[0]); return; }
+                    geoRenderResults(results, q);
+                } catch (e) {
+                    if (e && e.name === 'AbortError') return;
+                    geoMessage('fa-triangle-exclamation', 'Place search is unavailable right now. Check your connection, or enter coordinates.');
                 }
             }
+            function submitGeo() {
+                const q = geoInput.value.trim();
+                if (!q) return;
+                const coord = parseCoordString(q);
+                if (coord) {
+                    hideGeo();
+                    goToCoords(coord);
+                    if (coord.swapped) showToast('Read as lng, lat — the first number is outside ±90°', 'fa-info-circle');
+                    return;
+                }
+                if (q.length < 2) { showToast('Type a place name or coordinates', 'fa-info-circle'); return; }
+                runPlaceSearch(q);
+            }
+            if (geoInput && geoGo) {
+                geoInput.addEventListener('input', () => {
+                    geoClear.classList.toggle('show', !!geoInput.value.trim());
+                    hideGeo();
+                });
+                geoInput.addEventListener('keydown', (e) => {
+                    const open = geoList.classList.contains('open') && GEO.items.length > 0;
+                    if (e.key === 'ArrowDown' && open) { e.preventDefault(); geoSetActive(GEO.active + 1); }
+                    else if (e.key === 'ArrowUp' && open) { e.preventDefault(); geoSetActive(GEO.active - 1); }
+                    else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (open && GEO.active >= 0) geoChoose(GEO.items[GEO.active]); else submitGeo();
+                    }
+                    else if (e.key === 'Escape') {
+                        if (geoList.classList.contains('open')) { hideGeo(); }
+                        else { geoInput.value = ''; geoClear.classList.remove('show'); geoInput.blur(); }
+                    }
+                });
+                geoGo.addEventListener('click', submitGeo);
+                geoClear.addEventListener('click', () => {
+                    geoInput.value = '';
+                    geoClear.classList.remove('show');
+                    hideGeo();
+                    geoInput.focus();
+                });
+                document.addEventListener('mousedown', (e) => { if (!geoBox.contains(e.target)) hideGeo(); });
+                window.addEventListener('resize', () => { if (geoList.classList.contains('open')) placeGeoList(); });
+            }
+            document.getElementById('btn-locate').addEventListener('click', locateMe);
+
+            // ==================== COPY COORDINATES / MAP RIGHT-CLICK ====================
+            const fmtCoord = (n) => (Math.round(n * 1e6) / 1e6).toFixed(6);
+            function toDMS(v, pos, neg) {
+                const h = v >= 0 ? pos : neg;
+                v = Math.abs(v);
+                let d = Math.floor(v);
+                let m = Math.floor((v - d) * 60);
+                let s = Math.round((((v - d) * 60) - m) * 60 * 100) / 100;
+                if (s >= 60) { s = 0; m += 1; }
+                if (m >= 60) { m = 0; d += 1; }
+                return `${d}°${String(m).padStart(2, '0')}′${s.toFixed(2).padStart(5, '0')}″${h}`;
+            }
+            function coordsDMS(lat, lng) { return toDMS(lat, 'N', 'S') + ' ' + toDMS(lng, 'E', 'W'); }
+            async function copyCoords(lat, lng, how) {
+                const text = how === 'dms' ? coordsDMS(lat, lng)
+                    : how === 'lnglat' ? `${fmtCoord(lng)}, ${fmtCoord(lat)}`
+                    : `${fmtCoord(lat)}, ${fmtCoord(lng)}`;
+                try { await writeClipboard(text); showToast('Copied ' + text, 'fa-copy'); }
+                catch (err) { showToast('Copy failed', 'fa-times', { error: true, detail: err }); }
+            }
+            let _mouseOverMap = false;
+            map.on('mousemove', () => { _mouseOverMap = true; });
+            map.on('mouseout', () => { _mouseOverMap = false; });
+            function copyMouseCoords() {
+                const ll = map._lastMouseLatLng;
+                if (!_mouseOverMap || !ll) { showToast('Point at the map, then press C', 'fa-info-circle'); return; }
+                copyCoords(ll.lat, ll.lng);
+            }
+            function showMapContextMenu(latlng, x, y) {
+                const lat = latlng.lat, lng = latlng.lng;
+                const items = [
+                    { label: 'Copy coordinates', icon: 'fa-copy', action: () => copyCoords(lat, lng) },
+                    { label: 'Copy as DMS', icon: 'fa-compass', action: () => copyCoords(lat, lng, 'dms') },
+                    { label: 'Copy as lng, lat', icon: 'fa-arrows-left-right', action: () => copyCoords(lat, lng, 'lnglat') }
+                ];
+                const elev = (typeof getElevation === 'function') ? getElevation(lat, lng) : null;
+                if (elev !== null && elev !== undefined && !isNaN(elev)) {
+                    items.push({ label: `Copy elevation (${Math.round(elev)} m)`, icon: 'fa-mountain', action: async () => {
+                        try { await writeClipboard(String(Math.round(elev))); showToast('Copied ' + Math.round(elev) + ' m', 'fa-mountain'); }
+                        catch (err) { showToast('Copy failed', 'fa-times'); }
+                    }});
+                }
+                items.push({ sep: true });
+                items.push({ label: 'Add placemark here…', icon: 'fa-map-pin', action: () => addPlacemarkAt(latlng) });
+                buildContextMenu(x, y, lat.toFixed(5) + ', ' + lng.toFixed(5), items);
+            }
+            map.on('contextmenu', (e) => {
+                const oe = e.originalEvent;
+                if (drawState) { L.DomEvent.preventDefault(e); showToast('Drawing cancelled', 'fa-times'); cancelActiveDraw(); return; }
+                if (oe && oe.preventDefault) oe.preventDefault();
+                let px, py;
+                if (oe && oe.clientX != null) { px = oe.clientX; py = oe.clientY; }
+                else { const r = map.getContainer().getBoundingClientRect(); px = r.left + e.containerPoint.x; py = r.top + e.containerPoint.y; }
+                showMapContextMenu(e.latlng, px, py);
+            });
+
+            // ==================== NEW… MENU (places panel "+" button) ====================
+            function showNewMenu(x, y) {
+                const folder = currentFolderId ? findNode(currentFolderId) : null;
+                const items = [
+                    { label: 'New folder', icon: 'fa-folder-plus', action: () => promptNewFolder(folder) },
+                    { label: 'Import KML / GeoJSON…', icon: 'fa-file-import', action: () => openImportScreen(currentFolderId) }
+                ];
+                if (clipboard && clipboard.type === 'placemark') {
+                    items.push({ label: `Paste "${clipboard.name}"`, icon: 'fa-paste', action: () => pastePlacemarkInto(folder) });
+                }
+                buildContextMenu(x, y, folder ? 'Add to “' + folder.name + '”' : 'Add to Places', items);
+            }
+            (function wireNewButton() {
+                const b = document.getElementById('hdr-new');
+                if (!b) return;
+                b.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const r = b.getBoundingClientRect();
+                    showNewMenu(Math.max(8, r.right - 240), r.bottom + 4);
+                });
+            })();
+
 
             // ==================== FIT TO PLACES ====================
             function fitToPlacesExtent() {
@@ -6760,7 +7496,7 @@
                     }
                     losPreviewGroup.addLayer(L.circleMarker([endpoint.lat, endpoint.lng], {
                         radius: 6, color: 'white', weight: 2,
-                        fillColor: link.geo.lostAt !== null ? '#dc2626' : '#22c55e', fillOpacity: 1
+                        fillColor: linkEndColor(link.geo), fillOpacity: 1
                     }));
                 }
 
@@ -7080,9 +7816,6 @@
                     finishPathOrPolygon();
                 }
             });
-            map.on('contextmenu', (e) => {
-                if (drawState) { L.DomEvent.preventDefault(e); showToast('Drawing cancelled', 'fa-times'); cancelActiveDraw(); }
-            });
 
             document.getElementById('tool-placemark').addEventListener('click', () => beginDraw('placemark'));
             document.getElementById('tool-path').addEventListener('click', () => beginDraw('path'));
@@ -7161,6 +7894,427 @@
                 });
             }
 
+            // ==================== HISTORY (UNDO / REDO + JUMP LIST) ====================
+            const HISTORY_LIMIT = 50, HISTORY_MAX_CHARS = 40000000;
+            let hist = [], histIdx = -1, _lastObj = null, _undoBusy = false, _histSeq = 0;
+
+            function _plainForUndo(n) {
+                return {
+                    id: n.id, name: n.name, type: n.type,
+                    visible: n.visible !== false, expanded: n.expanded !== false,
+                    archivedFrom: n.archivedFrom || null,
+                    meta: n.meta || {},
+                    children: (n.children || []).map(_plainForUndo)
+                };
+            }
+            // Loaded HGT tiles live outside the history, so the terrain folder is left out of snapshots.
+            function _snapshotTree() {
+                return JSON.stringify({
+                    tree: treeNodes.filter(n => n.name !== 'Terrain (HGT)').map(_plainForUndo),
+                    archive: archivedNodes.map(_plainForUndo)
+                });
+            }
+            function _flattenSnap(obj) {
+                const map = new Map();
+                const walk = (nodes, parent, arch) => (nodes || []).forEach((n, i) => {
+                    map.set(n.id, { n, parent, idx: i, arch, metaStr: JSON.stringify(n.meta || {}) });
+                    walk(n.children, n.id, arch);
+                });
+                walk(obj.tree, null, false);
+                walk(obj.archive, null, true);
+                return map;
+            }
+            const _TYPE_LABEL = { placemark: 'placemark', path: 'path', polygon: 'polygon', measure: 'measurement', 'measure-area': 'area measurement', los: 'LOS', folder: 'folder', kml: 'KML folder' };
+            const _short = (s) => { s = String(s == null ? '' : s); return s.length > 28 ? s.slice(0, 27) + '…' : s; };
+            function _describeChange(a, b) {
+                if (!a || !b) return 'Changed places';
+                const A = _flattenSnap(a), B = _flattenSnap(b);
+                const added = [], removed = [], archived = [], restored = [], renamed = [], hidden = [], shown = [], moved = [], reordered = [], edited = [];
+                B.forEach((v, id) => { if (!A.has(id)) added.push(v); });
+                A.forEach((v, id) => { if (!B.has(id)) removed.push(v); });
+                B.forEach((v, id) => {
+                    const o = A.get(id);
+                    if (!o) return;
+                    if (o.arch !== v.arch) { (v.arch ? archived : restored).push(v); return; }
+                    if (o.n.name !== v.n.name) renamed.push({ o, v });
+                    const ov = o.n.visible !== false, nv = v.n.visible !== false;
+                    if (ov && !nv) hidden.push(v); else if (!ov && nv) shown.push(v);
+                    if (o.parent !== v.parent) moved.push(v); else if (o.idx !== v.idx) reordered.push(v);
+                    if (o.metaStr !== v.metaStr) edited.push({ o, v });
+                });
+                const roots = (list, map) => list.filter(x => !list.some(y => y.n.id === x.parent));
+                const q = (v) => '“' + _short(v.n.name) + '”';
+                const many = (list, word) => word + ' ' + list.length + ' items';
+                const labels = [];
+                if (added.length) {
+                    const r = roots(added);
+                    if (r.length === 1) labels.push(added.length > 1 ? 'Added ' + q(r[0]) + ' (' + added.length + ' items)' : 'Added ' + (_TYPE_LABEL[r[0].n.type] || 'item') + ' ' + q(r[0]));
+                    else labels.push(many(added, 'Added'));
+                }
+                if (removed.length) {
+                    const r = roots(removed);
+                    if (r.length === 1) labels.push(removed.length > 1 ? 'Deleted ' + q(r[0]) + ' (' + removed.length + ' items)' : 'Deleted ' + (_TYPE_LABEL[r[0].n.type] || 'item') + ' ' + q(r[0]));
+                    else labels.push(many(removed, 'Deleted'));
+                }
+                if (archived.length) labels.push(archived.length === 1 ? 'Archived ' + q(archived[0]) : many(archived, 'Archived'));
+                if (restored.length) labels.push(restored.length === 1 ? 'Restored ' + q(restored[0]) : many(restored, 'Restored'));
+                if (renamed.length) labels.push(renamed.length === 1 ? 'Renamed “' + _short(renamed[0].o.n.name) + '” → “' + _short(renamed[0].v.n.name) + '”' : many(renamed, 'Renamed'));
+                if (hidden.length && !shown.length) labels.push(hidden.length === 1 ? 'Hid ' + q(hidden[0]) : many(hidden, 'Hid'));
+                else if (shown.length && !hidden.length) labels.push(shown.length === 1 ? 'Showed ' + q(shown[0]) : many(shown, 'Showed'));
+                else if (hidden.length || shown.length) labels.push('Changed visibility of ' + (hidden.length + shown.length) + ' items');
+                if (moved.length) {
+                    if (moved.length === 1) {
+                        const p = moved[0].parent ? B.get(moved[0].parent) : null;
+                        labels.push('Moved ' + q(moved[0]) + ' to ' + (p ? '“' + _short(p.n.name) + '”' : 'top level'));
+                    } else labels.push(many(moved, 'Moved'));
+                } else if (reordered.length) labels.push('Reordered items');
+                if (edited.length) {
+                    if (edited.length === 1) {
+                        const ko = JSON.parse(edited[0].o.metaStr), kv = JSON.parse(edited[0].v.metaStr);
+                        const keys = Array.from(new Set(Object.keys(ko).concat(Object.keys(kv)))).filter(k => JSON.stringify(ko[k]) !== JSON.stringify(kv[k]));
+                        if (keys.every(k => k === 'lat' || k === 'lng')) labels.push('Moved ' + q(edited[0].v) + ' on map');
+                        else if (keys.includes('points')) labels.push('Edited shape ' + q(edited[0].v));
+                        else if (keys.includes('persistedP2P') || keys.includes('trackMouse')) labels.push('Set link target on ' + q(edited[0].v));
+                        else labels.push('Edited ' + q(edited[0].v));
+                    } else labels.push(many(edited, 'Edited'));
+                }
+                if (!labels.length) return 'Changed places';
+                if (labels.length === 1) return labels[0];
+                if (labels.length === 2) return labels.join(' · ');
+                return 'Multiple changes';
+            }
+
+            function resetHistory(prime, label) {
+                hist = []; histIdx = -1; _lastObj = null;
+                if (prime) {
+                    const s = _snapshotTree();
+                    hist = [{ id: ++_histSeq, snap: s, label: label || 'Opened', t: Date.now() }];
+                    histIdx = 0;
+                    _lastObj = JSON.parse(s);
+                }
+                updateUndoButtons();
+            }
+            function _trackUndo() {
+                if (_undoBusy) return;
+                const s = _snapshotTree();
+                if (histIdx < 0) { resetHistory(true); return; }
+                if (s === hist[histIdx].snap) return;
+                const obj = JSON.parse(s);
+                const label = _describeChange(_lastObj, obj);
+                hist.splice(histIdx + 1);                                   // a new edit drops the redo tail
+                hist.push({ id: ++_histSeq, snap: s, label, t: Date.now() });
+                histIdx = hist.length - 1;
+                _lastObj = obj;
+                let total = hist.reduce((acc, h) => acc + h.snap.length, 0);
+                while (hist.length > HISTORY_LIMIT || (hist.length > 2 && total > HISTORY_MAX_CHARS)) { total -= hist.shift().snap.length; histIdx--; }
+                updateUndoButtons();
+            }
+            function updateUndoButtons() {
+                const u = document.getElementById('btn-undo'), r = document.getElementById('btn-redo'), h = document.getElementById('btn-history');
+                const canUndo = histIdx > 0, canRedo = histIdx >= 0 && histIdx < hist.length - 1;
+                if (u) { u.disabled = !canUndo; u.title = canUndo ? 'Undo: ' + hist[histIdx].label + ' (Ctrl+Z)' : 'Undo (Ctrl+Z)'; u.setAttribute('aria-label', u.title); }
+                if (r) { r.disabled = !canRedo; r.title = canRedo ? 'Redo: ' + hist[histIdx + 1].label + ' (Ctrl+Shift+Z)' : 'Redo (Ctrl+Shift+Z)'; r.setAttribute('aria-label', r.title); }
+                if (h) h.disabled = hist.length < 2;
+                if (histPop && histPop.classList.contains('open')) renderHistoryPopover();
+            }
+            async function _gotoHistoryId(id) {
+                if (drawState) { showToast('Finish or cancel drawing first', 'fa-pen-ruler'); return false; }
+                if (_persistTimer) await persistTreeNow();                 // capture any pending edit first (may add an entry)
+                const i = hist.findIndex(h => h.id === id);
+                if (i < 0 || i === histIdx) return false;
+                const o = JSON.parse(hist[i].snap);
+                _undoBusy = true;
+                try {
+                    if (editorState) closeEditorPanel();
+                    if (typeof stopLOSTracking === 'function') stopLOSTracking();
+                    const profClose = document.getElementById('profile-close');
+                    if (profilePanel.classList.contains('open') && profClose) profClose.click();
+                    const keep = treeNodes.filter(n => n.name === 'Terrain (HGT)');
+                    treeNodes = (o.tree || []).map(fromPlain).concat(keep);
+                    archivedNodes = (o.archive || []).map(fromPlain);
+                    if (currentFolderId && !findNode(currentFolderId)) currentFolderId = null;
+                    selectedNodeId = null; lastSelectedId = null; multiSelection.clear();
+                    rebuildLayers();
+                    renderTree();
+                    histIdx = i; _lastObj = o;
+                    await persistTreeNow();
+                } finally { _undoBusy = false; }
+                updateUndoButtons();
+                return true;
+            }
+            async function undoTree() {
+                if (_persistTimer) await persistTreeNow();
+                if (histIdx <= 0) { showToast('Nothing to undo', 'fa-rotate-left'); return; }
+                const undone = hist[histIdx].label;
+                if (await _gotoHistoryId(hist[histIdx - 1].id)) showToast('Undid: ' + undone, 'fa-rotate-left');
+            }
+            async function redoTree() {
+                if (_persistTimer) await persistTreeNow();
+                if (histIdx < 0 || histIdx >= hist.length - 1) { showToast('Nothing to redo', 'fa-rotate-right'); return; }
+                const next = hist[histIdx + 1];
+                if (await _gotoHistoryId(next.id)) showToast('Redid: ' + next.label, 'fa-rotate-right');
+            }
+
+            // ---- history dropdown under the undo/redo buttons ----
+            const histBtn = document.getElementById('btn-history');
+            const histPop = document.createElement('div');
+            histPop.className = 'history-popover';
+            histPop.id = 'history-popover';
+            histPop.setAttribute('role', 'dialog');
+            histPop.setAttribute('aria-label', 'History');
+            document.body.appendChild(histPop);
+            function _fmtTime(t) { return new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+            function renderHistoryPopover() {
+                histPop.innerHTML = '';
+                const head = document.createElement('div');
+                head.className = 'hp-head';
+                const title = document.createElement('span'); title.textContent = 'History';
+                const clr = document.createElement('button'); clr.className = 'hp-clear'; clr.textContent = 'Clear';
+                clr.title = 'Forget earlier steps (keeps the current state)';
+                clr.addEventListener('click', () => { resetHistory(true, 'Current state'); renderHistoryPopover(); });
+                head.appendChild(title); head.appendChild(clr);
+                histPop.appendChild(head);
+                const list = document.createElement('div');
+                list.className = 'hp-list';
+                list.setAttribute('role', 'listbox');
+                for (let i = hist.length - 1; i >= 0; i--) {
+                    const h = hist[i];
+                    const b = document.createElement('button');
+                    b.className = 'hp-item' + (i === histIdx ? ' current' : '') + (i > histIdx ? ' future' : '');
+                    b.setAttribute('role', 'option');
+                    b.setAttribute('aria-selected', i === histIdx ? 'true' : 'false');
+                    const dot = document.createElement('span'); dot.className = 'hp-dot';
+                    const lab = document.createElement('span'); lab.className = 'hp-label'; lab.textContent = h.label;
+                    const tm = document.createElement('span'); tm.className = 'hp-time'; tm.textContent = i === histIdx ? 'Current' : _fmtTime(h.t);
+                    b.appendChild(dot); b.appendChild(lab); b.appendChild(tm);
+                    b.addEventListener('click', async () => { if (i !== histIdx) { await _gotoHistoryId(h.id); renderHistoryPopover(); } });
+                    list.appendChild(b);
+                }
+                histPop.appendChild(list);
+                const foot = document.createElement('div');
+                foot.className = 'hp-foot';
+                foot.textContent = 'Click a step to jump to it · greyed steps are redo-able · this session only';
+                histPop.appendChild(foot);
+                const cur = list.querySelector('.current');
+                if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest' });
+            }
+            function openHistoryPopover() {
+                if (!histBtn || histBtn.disabled) return;
+                renderHistoryPopover();
+                const grp = histBtn.closest('.h-group') || histBtn;
+                const r = grp.getBoundingClientRect();
+                const w = Math.min(320, window.innerWidth - 16);
+                histPop.style.width = w + 'px';
+                histPop.style.left = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8)) + 'px';
+                histPop.style.top = (r.bottom + 6) + 'px';
+                histPop.classList.add('open');
+                histBtn.setAttribute('aria-expanded', 'true');
+                const first = histPop.querySelector('.hp-item.current') || histPop.querySelector('.hp-item');
+                if (first) first.focus();
+            }
+            function closeHistoryPopover(refocus) {
+                if (!histPop.classList.contains('open')) return;
+                histPop.classList.remove('open');
+                histBtn.setAttribute('aria-expanded', 'false');
+                if (refocus && !histBtn.disabled) histBtn.focus();
+            }
+            histBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (histPop.classList.contains('open')) closeHistoryPopover(false); else openHistoryPopover();
+            });
+            document.addEventListener('mousedown', (e) => {
+                if (!histPop.classList.contains('open')) return;
+                if (histPop.contains(e.target) || histBtn.contains(e.target)) return;
+                closeHistoryPopover(false);
+            });
+            histPop.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { e.preventDefault(); closeHistoryPopover(true); return; }
+                if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+                const items = Array.from(histPop.querySelectorAll('.hp-item'));
+                const i = items.indexOf(document.activeElement);
+                if (i < 0) return;
+                e.preventDefault();
+                const n = e.key === 'ArrowDown' ? Math.min(items.length - 1, i + 1) : Math.max(0, i - 1);
+                items[n].focus();
+            });
+            document.getElementById('btn-undo').addEventListener('click', undoTree);
+            document.getElementById('btn-redo').addEventListener('click', redoTree);
+            document.addEventListener('keydown', (e) => {
+                if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+                const tgt = e.target;
+                if (tgt && ((tgt.matches && tgt.matches('input, textarea, select')) || tgt.isContentEditable)) return;
+                const key = (e.key || '').toLowerCase();
+                if (key === 'z' && !e.shiftKey) { e.preventDefault(); undoTree(); }
+                else if ((key === 'z' && e.shiftKey) || key === 'y') { e.preventDefault(); redoTree(); }
+            });
+
+            // ==================== CSV EXPORT ====================
+            // Text cells starting with = + - @ are prefixed so spreadsheets don't evaluate them as formulas.
+            function csvText(v) {
+                let s = (v == null) ? '' : String(v);
+                if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+                return '"' + s.replace(/"/g, '""') + '"';
+            }
+            function csvNum(v, dp) {
+                const n = parseFloat(v);
+                if (!isFinite(n)) return '';
+                return dp != null ? n.toFixed(dp) : String(n);
+            }
+            function exportSitesCSV() {
+                const header = ['Name', 'Type', 'Folder', 'Latitude', 'Longitude', 'Ground elevation (m)', 'Antenna height (m)',
+                                'Description', 'Link end lat', 'Link end lng', 'Link distance (m)', 'Link LOS', 'Min F1 clearance (x)',
+                                'Frequency (GHz)', 'k-factor'];
+                const rows = [header.map(csvText).join(',')];
+                let count = 0;
+                (function walk(nodes, path) {
+                    for (const n of nodes) {
+                        if (n.name === 'Terrain (HGT)' || n.type === 'terrain') continue;
+                        if ((n.type === 'placemark' || n.type === 'los') && n.meta && n.meta.lat != null && n.meta.lng != null) {
+                            const isLos = n.type === 'los';
+                            const g = getElevation(n.meta.lat, n.meta.lng);
+                            let endLat = '', endLng = '', dist = '', status = '', clear = '';
+                            const p2p = (isLos && n.meta.persistedP2P && n.meta.persistedP2P.lat != null) ? n.meta.persistedP2P : null;
+                            if (p2p) {
+                                const a = L.latLng(n.meta.lat, n.meta.lng), b = L.latLng(p2p.lat, p2p.lng);
+                                endLat = csvNum(p2p.lat, 6); endLng = csvNum(p2p.lng, 6);
+                                dist = csvNum(haversine(a, b), 0);
+                                try {
+                                    const link = buildLinkSegments(n, a, b);
+                                    if (link) { status = link.geo.lostAt !== null ? 'blocked' : 'clear'; clear = csvNum(link.geo.minClearRatio, 2); }
+                                    else status = 'no terrain data';
+                                } catch (err) { status = ''; }
+                            }
+                            rows.push([
+                                csvText(n.name), csvText(n.type), csvText(path.join(' / ')),
+                                csvNum(n.meta.lat, 6), csvNum(n.meta.lng, 6),
+                                g !== null ? csvNum(Math.round(g)) : '',
+                                isLos ? csvNum(numOr(n.meta.centerHeight, 30)) : '',
+                                csvText(n.meta.desc || ''),
+                                endLat, endLng, dist, csvText(status), clear,
+                                isLos ? csvNum(n.meta.freqGHz) : '',
+                                isLos ? csvNum(kFactorOf(n), 2) : ''
+                            ].join(','));
+                            count++;
+                        }
+                        if (n.children && n.children.length) walk(n.children, path.concat(n.name));
+                    }
+                })(treeNodes, []);
+                if (!count) { showToast('No placemarks or LOS sites to export', 'fa-info-circle'); return; }
+                downloadFile('\ufeff' + rows.join('\r\n'), 'telco-earth-sites.csv', 'text/csv;charset=utf-8');
+                showToast(count + ' site' + (count !== 1 ? 's' : '') + ' exported', 'fa-file-csv');
+            }
+
+            // ==================== MOVE TO / KEYBOARD REORDER ====================
+            function nodeContains(anc, id) {
+                if (!anc.children) return false;
+                for (const c of anc.children) { if (c.id === id || nodeContains(c, id)) return true; }
+                return false;
+            }
+            function moveNodeToFolder(node, folder) {
+                if (folder && (folder.id === node.id || nodeContains(node, folder.id))) return false;
+                const removed = removeNode(node.id);
+                if (!removed) return false;
+                if (folder) { if (!folder.children) folder.children = []; folder.children.push(removed); }
+                else treeNodes.push(removed);
+                return true;
+            }
+            function reorderNode(node, delta) {
+                const loc = findParent(node.id);
+                if (!loc) return false;
+                const i = loc.list.findIndex(n => n.id === node.id), j = i + delta;
+                if (i < 0 || j < 0 || j >= loc.list.length) return false;
+                const tmp = loc.list[i]; loc.list[i] = loc.list[j]; loc.list[j] = tmp;
+                return true;
+            }
+            function showMoveToMenu(node, x, y) {
+                const items = [{ label: 'Top level', icon: 'fa-house', action: () => finishMove(node, null) }];
+                (function walk(nodes, path) {
+                    for (const n of nodes) {
+                        if (n.name === 'Terrain (HGT)' || n.type === 'terrain') continue;
+                        if ((n.type === 'folder' || n.type === 'kml') && n.id !== node.id && !nodeContains(node, n.id)) {
+                            const label = path.concat(n.name).join(' / ');
+                            items.push({ label, icon: 'fa-folder', action: () => finishMove(node, n) });
+                            walk(n.children || [], path.concat(n.name));
+                        }
+                    }
+                })(treeNodes, []);
+                if (items.length === 1) { showToast('No folders to move into — create one first', 'fa-info-circle'); return; }
+                buildContextMenu(x, y, 'Move “' + node.name + '” to', items);
+                ctxMenu.style.maxHeight = '60vh';
+                ctxMenu.style.overflowY = 'auto';
+            }
+            async function finishMove(node, folder) {
+                if (!moveNodeToFolder(node, folder)) { showToast('Cannot move there', 'fa-exclamation-circle'); return; }
+                renderTree();
+                await persistTreeNow();
+                showToast('Moved', 'fa-folder-tree');
+            }
+            document.getElementById('subrail-body').addEventListener('keydown', (e) => {
+                const row = e.target;
+                if (!row || !row.classList || !row.classList.contains('fx-row')) return;
+                const body = e.currentTarget;
+                const rows = Array.from(body.querySelectorAll('.fx-row'));
+                const i = rows.indexOf(row);
+                const id = row.dataset.nodeId;
+                const refocus = () => setTimeout(() => {
+                    const r = (id && body.querySelector('.fx-row[data-node-id="' + CSS.escape(id) + '"]')) || body.querySelector('.fx-row');
+                    if (r) r.focus();
+                }, 0);
+                if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                    e.preventDefault();
+                    const node = findNode(id);
+                    if (!node) return;
+                    if (placesSortMode !== 'default') { showToast('Switch sort to Default order to reorder', 'fa-arrow-down-wide-short'); return; }
+                    if (reorderNode(node, e.key === 'ArrowUp' ? -1 : 1)) { renderTree(); persistTree(); refocus(); }
+                    return;
+                }
+                if (e.key === 'ArrowDown') { e.preventDefault(); if (rows[i + 1]) rows[i + 1].focus(); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); if (rows[i - 1]) rows[i - 1].focus(); }
+                else if (e.key === 'Home') { e.preventDefault(); if (rows[0]) rows[0].focus(); }
+                else if (e.key === 'End') { e.preventDefault(); if (rows.length) rows[rows.length - 1].focus(); }
+                else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); refocus(); }
+                else if (e.key === 'ContextMenu' || (e.key === 'F10' && e.shiftKey)) {
+                    e.preventDefault();
+                    const rc = row.getBoundingClientRect();
+                    row.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: rc.left + 24, clientY: rc.bottom }));
+                }
+                else if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.metaKey) {
+                    const node = findNode(id);
+                    if (node) { e.preventDefault(); const rc = row.getBoundingClientRect(); showMoveToMenu(node, rc.left + 24, rc.bottom); }
+                }
+                else if ((e.key === 'v' || e.key === 'V') && !e.ctrlKey && !e.metaKey) {
+                    const eye = row.querySelector('.fx-vis');
+                    if (eye) { e.preventDefault(); eye.click(); refocus(); }
+                }
+            });
+
+            // Keyboard control for the sub-rail splitter (arrows, Shift = bigger step, Home/End = min/max).
+            (function initResizerKeyboard() {
+                const handle = document.getElementById('subrail-resizer');
+                if (!handle) return;
+                handle.setAttribute('aria-valuemin', '220');
+                handle.setAttribute('aria-valuemax', '600');
+                handle.addEventListener('keydown', (e) => {
+                    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+                    e.preventDefault();
+                    const cur = subrail.getBoundingClientRect().width || parseFloat(subrail.style.width) || 320;
+                    const step = e.shiftKey ? 48 : 16;
+                    let w = cur;
+                    if (e.key === 'ArrowLeft') w = cur - step;
+                    else if (e.key === 'ArrowRight') w = cur + step;
+                    else if (e.key === 'Home') w = 220;
+                    else w = 600;
+                    w = Math.max(220, Math.min(600, w));
+                    subrail.style.width = w + 'px';
+                    SETTINGS.subrailWidth = w;
+                    handle.setAttribute('aria-valuenow', String(Math.round(w)));
+                    const railRect = railEl.getBoundingClientRect();
+                    document.documentElement.style.setProperty('--subrail-width', (railRect.right + w) + 'px');
+                    saveSettings();
+                    setTimeout(syncProfilePanelLeft, 300);
+                });
+            })();
+
             // ==================== INIT ====================
             (async function init() {
                 await loadSettings();
@@ -7187,6 +8341,7 @@
                 updateTerrainVisibility();
                 await loadPersistedTiles();
                 const restored = await loadPersistedTree();
+                resetHistory(true);
                 if (restored && hasAnyPlaces()) setTimeout(fitToPlacesExtent, 200);
                 updateMapToolsVisibility();
                 syncProfilePanelLeft();
