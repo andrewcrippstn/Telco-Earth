@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   ============================================================
-  BUILD: 2026-11-03 03:48:16 (local)
+  BUILD: 2026-11-03 11:07:02 (local)
   ------------------------------------------------------------
   MAINTENANCE RULE — READ BEFORE EDITING THIS FILE:
   Whenever the code in this file is modified in any way,
@@ -98,7 +98,7 @@
     .rail-tooltip::before { content: ''; position: absolute; left: -4px; top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-right-color: var(--text); }
 
     .subrail { width: 0; overflow: hidden; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1); background: var(--surface-soft); border-right: 1px solid var(--border); z-index: 15; position: relative; }
-    .subrail.open { width: 320px; }
+    .subrail.open { width: var(--subrail-w, 320px); }
     .subrail-resizer { position: absolute; right: 0; top: 0; bottom: 0; width: 4px; cursor: ew-resize; z-index: 100; background: transparent; transition: background 0.15s ease; }
     .subrail-resizer:hover { background: var(--accent-soft-hi); }
     .subrail-inner { width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
@@ -493,7 +493,7 @@
         .header { padding: 8px 12px; }
         .brand span { display: none; }
         .header-search { width: 180px; max-width: 40vw; }
-        .subrail.open { width: 260px; }
+        .subrail.open { width: var(--subrail-w, 260px); }
         .icon-grid { grid-template-columns: repeat(6, 1fr); }
         .sheet-body { grid-template-columns: 1fr; }
         .editor-panel { width: 100%; }
@@ -804,11 +804,14 @@
     .breadcrumb-crumb { flex-shrink: 0; }
     .breadcrumb-crumb.current { flex-shrink: 1; min-width: 44px; max-width: none; }
     .breadcrumb-more { flex-shrink: 0; }
-    .breadcrumb.vertical { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 1px; overflow-x: hidden; overflow-y: auto; max-height: 190px; }
-    .breadcrumb-row { display: flex; align-items: center; gap: 2px; min-width: 0; }
-    .breadcrumb-row .breadcrumb-crumb { flex: 1 1 auto; min-width: 0; max-width: none; text-align: left; flex-shrink: 1; }
-    .breadcrumb-row:not(:first-child) .breadcrumb-sep { flex-shrink: 0; }
-    .breadcrumb-row .breadcrumb-more { margin-left: 0; }
+    .subrail { position: relative; }
+    .subrail.vcrumbs .subrail-inner { padding-left: 34px; box-sizing: border-box; }
+    .subrail.vcrumbs .breadcrumb.vertical { position: absolute; left: 0; top: 0; bottom: 0; width: 34px; margin: 0; padding: 6px 4px; border-width: 0 1px 0 0; border-radius: 0; z-index: 5;
+        writing-mode: vertical-rl; text-orientation: mixed; flex-wrap: nowrap; overflow: hidden; box-sizing: border-box; background: var(--surface-soft); }
+    .breadcrumb.vertical .breadcrumb-crumb { padding: 6px 2px; max-width: none; max-height: 140px; }
+    .breadcrumb.vertical .breadcrumb-crumb.current { max-height: none; min-width: 0; min-height: 44px; }
+    .breadcrumb.vertical .breadcrumb-more { margin-left: 0; margin-top: auto; }
+    .breadcrumb.vertical .breadcrumb-ellipsis { padding: 8px 3px; }
     .breadcrumb-ellipsis { border: none; background: var(--surface-3); color: var(--text-1); font: inherit; font-weight: 700; line-height: 1; padding: 3px 8px 5px; border-radius: 5px; cursor: pointer; flex-shrink: 0; }
     .breadcrumb-ellipsis:hover { background: var(--accent-soft); color: var(--accent); }
     .breadcrumb-ellipsis[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
@@ -935,7 +938,7 @@
             </div>
             <div class="draw-status" id="los-tracking-hint" style="background: var(--los);">
                 <i class="fas fa-mouse-pointer"></i>
-                <span>Move mouse to preview · click to set the link target</span>
+                <span>Move mouse to preview · click to set the far end</span>
                 <button id="los-tracking-cancel">Cancel</button>
             </div>
             <div class="draw-badge" id="draw-badge"></div>
@@ -1003,11 +1006,11 @@
         <span class="sb-spacer"></span>
         <span class="sb-seg sb-progress" id="sb-progress" hidden><span id="sb-progress-label"></span><span class="sb-progress-track"><span class="sb-progress-fill" id="sb-progress-fill"></span></span></span>
         <div class="terrain-status" id="terrain-status"><i class="fas fa-circle" style="font-size: 0.5rem; color: var(--text-3);"></i> No terrain loaded</div>
-        <!-- BUILD-FOOTER --><span class="sb-seg sb-build" id="sb-build" title="Build date and time (local)">Build 2026-11-03 03:48:16</span>
+        <!-- BUILD-FOOTER --><span class="sb-seg sb-build" id="sb-build" title="Build date and time (local)">Build 2026-11-03 11:07:02</span>
     </div>
 
     <input type="file" id="file-input" accept=".hgt,.HGT" multiple style="display:none">
-    <input type="file" id="kml-input" accept=".kml,.kmz" multiple style="display:none">
+    <input type="file" id="kml-input" accept=".kml,.geojson,.json,.gpx" multiple style="display:none">
     <input type="file" id="geojson-input" accept=".geojson,.json,application/geo+json,application/json" multiple style="display:none">
 
     <div class="drop-overlay" id="drop-overlay" aria-hidden="true">
@@ -1967,9 +1970,8 @@
                 return () => cleanups.forEach(fn => { try { fn(); } catch(e){} });
             }
 
-            function rebuildLayers() {
-                drawnItems.clearLayers();
-                function walk(nodes) {
+            // Builds Leaflet layers for a list of (plain) nodes and their children; used on load, restore and import.
+            function buildLayersFor(nodes) {
                     for (const n of nodes) {
                         if (n.type === 'placemark' && n.meta.lat != null && n.meta.lng != null) {
                             const marker = L.marker([n.meta.lat, n.meta.lng], { icon: makeIconFromNode(n) });
@@ -2002,10 +2004,12 @@
                                 if (n.visible !== false) n.layer.addTo(drawnItems);
                             }
                         }
-                        if (n.children) walk(n.children);
+                        if (n.children) buildLayersFor(n.children);
                     }
                 }
-                walk(treeNodes);
+            function rebuildLayers() {
+                drawnItems.clearLayers();
+                buildLayersFor(treeNodes);
                 if (drawnItems.bringToFront) drawnItems.bringToFront();
                 rebuildSnapZoneLayer();
                 updateMinimapDots();
@@ -2176,6 +2180,7 @@
 
                 const showCrumb = (activeSection === 'places' && placesTab === 'places' && !searchMode);
                 breadcrumbEl.style.display = showCrumb ? '' : 'none';
+                subrail.classList.toggle('vcrumbs', showCrumb && !!FLAGS.verticalCrumbs);
                 if (showCrumb) renderBreadcrumb();
             }
 
@@ -2437,7 +2442,7 @@
                     const loc = findParent(node.id);
                     node = loc && loc.parent ? loc.parent : null;
                 }
-                const items = [{ id: null, label: 'All places', root: true }].concat(chain.map(n => ({ id: n.id, label: n.name })));
+                const items = [{ id: null, label: 'All', root: true }].concat(chain.map(n => ({ id: n.id, label: n.name })));
                 const last = items.length - 1;
                 const vertical = !!FLAGS.verticalCrumbs;
                 breadcrumbEl.classList.toggle('vertical', vertical);
@@ -2480,35 +2485,15 @@
                     crumb.className = 'breadcrumb-crumb' + (isCurrent ? ' current' : '');
                     if (it.root) {
                         crumb.innerHTML = '<i class="fas fa-map-location-dot"></i>' + (iconOnly ? '' : ' ' + escapeHtml(it.label));
-                        if (iconOnly) crumb.setAttribute('aria-label', it.label);
+                        if (iconOnly) crumb.setAttribute('aria-label', 'All places');
                     } else crumb.textContent = it.label;
-                    crumb.title = it.label;
+                    crumb.title = it.root ? 'All places' : it.label;
                     if (isCurrent) crumb.setAttribute('aria-current', 'page');
                     else crumb.addEventListener('click', () => { currentFolderId = it.id; multiSelection.clear(); renderTree(); });
                     if (it.id !== currentFolderId) attachBreadcrumbDrop(crumb, it.id);
                     return crumb;
                 };
                 const mkSep = () => { const sep = document.createElement('span'); sep.className = 'breadcrumb-sep'; sep.textContent = '/'; return sep; };
-
-                // vertical: one folder per row, indented by depth; the current folder is always the last (highlighted) row
-                const buildVertical = () => {
-                    breadcrumbEl.innerHTML = '';
-                    breadcrumbEl.classList.remove('expanded');
-                    items.forEach((it, i) => {
-                        const row = document.createElement('div');
-                        row.className = 'breadcrumb-row' + (i === last ? ' current' : '');
-                        if (i === 0) row.appendChild(mkBack());
-                        else {
-                            row.style.paddingLeft = (26 + (i - 1) * 14) + 'px';
-                            const turn = document.createElement('span');
-                            turn.className = 'breadcrumb-sep'; turn.textContent = '↳';
-                            row.appendChild(turn);
-                        }
-                        row.appendChild(mkCrumb(i, false));
-                        if (i === 0) row.appendChild(mkMore());
-                        breadcrumbEl.appendChild(row);
-                    });
-                };
 
                 // horizontal: start = first path item still shown after the root; the root collapses to an icon, hidden parents to "…"
                 const buildHorizontal = (start, expanded) => {
@@ -2539,21 +2524,23 @@
                 };
                 // too wide if the row overflows, or if the current folder's name is being cut off
                 const tooWide = () => {
-                    if (breadcrumbEl.scrollWidth > breadcrumbEl.clientWidth + 1) return true;
                     const cur = breadcrumbEl.querySelector('.breadcrumb-crumb.current');
+                    if (vertical) {   // rotated: the path runs along the vertical axis
+                        if (breadcrumbEl.scrollHeight > breadcrumbEl.clientHeight + 1) return true;
+                        return !!(cur && cur.scrollHeight > cur.clientHeight + 1);
+                    }
+                    if (breadcrumbEl.scrollWidth > breadcrumbEl.clientWidth + 1) return true;
                     return !!(cur && cur.scrollWidth > cur.clientWidth + 1);
                 };
 
-                if (vertical) buildVertical();
-                else {
-                    buildHorizontal(0, false);
-                    if (last > 0 && tooWide()) {
-                        if (breadcrumbExpanded) buildHorizontal(0, true);
-                        else {
-                            let st = 1;
-                            buildHorizontal(st, false);
-                            while (st < last && tooWide()) { st++; buildHorizontal(st, false); }
-                        }
+                subrail.classList.toggle('vcrumbs', vertical && breadcrumbEl.style.display !== 'none');
+                buildHorizontal(0, false);
+                if (last > 0 && tooWide()) {
+                    if (breadcrumbExpanded && !vertical) buildHorizontal(0, true);
+                    else {
+                        let st = 1;
+                        buildHorizontal(st, false);
+                        while (st < last && tooWide()) { st++; buildHorizontal(st, false); }
                     }
                 }
 
@@ -3338,10 +3325,7 @@
                 // 5 - export
                 const exp = [];
                 if (['placemark', 'path', 'polygon', 'measure', 'measure-area', 'folder', 'kml', 'los'].includes(t)) {
-                    exp.push({ label: 'Export as KML…', icon: 'fa-file-code', action: () => exportKMLNode(node) });
-                }
-                if (['placemark', 'path', 'polygon', 'measure', 'measure-area'].includes(t)) {
-                    exp.push({ label: 'Export as GPX…', icon: 'fa-file-export', action: () => exportGPX(node) });
+                    ioExportMenuItems(node).forEach(it => exp.push(it));
                 }
                 groups.push(exp);
 
@@ -3395,7 +3379,7 @@
                 const title = folder ? folder.name : 'Places (root)';
                 const items = [];
                 items.push({ label: folder ? 'New folder here' : 'New folder', icon: 'fa-folder-plus', action: () => promptNewFolder(folder) });
-                items.push({ label: 'Import KML / GeoJSON…', icon: 'fa-file-import', action: () => openImportScreen(parentFolderId) });
+                items.push({ label: 'Import KML / GeoJSON / GPX…', icon: 'fa-file-import', action: () => openImportScreen(parentFolderId) });
                 if (clipboard && clipboard.type === 'placemark') {
                     items.push({ label: `Paste "${clipboard.name}" here`, icon: 'fa-paste', action: () => pastePlacemarkInto(folder) });
                 }
@@ -3412,12 +3396,10 @@
                 items.push({ label: folder ? 'Zoom to contents' : 'Zoom to all', icon: 'fa-crosshairs', action: () => folder ? zoomToNode(folder) : fitToPlacesExtent() });
                 items.push({ sep: true });
                 if (folder) {
-                    items.push({ label: 'Export folder as KML…', icon: 'fa-file-code', action: () => exportKMLNode(folder) });
-                    items.push({ label: 'Export folder as GPX…', icon: 'fa-file-export', action: () => exportGPX(folder) });
+                    ioExportMenuItems(folder).forEach(it => items.push(it));
                     items.push({ label: 'Export site list as CSV…', icon: 'fa-file-csv', action: () => exportSitesCSV(folder) });
                 } else {
-                    items.push({ label: 'Export all as KML…', icon: 'fa-file-code', action: () => exportKMLAll() });
-                    items.push({ label: 'Export all as GPX…', icon: 'fa-file-export', action: () => exportGPXAll() });
+                    ioExportMenuItems(null).forEach(it => items.push(it));
                     items.push({ label: 'Export site list as CSV…', icon: 'fa-file-csv', action: () => exportSitesCSV() });
                 }
                 items.push({ sep: true });
@@ -3776,6 +3758,7 @@
             function renderStaticSection(section) {
                 subrailFooter.style.display = 'none';
                 breadcrumbEl.style.display = 'none';
+                subrail.classList.remove('vcrumbs');
                 placesSearchRow.classList.remove('show');
                 subrailBody.onscroll = null;
                 if (section === 'draw') {
@@ -4002,8 +3985,7 @@
                     };
                     const settingsGroups = [
                         { title: 'Export', items: [
-                            { icon: 'fa-file-code', label: 'Export all as KML', desc: 'Google Earth format, all places', action: () => exportKMLAll() },
-                            { icon: 'fa-route', label: 'Export all as GPX', desc: 'GPS Exchange Format', action: () => exportGPXAll() },
+                            ...IO_FORMATS.map(f => ({ icon: f.icon, label: 'Export all as ' + f.label, desc: f.key === 'gpx' ? 'Geometry, names and descriptions only' : 'Full round-trip: folders, styles and metadata', action: () => exportAs(f.key, null) })),
                             { icon: 'fa-file-csv', label: 'Export site list as CSV', desc: 'Placemarks and links with elevation and link status', action: () => exportSitesCSV() }
                         ]},
                         { title: 'Storage', items: [
@@ -4193,7 +4175,7 @@
                 if (!_resizing) return;
                 const railRect = railEl.getBoundingClientRect();
                 const w = Math.max(220, Math.min(600, e.clientX - railRect.right));
-                subrail.style.width = w + 'px';
+                subrail.style.setProperty('--subrail-w', w + 'px');
                 SETTINGS.subrailWidth = w;
                 document.documentElement.style.setProperty('--subrail-width', (railRect.right + w) + 'px');
             });
@@ -4805,14 +4787,14 @@
                         const dist = haversine(centerLL, p2pLL);
                         losP2PHTML = `
                             <div class="editor-hint" style="margin-top:8px;">
-                                <b>Link target set</b> — bearing ${brg.toFixed(0)}°, distance ${formatDistance(dist)}.
-                                <button class="btn btn-secondary" id="los-clear-p2p" style="margin-top:6px;width:100%;font-size:0.72rem;"><i class="fas fa-times"></i> Clear link target</button>
+                                <b>Far end set</b> — bearing ${brg.toFixed(0)}°, distance ${formatDistance(dist)}.
+                                <button class="btn btn-secondary" id="los-clear-p2p" style="margin-top:6px;width:100%;font-size:0.72rem;"><i class="fas fa-times"></i> Clear far end</button>
                             </div>
                         `;
                     } else {
                         losP2PHTML = `
                             <div class="editor-hint" style="margin-top:8px;">
-                                <i class="fas fa-mouse-pointer"></i> <b>Move the mouse over the map</b> to preview the link, then <b>click to set the link target</b>.
+                                <i class="fas fa-mouse-pointer"></i> <b>Move the mouse over the map</b> to preview the link, then <b>click to set the far end</b>.
                             </div>
                         `;
                     }
@@ -4901,7 +4883,7 @@
                                 drawProfileChart();
                             }
                             await persistTreeNow();
-                            showToast('Link target cleared — move the mouse to preview, click to set', 'fa-times');
+                            showToast('Far end cleared — move the mouse to preview, click to set', 'fa-times');
                         });
                     }
                 }
@@ -5700,9 +5682,12 @@
                 const typeOptions = [
                     { key: 'points', icon: 'fa-map-pin', label: 'Points', desc: 'One marker per row' },
                     { key: 'path', icon: 'fa-route', label: 'Path', desc: 'One vertex per row' },
-                    { key: 'kml', icon: 'fa-file-code', label: 'KML / KMZ', desc: 'Points, lines, polygons' },
-                    { key: 'geojson', icon: 'fa-code', label: 'GeoJSON', desc: 'Standard feature collection' }
+                    ...IO_FORMATS.map(f => ({ key: f.key, icon: f.icon, label: f.label, desc: f.shortDesc }))
                 ];
+                let importDirect = false;   // default: wrap the import in its own folder (safe for unfamiliar files)
+                const tgtId = (targetFolderId != null) ? targetFolderId : currentFolderId;
+                const tgtNode = tgtId ? findNode(tgtId) : null;
+                const tgtLabel = tgtNode ? '“' + escapeHtml(tgtNode.name) + '”' : 'the root';
                 const formatHints = {
                     points: {
                         columns: 'lat, lng, [name], [description]',
@@ -5717,8 +5702,7 @@
                 };
 
                 function render() {
-                    const isKML = currentType === 'kml';
-                    const isGeoJSON = currentType === 'geojson';
+                    const ioFmt = IO_FORMATS.find(f => f.key === currentType) || null;
                     const isPath = currentType === 'path';
                     const hint = formatHints[currentType];
 
@@ -5765,12 +5749,17 @@
                                     <div class="import-format-hint-note">${hint.note}</div>
                                 </div>
                             ` : ''}
-                            ${isKML || isGeoJSON ? `
-                                <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px;">
-                                    <div style="text-align:center;">
-                                        <div style="font-size:3rem;color:var(--accent);margin-bottom:20px;"><i class="fas ${isKML ? 'fa-file-code' : 'fa-code'}"></i></div>
-                                        <div style="font-family:'Inter',system-ui,sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:8px;">Choose a ${isKML ? 'KML or KMZ' : 'GeoJSON'} file</div>
-                                        <div style="font-size:0.78rem;color:var(--text-3);margin-bottom:20px;">${isKML ? 'Points, lines and polygons from the file will be imported.' : 'Feature collections will be imported as folders.'}</div>
+                            ${ioFmt ? `
+                                <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto;">
+                                    <div style="text-align:center;max-width:480px;">
+                                        <div style="font-size:3rem;color:var(--accent);margin-bottom:16px;"><i class="fas ${ioFmt.icon}"></i></div>
+                                        <div style="font-family:'Inter',system-ui,sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:8px;">Choose a ${ioFmt.label} file</div>
+                                        <div style="font-size:0.78rem;color:var(--text-3);margin-bottom:14px;">${ioFmt.pickDesc}</div>
+                                        ${ioFmt.note ? `<div style="font-size:0.74rem;line-height:1.45;text-align:left;color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:8px 10px;margin-bottom:14px;"><i class="fas fa-circle-info" style="color:var(--accent);margin-right:6px;"></i>${ioFmt.note}</div>` : ''}
+                                        <label style="display:flex;gap:8px;align-items:flex-start;text-align:left;font-size:0.76rem;color:var(--text-2);margin-bottom:18px;cursor:pointer;">
+                                            <input type="checkbox" id="import-direct" ${importDirect ? 'checked' : ''} style="margin-top:2px;">
+                                            <span><b>Import directly into ${tgtLabel}</b> — no wrapper folder. Use this to restore a file exported from this app. Leave it off for files from elsewhere, so they go in their own folder instead of mixing into your tree.</span>
+                                        </label>
                                         <button class="btn btn-primary" id="import-file-pick"><i class="fas fa-folder-open"></i> Select file…</button>
                                     </div>
                                 </div>
@@ -5809,10 +5798,13 @@
                             render();
                         });
                     });
-                    if (isKML || isGeoJSON) {
+                    if (ioFmt) {
+                        const directEl = fsContent.querySelector('#import-direct');
+                        directEl.addEventListener('change', () => { importDirect = directEl.checked; });
                         fsContent.querySelector('#import-file-pick').addEventListener('click', () => {
+                            pendingImport = { direct: importDirect, targetFolderId: tgtId };
                             closeImport();
-                            setTimeout(() => (isKML ? kmlInput : geojsonInput).click(), 80);
+                            setTimeout(() => { kmlInput.setAttribute('accept', ioFmt.accept); kmlInput.click(); }, 80);
                         });
                     } else {
                         initSpreadsheetUI(currentType, targetFolderId);
@@ -6025,132 +6017,6 @@
                 });
             }
 
-
-            // ==================== GEOJSON ====================
-            function nodeToGeoJSON(node) {
-                if (node.type === 'placemark' && node.meta.lat != null) {
-                    return { type: 'Feature', properties: { name: node.name, description: node.meta.desc || '', color: node.meta.color, icon: node.meta.icon }, geometry: { type: 'Point', coordinates: [node.meta.lng, node.meta.lat] } };
-                }
-                if ((node.type === 'path' || node.type === 'measure') && node.meta.points) {
-                    return { type: 'Feature', properties: { name: node.name, description: node.meta.desc || '', color: node.meta.color, type: node.type }, geometry: { type: 'LineString', coordinates: node.meta.points.map(p => [p[1], p[0]]) } };
-                }
-                if ((node.type === 'polygon' || node.type === 'measure-area') && node.meta.points) {
-                    const coords = node.meta.points.map(p => [p[1], p[0]]);
-                    coords.push(coords[0]);
-                    return { type: 'Feature', properties: { name: node.name, description: node.meta.desc || '', color: node.meta.color, type: node.type }, geometry: { type: 'Polygon', coordinates: [coords] } };
-                }
-                if (node.type === 'los' && node.meta.lat != null) {
-                    return { type: 'Feature', properties: { name: node.name, description: node.meta.desc || '', color: node.meta.color, type: 'los' }, geometry: { type: 'Point', coordinates: [node.meta.lng, node.meta.lat] } };
-                }
-                if (node.type === 'folder' || node.type === 'kml') {
-                    const features = [];
-                    (node.children || []).forEach(c => {
-                        try { features.push(nodeToGeoJSON(c)); } catch(e) {}
-                    });
-                    return { type: 'Feature', properties: { name: node.name, description: node.meta.desc || '', type: 'folder' }, geometry: null, features };
-                }
-                throw new Error('Cannot convert node to GeoJSON: ' + node.type);
-            }
-
-            async function importGeoJSONText(text, filename) {
-                let gj;
-                try { gj = JSON.parse(text); } catch (err) { showToast('Invalid GeoJSON', 'fa-times', { error: true, detail: err }); return; }
-                if (!gj || !gj.type) { showToast('Not a GeoJSON object', 'fa-times'); return; }
-                const parent = currentFolderId ? findNode(currentFolderId) : null;
-                const folderName = filename.replace(/\.(geojson|json)$/i, '');
-                const geojsonFolder = createNode({ type: 'folder', name: folderName, expanded: true, children: [], meta: { color: '#4d7c0f', desc: 'Imported from ' + filename } });
-                let count = 0;
-
-                function walkFeature(feature, target) {
-                    if (!feature) return;
-                    if (feature.type === 'FeatureCollection' && Array.isArray(feature.features)) {
-                        const subFolder = createNode({ type: 'folder', name: (feature.properties && feature.properties.name) || 'Collection', expanded: true, children: [], meta: { color: '#4d7c0f' } });
-                        feature.features.forEach(f => walkFeature(f, subFolder));
-                        if (subFolder.children.length > 0) (target || geojsonFolder).children.push(subFolder);
-                        return;
-                    }
-                    if (feature.type === 'Feature' && feature.geometry) {
-                        const geom = feature.geometry;
-                        const props = feature.properties || {};
-                        const name = props.name || props.title || 'Feature';
-                        const desc = props.description || props.desc || '';
-                        if (geom.type === 'Point') {
-                            const [lng, lat] = geom.coordinates;
-                            const marker = L.marker([lat, lng], { icon: makeLeafletIcon(DEFAULT_ICON, safeColor(props.color)) });
-                            marker.bindPopup(`<b>${escapeHtml(name)}</b>${desc ? '<br>' + escapeHtml(desc) : ''}`);
-                            drawnItems.addLayer(marker);
-                            const n = createNode({ type: 'placemark', name, layer: marker, meta: { desc, lat, lng, icon: DEFAULT_ICON, color: safeColor(props.color) } });
-                            bindLayerFocus(n, marker);
-                            attachLayerDrag(n, marker);
-                            (target || geojsonFolder).children.push(n);
-                            count++;
-                        } else if (geom.type === 'LineString') {
-                            const latlngs = geom.coordinates.map(c => [c[1], c[0]]);
-                            const line = L.polyline(latlngs, { color: safeColor(props.color), weight: 3 });
-                            line.bindPopup(`<b>${escapeHtml(name)}</b>`);
-                            drawnItems.addLayer(line);
-                            const n = createNode({ type: 'path', name, layer: line, meta: { desc, points: latlngs, color: safeColor(props.color), lineThickness: 3, distance: pathDistance(latlngs.map(p => L.latLng(p[0], p[1]))) } });
-                            bindLayerFocus(n, line);
-                            attachLayerDrag(n, line);
-                            (target || geojsonFolder).children.push(n);
-                            count++;
-                        } else if (geom.type === 'Polygon' && geom.coordinates && geom.coordinates[0]) {
-                            const ring = geom.coordinates[0];
-                            const latlngs = ring.map(c => [c[1], c[0]]);
-                            const poly = L.polygon(latlngs, { color: safeColor(props.color), weight: 2, fillOpacity: 0.2 });
-                            poly.bindPopup(`<b>${escapeHtml(name)}</b>`);
-                            drawnItems.addLayer(poly);
-                            const n = createNode({ type: 'polygon', name, layer: poly, meta: { desc, points: latlngs, color: safeColor(props.color), lineThickness: 2, area: polygonArea(latlngs.map(p => L.latLng(p[0], p[1]))) } });
-                            bindLayerFocus(n, poly);
-                            attachLayerDrag(n, poly);
-                            (target || geojsonFolder).children.push(n);
-                            count++;
-                        } else if (geom.type === 'MultiPolygon' && geom.coordinates) {
-                            geom.coordinates.forEach((polyCoords, idx) => {
-                                if (!polyCoords[0]) return;
-                                const latlngs = polyCoords[0].map(c => [c[1], c[0]]);
-                                const poly = L.polygon(latlngs, { color: safeColor(props.color), weight: 2, fillOpacity: 0.2 });
-                                poly.bindPopup(`<b>${escapeHtml(name)} #${idx + 1}</b>`);
-                                drawnItems.addLayer(poly);
-                                const n = createNode({ type: 'polygon', name: name + ' #' + (idx + 1), layer: poly, meta: { desc, points: latlngs, color: safeColor(props.color), lineThickness: 2 } });
-                                bindLayerFocus(n, poly);
-                                attachLayerDrag(n, poly);
-                                (target || geojsonFolder).children.push(n);
-                                count++;
-                            });
-                        }
-                    }
-                }
-
-                walkFeature(gj);
-                if (count > 0) {
-                    if (parent) addNodeToTree(geojsonFolder, parent); else addNodeToTree(geojsonFolder);
-                    const bounds = L.latLngBounds([]);
-                    geojsonFolder.children.forEach(c => {
-                        if (c.layer && c.layer.getBounds) { try { bounds.extend(c.layer.getBounds()); } catch(e){} }
-                        else if (c.layer && c.layer.getLatLng) bounds.extend(c.layer.getLatLng());
-                    });
-                    if (bounds.isValid()) setTimeout(() => map.fitBounds(bounds, { ...availableMapPadding(), maxZoom: 16 }), 100);
-                    await persistTreeNow();
-                    showToast(`Imported ${count} feature(s)`, 'fa-code');
-                } else {
-                    showToast('No importable geometries found', 'fa-info-circle');
-                }
-            }
-
-            geojsonInput.addEventListener('change', async (e) => {
-                const files = e.target.files;
-                if (!files || !files.length) return;
-                for (const file of files) {
-                    try {
-                        const text = await file.text();
-                        await importGeoJSONText(text, file.name);
-                    } catch (err) {
-                        showToast(`GeoJSON error: ${file.name}`, 'fa-times', { error: true, detail: err });
-                    }
-                }
-                geojsonInput.value = '';
-            });
 
             // ==================== LOS ENGINE ====================
             function kFactorOf(node) {
@@ -6445,182 +6311,410 @@
                 return total;
             }
 
-            // ==================== KML IMPORT / EXPORT ====================
-            kmlInput.addEventListener('change', async (e) => {
-                const files = e.target.files;
-                if (!files || !files.length) return;
-                for (const file of files) {
-                    try {
-                        const text = await file.text();
-                        await importKML(text, file.name);
-                    } catch (err) {
-                        showToast(`KML error: ${file.name}`, 'fa-times', { error: true, detail: err });
-                    }
-                }
-                await persistTreeNow();
-                kmlInput.value = '';
-            });
-            async function importKML(text, filename) {
-                const parser = new DOMParser();
-                let doc;
-                try { doc = parser.parseFromString(text, 'text/xml'); }
-                catch (err) { showToast('Invalid KML', 'fa-times', { error: true, detail: err }); return; }
-                if (doc.querySelector('parsererror')) { showToast('KML parse error', 'fa-times', { error: true, detail: 'Document has XML errors' }); return; }
-                if (!doc.querySelector('kml')) { showToast('Not a KML file', 'fa-times'); return; }
-                const placemarks = doc.querySelectorAll('Placemark');
-                if (!placemarks.length) { showToast('No placemarks', 'fa-info-circle'); return; }
-                const parent = currentFolderId ? findNode(currentFolderId) : null;
-                const folderName = filename.replace(/\.(kml|kmz)$/i, '');
-                const kmlFolder = createNode({ type: 'folder', name: folderName, expanded: true, children: [], meta: { color: '#4d7c0f', desc: 'Imported from ' + filename } });
-                let count = 0;
-                placemarks.forEach((pm, idx) => {
-                    const nameEl = pm.querySelector('name');
-                    const descEl = pm.querySelector('description');
-                    const name = nameEl ? nameEl.textContent.trim() : `Placemark ${idx + 1}`;
-                    const desc = descEl ? descEl.textContent.trim() : '';
-                    const point = pm.querySelector('Point coordinates');
-                    if (point) {
-                        const coords = parseKMLCoords(point.textContent);
-                        if (coords.length) {
-                            const [lng, lat] = coords[0];
-                            const marker = L.marker([lat, lng], { icon: makeLeafletIcon(DEFAULT_ICON, '#4d7c0f') });
-                            marker.bindPopup(`<b>${escapeHtml(name)}</b>${desc ? '<br>' + escapeHtml(desc) : ''}`);
-                            drawnItems.addLayer(marker);
-                            const newNode = createNode({ type: 'placemark', name, layer: marker, meta: { desc, lat, lng, kml: true, icon: DEFAULT_ICON, color: '#4d7c0f' } });
-                            bindLayerFocus(newNode, marker);
-                            attachLayerDrag(newNode, marker);
-                            kmlFolder.children.push(newNode);
-                            count++;
-                        }
-                    }
-                    const lineEl = pm.querySelector('LineString coordinates');
-                    if (lineEl) {
-                        const coords = parseKMLCoords(lineEl.textContent);
-                        if (coords.length >= 2) {
-                            const latlngs = coords.map(c => [c[1], c[0]]);
-                            const line = L.polyline(latlngs, { color: '#4d7c0f', weight: 3 });
-                            line.bindPopup(`<b>${escapeHtml(name)}</b>`);
-                            drawnItems.addLayer(line);
-                            const newNode = createNode({ type: 'path', name, layer: line, meta: { desc, points: latlngs, kml: true, color: '#4d7c0f', lineThickness: 3 } });
-                            bindLayerFocus(newNode, line);
-                            attachLayerDrag(newNode, line);
-                            kmlFolder.children.push(newNode);
-                            count++;
-                        }
-                    }
-                    const polyEl = pm.querySelector('Polygon outerBoundaryIs LinearRing coordinates');
-                    if (polyEl) {
-                        const coords = parseKMLCoords(polyEl.textContent);
-                        if (coords.length >= 3) {
-                            const latlngs = coords.map(c => [c[1], c[0]]);
-                            const poly = L.polygon(latlngs, { color: '#4d7c0f', weight: 2, fillOpacity: 0.15 });
-                            poly.bindPopup(`<b>${escapeHtml(name)}</b>`);
-                            drawnItems.addLayer(poly);
-                            const newNode = createNode({ type: 'polygon', name, layer: poly, meta: { desc, points: latlngs, kml: true, color: '#4d7c0f', lineThickness: 2 } });
-                            bindLayerFocus(newNode, poly);
-                            attachLayerDrag(newNode, poly);
-                            kmlFolder.children.push(newNode);
-                            count++;
-                        }
-                    }
-                });
-                if (count > 0) {
-                    if (parent) addNodeToTree(kmlFolder, parent); else addNodeToTree(kmlFolder);
-                    const bounds = L.latLngBounds([]);
-                    kmlFolder.children.forEach(c => {
-                        if (c.layer) {
-                            if (c.layer.getBounds) { try { bounds.extend(c.layer.getBounds()); } catch(e){} }
-                            else if (c.layer.getLatLng) bounds.extend(c.layer.getLatLng());
-                        }
+            // ==================== IMPORT / EXPORT (one shared format list) ====================
+            // Every format is described once in IO_FORMATS; the export menus, the import dialog and drag-and-drop all read it.
+            //
+            // KML + GeoJSON  : full round-trip. Besides the standard geometry/style/description (so other apps can read the files),
+            //                  every node carries a "telco-earth" record (type, id, name, visibility, all metadata). On import that record
+            //                  rebuilds the node exactly; the folder tree comes from the file's own Folder / nested-feature structure.
+            // GPX            : geometry, name and description only (waypoints + tracks). GPX has no folders, styles or custom metadata,
+            //                  so a GPX re-import restores shapes but NOT the folder tree, colours, icons or link/analysis settings.
+            const isTerrainNode = (n) => n.name === 'Terrain (HGT)' || n.type === 'terrain';
+            const IO_FORMATS = [
+                { key: 'kml', label: 'KML', exts: ['kml'], accept: '.kml,application/vnd.google-earth.kml+xml', mime: 'application/vnd.google-earth.kml+xml', icon: 'fa-file-code',
+                  shortDesc: 'Full round-trip', pickDesc: 'Folders, names, descriptions, styles, icons and custom metadata are all restored when the file was exported from this app.', note: '',
+                  build: (nodes, name, scope) => buildKML(nodes, name, scope), parse: (text) => parseKMLText(text) },
+                { key: 'geojson', label: 'GeoJSON', exts: ['geojson', 'json'], accept: '.geojson,.json,application/geo+json,application/json', mime: 'application/geo+json', icon: 'fa-code',
+                  shortDesc: 'Full round-trip', pickDesc: 'Folders, names, descriptions, styles, icons and custom metadata are all restored when the file was exported from this app.', note: '',
+                  build: (nodes, name, scope) => buildGeoJSON(nodes, name, scope), parse: (text) => parseGeoJSONText(text) },
+                { key: 'gpx', label: 'GPX', exts: ['gpx'], accept: '.gpx,application/gpx+xml', mime: 'application/gpx+xml', icon: 'fa-route',
+                  shortDesc: 'Geometry only', pickDesc: 'Waypoints become placemarks; tracks and routes become paths.',
+                  note: 'GPX can only hold geometry, name and description. Folders, colours, icons and custom metadata cannot be stored in a GPX file, so they are not restored.',
+                  build: (nodes, name) => buildGPX(nodes, name), parse: (text) => parseGPXText(text) }
+            ];
+            const IO_ACCEPT = IO_FORMATS.map(f => f.accept).join(',');
+            function ioFormatByExt(ext) { ext = (ext || '').toLowerCase(); return IO_FORMATS.find(f => f.exts.includes(ext)); }
+            function ioSafeName(s) { return String(s || '').replace(/[^a-z0-9\-_]/gi, '_') || 'export'; }
+
+            // ---- shared helpers ----
+            function teOf(node) {
+                return { v: 1, id: node.id, type: node.type, name: node.name, visible: node.visible !== false, expanded: node.expanded !== false,
+                         meta: JSON.parse(JSON.stringify(node.meta || {})) };
+            }
+            function nodeFromTe(te, children) {
+                return fromPlain({ id: te.id, name: te.name, type: te.type, visible: te.visible, expanded: te.expanded, meta: te.meta || {}, children: children || [] });
+            }
+            function exportableNodes(nodes) { return (nodes || []).filter(n => !isTerrainNode(n)); }
+            function hexToKmlColor(hex, alpha) {
+                const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+                if (!m) return null;
+                const a = Math.round((alpha == null ? 1 : alpha) * 255).toString(16).padStart(2, '0');
+                return (a + m[1].slice(4, 6) + m[1].slice(2, 4) + m[1].slice(0, 2)).toLowerCase();
+            }
+            function kmlColorToHex(k) {
+                const m = /^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec((k || '').trim());
+                return m ? '#' + m[4] + m[3] + m[2] : null;
+            }
+            function dedupeIds(nodes) {
+                const used = new Set();
+                (function collect(list) { list.forEach(n => { used.add(n.id); if (n.children) collect(n.children); }); })(treeNodes.concat(archivedNodes));
+                (function fix(list) {
+                    list.forEach(n => {
+                        if (!n.id || used.has(n.id)) n.id = genId();
+                        used.add(n.id);
+                        if (n.children) fix(n.children);
                     });
-                    if (bounds.isValid()) setTimeout(() => map.flyToBounds(bounds, { ...availableMapPadding(), duration: 1.2, maxZoom: 16 }), 100);
-                    showToast(`Imported ${count} items`, 'fa-file-import');
-                } else showToast('No importable geometries', 'fa-info-circle');
+                })(nodes);
+            }
+
+            // ---- export (all formats) ----
+            // exportAs('kml', null) exports everything; exportAs('geojson', folderNode) exports that node (with its contents).
+            function exportAs(fmtKey, node) {
+                const fmt = IO_FORMATS.find(f => f.key === fmtKey);
+                if (!fmt) return;
+                const nodes = node ? [node] : exportableNodes(treeNodes);
+                const docName = node ? node.name : 'Telco Earth Export';
+                const content = fmt.build(nodes, docName, node ? 'node' : 'all');
+                const base = node ? ioSafeName(node.name) : 'telco-earth-export';
+                downloadFile(content, base + '.' + fmt.exts[0], fmt.mime);
+                showToast(fmt.label + ' exported' + (fmt.note ? ' — geometry, names and descriptions only' : ''), 'fa-file-export');
+            }
+            function exportKMLAll() { exportAs('kml', null); }
+            function exportKMLNode(node) { exportAs('kml', node); }
+            function exportGeoJSONAll() { exportAs('geojson', null); }
+            function exportGPX(node) { exportAs('gpx', node); }
+            function exportGPXAll() { exportAs('gpx', null); }
+            function ioExportMenuItems(node) {
+                return IO_FORMATS.map(f => ({ label: (node ? (node.type === 'folder' || node.type === 'kml' ? 'Export folder as ' : 'Export as ') : 'Export all as ') + f.label + '…',
+                                              icon: f.icon, action: () => exportAs(f.key, node) }));
+            }
+
+            // ---- GeoJSON ----
+            function nodeToGeoJSON(node, withTe) {
+                const props = { name: node.name, description: (node.meta && node.meta.desc) || '' };
+                if (node.meta && node.meta.color) { props.color = node.meta.color; props.stroke = node.meta.color; props['marker-color'] = node.meta.color; }
+                if (node.meta && node.meta.lineThickness) props['stroke-width'] = node.meta.lineThickness;
+                if (node.meta && node.meta.icon && node.type === 'placemark') props.icon = node.meta.icon;
+                props.type = node.type;
+                if (withTe) props.te = teOf(node);
+                const m = node.meta || {};
+                if ((node.type === 'placemark' || node.type === 'los') && m.lat != null) {
+                    return { type: 'Feature', properties: props, geometry: { type: 'Point', coordinates: [m.lng, m.lat] } };
+                }
+                if ((node.type === 'path' || node.type === 'measure') && m.points) {
+                    return { type: 'Feature', properties: props, geometry: { type: 'LineString', coordinates: m.points.map(p => [p[1], p[0]]) } };
+                }
+                if ((node.type === 'polygon' || node.type === 'measure-area') && m.points && m.points.length) {
+                    const coords = m.points.map(p => [p[1], p[0]]);
+                    coords.push(coords[0]);
+                    return { type: 'Feature', properties: props, geometry: { type: 'Polygon', coordinates: [coords] } };
+                }
+                if (node.type === 'folder' || node.type === 'kml') {
+                    const features = [];
+                    exportableNodes(node.children).forEach(c => { try { features.push(nodeToGeoJSON(c, withTe)); } catch (e) {} });
+                    props.type = 'folder';
+                    if (withTe) props.te = teOf(node);
+                    return { type: 'Feature', properties: props, geometry: null, features };
+                }
+                if (withTe) return { type: 'Feature', properties: props, geometry: null };
+                throw new Error('Cannot convert node to GeoJSON: ' + node.type);
+            }
+            function buildGeoJSON(nodes, name, scope) {
+                const features = [];
+                nodes.forEach(n => { try { features.push(nodeToGeoJSON(n, true)); } catch (e) {} });
+                return JSON.stringify({ type: 'FeatureCollection', name, telcoEarth: { version: 1, scope: scope || 'all' }, features }, null, 2);
+            }
+            function parseGeoJSONText(text) {
+                let gj;
+                try { gj = JSON.parse(text); } catch (err) { throw new Error('Invalid GeoJSON (' + err.message + ')'); }
+                if (!gj || !gj.type) throw new Error('Not a GeoJSON object');
+                const nodes = [];
+                if (gj.type === 'FeatureCollection' && Array.isArray(gj.features)) gj.features.forEach(f => nodes.push(...geoJsonFeatureToNodes(f)));
+                else nodes.push(...geoJsonFeatureToNodes(gj));
+                return nodes;
+            }
+            function geoJsonFeatureToNodes(f) {
+                if (!f) return [];
+                if (f.type === 'FeatureCollection' && Array.isArray(f.features)) {
+                    const kids = [];
+                    f.features.forEach(c => kids.push(...geoJsonFeatureToNodes(c)));
+                    if (!kids.length) return [];
+                    return [createNode({ type: 'folder', name: f.name || (f.properties && f.properties.name) || 'Collection', expanded: true, children: kids, meta: { color: '#4d7c0f' } })];
+                }
+                if (f.type !== 'Feature') {
+                    if (f.type && f.coordinates) return geoJsonGeometryToNodes(f, 'Feature', '', {});   // bare geometry
+                    return [];
+                }
+                const props = f.properties || {};
+                const te = props.te && typeof props.te === 'object' ? props.te : null;
+                if (Array.isArray(f.features)) {   // folder
+                    const kids = [];
+                    f.features.forEach(c => kids.push(...geoJsonFeatureToNodes(c)));
+                    if (te) return [nodeFromTe(te, kids)];
+                    return [createNode({ type: 'folder', name: props.name || 'Folder', expanded: true, children: kids, meta: { color: '#4d7c0f', desc: props.description || '' } })];
+                }
+                if (te) return [nodeFromTe(te, [])];
+                if (!f.geometry) return [];
+                return geoJsonGeometryToNodes(f.geometry, props.name || props.title || 'Feature', props.description || props.desc || '', props);
+            }
+            function geoJsonGeometryToNodes(geom, name, desc, props) {
+                const color = safeColor(props.color || props.stroke || props['marker-color'], '#4d7c0f');
+                const width = parseFloat(props['stroke-width']);
+                const out = [];
+                const ll = (c) => [c[1], c[0]];
+                const addPoint = (c, nm) => out.push(createNode({ type: 'placemark', name: nm, meta: { desc, lat: c[1], lng: c[0], icon: DEFAULT_ICON, color } }));
+                const addLine = (cs, nm) => { if (!cs || cs.length < 2) return; const pts = cs.map(ll); out.push(createNode({ type: 'path', name: nm, meta: { desc, points: pts, color, lineThickness: width > 0 ? width : 3, distance: pathDistance(pts.map(p => L.latLng(p[0], p[1]))) } })); };
+                const addPoly = (ring, nm) => {
+                    if (!ring || ring.length < 3) return;
+                    let pts = ring.map(ll);
+                    if (pts.length > 3 && pts[0][0] === pts[pts.length - 1][0] && pts[0][1] === pts[pts.length - 1][1]) pts = pts.slice(0, -1);
+                    out.push(createNode({ type: 'polygon', name: nm, meta: { desc, points: pts, color, lineThickness: width > 0 ? width : 2, area: polygonArea(pts.map(p => L.latLng(p[0], p[1]))) } }));
+                };
+                const num = (arr, i) => arr.length > 1 ? `${name} #${i + 1}` : name;
+                switch (geom.type) {
+                    case 'Point': addPoint(geom.coordinates, name); break;
+                    case 'MultiPoint': geom.coordinates.forEach((c, i) => addPoint(c, num(geom.coordinates, i))); break;
+                    case 'LineString': addLine(geom.coordinates, name); break;
+                    case 'MultiLineString': geom.coordinates.forEach((c, i) => addLine(c, num(geom.coordinates, i))); break;
+                    case 'Polygon': addPoly(geom.coordinates && geom.coordinates[0], name); break;
+                    case 'MultiPolygon': geom.coordinates.forEach((p, i) => addPoly(p && p[0], num(geom.coordinates, i))); break;
+                    case 'GeometryCollection': (geom.geometries || []).forEach(g => out.push(...geoJsonGeometryToNodes(g, name, desc, props))); break;
+                }
+                return out;
+            }
+
+            // ---- KML ----
+            function kmlStyleXml(node) {
+                const m = node.meta || {};
+                const c = hexToKmlColor(m.color);
+                if (!c) return '';
+                if (node.type === 'placemark' || node.type === 'los') return `<Style><IconStyle><color>${c}</color></IconStyle></Style>`;
+                if (node.type === 'path' || node.type === 'measure') return `<Style><LineStyle><color>${c}</color><width>${m.lineThickness || 3}</width></LineStyle></Style>`;
+                if (node.type === 'polygon' || node.type === 'measure-area') return `<Style><LineStyle><color>${c}</color><width>${m.lineThickness || 2}</width></LineStyle><PolyStyle><color>${hexToKmlColor(m.color, 0.2)}</color></PolyStyle></Style>`;
+                return '';
+            }
+            function writeKMLNode(node, lines, indent) {
+                if (isTerrainNode(node)) return;
+                const pad = '  '.repeat(indent);
+                const ext = `<ExtendedData><Data name="telco-earth"><value>${escapeXml(JSON.stringify(teOf(node)))}</value></Data></ExtendedData>`;
+                const head = `<name>${escapeXml(node.name)}</name><visibility>${node.visible === false ? 0 : 1}</visibility>` +
+                             (node.meta && node.meta.desc ? `<description>${escapeXml(node.meta.desc)}</description>` : '');
+                const m = node.meta || {};
+                if (node.type === 'folder' || node.type === 'kml') {
+                    lines.push(`${pad}<Folder>${head}<open>${node.expanded === false ? 0 : 1}</open>${ext}`);
+                    (node.children || []).forEach(c => writeKMLNode(c, lines, indent + 1));
+                    lines.push(`${pad}</Folder>`);
+                    return;
+                }
+                let geom = '';
+                if ((node.type === 'placemark' || node.type === 'los') && m.lat != null) geom = `<Point><coordinates>${m.lng},${m.lat},0</coordinates></Point>`;
+                else if ((node.type === 'path' || node.type === 'measure') && m.points) geom = `<LineString><tessellate>1</tessellate><coordinates>${m.points.map(p => `${p[1]},${p[0]},0`).join(' ')}</coordinates></LineString>`;
+                else if ((node.type === 'polygon' || node.type === 'measure-area') && m.points && m.points.length) {
+                    const pts = m.points.concat([m.points[0]]);
+                    geom = `<Polygon><outerBoundaryIs><LinearRing><coordinates>${pts.map(p => `${p[1]},${p[0]},0`).join(' ')}</coordinates></LinearRing></outerBoundaryIs></Polygon>`;
+                }
+                lines.push(`${pad}<Placemark>${head}${kmlStyleXml(node)}${ext}${geom}</Placemark>`);
+            }
+            function buildKML(nodes, docName, scope) {
+                const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<kml xmlns="http://www.opengis.net/kml/2.2">', '<Document>',
+                    `<name>${escapeXml(docName)}</name>`,
+                    `<ExtendedData><Data name="telco-earth-doc"><value>${escapeXml(JSON.stringify({ v: 1, scope: scope || 'all' }))}</value></Data></ExtendedData>`];
+                nodes.forEach(n => writeKMLNode(n, lines, 1));
+                lines.push('</Document>', '</kml>');
+                return lines.join('\n');
             }
             function parseKMLCoords(text) {
                 if (!text) return [];
                 return text.trim().split(/\s+/).map(p => p.split(',').map(parseFloat)).filter(b => b.length >= 2 && !isNaN(b[0]) && !isNaN(b[1]));
             }
-            function exportKMLAll() {
-                const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<kml xmlns="http://www.opengis.net/kml/2.2">', '<Document>'];
-                lines.push(`<name>Telco Earth Export</name>`);
-                treeNodes.forEach(n => writeKMLNode(n, lines, 1));
-                lines.push('</Document>', '</kml>');
-                downloadFile(lines.join('\n'), 'telco-earth-export.kml', 'application/vnd.google-earth.kml+xml');
-                showToast('KML exported', 'fa-file-export');
+            function parseKMLText(text) {
+                const doc = new DOMParser().parseFromString(text, 'text/xml');
+                if (doc.querySelector('parsererror')) throw new Error('The file has XML errors');
+                const root = doc.documentElement;
+                if (!root || root.localName !== 'kml') throw new Error('Not a KML file');
+                const kids = (el) => Array.from(el.children);
+                const child = (el, n) => kids(el).find(c => c.localName === n);
+                const txt = (el, n) => { const c = child(el, n); return c ? c.textContent.trim() : ''; };
+                // shared styles (for KML from other apps)
+                const styles = {};
+                Array.from(doc.getElementsByTagName('Style')).forEach(st => { const id = st.getAttribute('id'); if (id) styles['#' + id] = st; });
+                const styleOf = (pm) => {
+                    const inline = child(pm, 'Style');
+                    if (inline) return inline;
+                    const ref = txt(pm, 'styleUrl');
+                    return ref ? (styles[ref] || null) : null;
+                };
+                const teOfEl = (el) => {
+                    const ed = child(el, 'ExtendedData');
+                    if (!ed) return null;
+                    const d = kids(ed).find(c => c.localName === 'Data' && c.getAttribute('name') === 'telco-earth');
+                    if (!d) return null;
+                    try { const t = JSON.parse(txt(d, 'value')); return t && t.type ? t : null; } catch (e) { return null; }
+                };
+                const placemarkNodes = (pm) => {
+                    const te = teOfEl(pm);
+                    if (te) return [nodeFromTe(te, [])];
+                    const name = txt(pm, 'name') || 'Placemark';
+                    const desc = txt(pm, 'description');
+                    const st = styleOf(pm);
+                    const sub = (n) => st ? child(st, n) : null;
+                    const lineColor = sub('LineStyle') ? kmlColorToHex(txt(sub('LineStyle'), 'color')) : null;
+                    const iconColor = sub('IconStyle') ? kmlColorToHex(txt(sub('IconStyle'), 'color')) : null;
+                    const lineW = sub('LineStyle') ? parseFloat(txt(sub('LineStyle'), 'width')) : NaN;
+                    const hidden = txt(pm, 'visibility') === '0';
+                    const out = [];
+                    const geoms = [];
+                    (function collect(el) { kids(el).forEach(c => { if (['Point', 'LineString', 'Polygon'].includes(c.localName)) geoms.push(c); else if (c.localName === 'MultiGeometry') collect(c); }); })(pm);
+                    geoms.forEach((g, i) => {
+                        const nm = geoms.length > 1 ? `${name} #${i + 1}` : name;
+                        const coordsOf = (el) => { const c = el.getElementsByTagName('coordinates')[0]; return c ? parseKMLCoords(c.textContent) : []; };
+                        if (g.localName === 'Point') {
+                            const c = coordsOf(g);
+                            if (c.length) out.push(createNode({ type: 'placemark', name: nm, visible: !hidden, meta: { desc, lat: c[0][1], lng: c[0][0], icon: DEFAULT_ICON, color: iconColor || '#4d7c0f' } }));
+                        } else if (g.localName === 'LineString') {
+                            const c = coordsOf(g);
+                            if (c.length >= 2) { const pts = c.map(p => [p[1], p[0]]); out.push(createNode({ type: 'path', name: nm, visible: !hidden, meta: { desc, points: pts, color: lineColor || '#4d7c0f', lineThickness: lineW > 0 ? lineW : 3, distance: pathDistance(pts.map(p => L.latLng(p[0], p[1]))) } })); }
+                        } else {
+                            const ob = g.getElementsByTagName('outerBoundaryIs')[0];
+                            const c = ob ? coordsOf(ob) : coordsOf(g);
+                            if (c.length >= 3) {
+                                let pts = c.map(p => [p[1], p[0]]);
+                                if (pts.length > 3 && pts[0][0] === pts[pts.length - 1][0] && pts[0][1] === pts[pts.length - 1][1]) pts = pts.slice(0, -1);
+                                out.push(createNode({ type: 'polygon', name: nm, visible: !hidden, meta: { desc, points: pts, color: lineColor || '#4d7c0f', lineThickness: lineW > 0 ? lineW : 2, area: polygonArea(pts.map(p => L.latLng(p[0], p[1]))) } }));
+                            }
+                        }
+                    });
+                    return out;
+                };
+                const walk = (container) => {
+                    const out = [];
+                    kids(container).forEach(c => {
+                        if (c.localName === 'Folder' || c.localName === 'Document') {
+                            const te = teOfEl(c);
+                            const sub = walk(c);
+                            if (te) out.push(nodeFromTe(te, sub));
+                            else if (sub.length) out.push(createNode({ type: 'folder', name: txt(c, 'name') || 'Folder', expanded: true, visible: txt(c, 'visibility') !== '0', children: sub, meta: { color: '#4d7c0f', desc: txt(c, 'description') } }));
+                        } else if (c.localName === 'Placemark') out.push(...placemarkNodes(c));
+                    });
+                    return out;
+                };
+                // a file that is a single <Document> is the file's own container, so its contents are what we import
+                const tops = kids(root).filter(c => ['Document', 'Folder', 'Placemark'].includes(c.localName));
+                const container = (tops.length === 1 && tops[0].localName === 'Document') ? tops[0] : root;
+                return walk(container);
             }
-            function exportKMLNode(node) {
-                const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<kml xmlns="http://www.opengis.net/kml/2.2">', '<Document>'];
-                lines.push(`<name>${escapeXml(node.name)}</name>`);
-                writeKMLNode(node, lines, 1);
-                lines.push('</Document>', '</kml>');
-                const safe = node.name.replace(/[^a-z0-9\-_]/gi, '_') || 'export';
-                downloadFile(lines.join('\n'), `${safe}.kml`, 'application/vnd.google-earth.kml+xml');
-                showToast('KML exported', 'fa-file-export');
-            }
-            function writeKMLNode(node, lines, indent) {
-                const pad = '  '.repeat(indent);
-                if (node.type === 'folder' || node.type === 'kml') {
-                    lines.push(`${pad}<Folder><name>${escapeXml(node.name)}</name>`);
-                    if (node.meta.desc) lines.push(`${pad}  <description>${escapeXml(node.meta.desc)}</description>`);
-                    if (node.children) node.children.forEach(c => writeKMLNode(c, lines, indent + 1));
-                    lines.push(`${pad}</Folder>`);
-                } else if (node.type === 'placemark' && node.meta.lat != null) {
-                    lines.push(`${pad}<Placemark><name>${escapeXml(node.name)}</name>`);
-                    if (node.meta.desc) lines.push(`${pad}  <description>${escapeXml(node.meta.desc)}</description>`);
-                    lines.push(`${pad}  <Point><coordinates>${node.meta.lng},${node.meta.lat},0</coordinates></Point>`);
-                    lines.push(`${pad}</Placemark>`);
-                } else if ((node.type === 'path' || node.type === 'measure') && node.meta.points) {
-                    lines.push(`${pad}<Placemark><name>${escapeXml(node.name)}</name>`);
-                    lines.push(`${pad}  <LineString><coordinates>`);
-                    node.meta.points.forEach(p => lines.push(`${pad}    ${p[1]},${p[0]},0`));
-                    lines.push(`${pad}  </coordinates></LineString></Placemark>`);
-                } else if ((node.type === 'polygon' || node.type === 'measure-area') && node.meta.points) {
-                    lines.push(`${pad}<Placemark><name>${escapeXml(node.name)}</name>`);
-                    lines.push(`${pad}  <Polygon><outerBoundaryIs><LinearRing><coordinates>`);
-                    node.meta.points.forEach(p => lines.push(`${pad}    ${p[1]},${p[0]},0`));
-                    lines.push(`${pad}  </coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`);
-                } else if (node.type === 'los' && node.meta.lat != null) {
-                    lines.push(`${pad}<Placemark><name>${escapeXml(node.name)}</name>`);
-                    if (node.meta.desc) lines.push(`${pad}  <description>${escapeXml(node.meta.desc)}</description>`);
-                    lines.push(`${pad}  <Point><coordinates>${node.meta.lng},${node.meta.lat},0</coordinates></Point>`);
-                    lines.push(`${pad}</Placemark>`);
-                }
-            }
-            function exportGPX(node) {
-                const now = new Date().toISOString();
+
+            // ---- GPX (geometry, name and description only) ----
+            function buildGPX(nodes, name) {
                 const lines = ['<?xml version="1.0" encoding="UTF-8"?>',
                     '<gpx version="1.1" creator="Telco Earth" xmlns="http://www.topografix.com/GPX/1/1">',
-                    `  <metadata><name>${escapeXml(node.name)}</name><time>${now}</time></metadata>`];
-                function addWaypoint(n) {
-                    lines.push(`  <wpt lat="${n.meta.lat}" lon="${n.meta.lng}">`);
-                    lines.push(`    <name>${escapeXml(n.name)}</name>`);
-                    if (n.meta.desc) lines.push(`    <desc>${escapeXml(n.meta.desc)}</desc>`);
-                    lines.push(`  </wpt>`);
-                }
-                function addTrack(n) {
+                    `  <metadata><name>${escapeXml(name)}</name><desc>Geometry, names and descriptions only. Folders, styles and metadata are not stored in GPX.</desc><time>${new Date().toISOString()}</time></metadata>`];
+                const descLine = (n, ind) => { if (n.meta && n.meta.desc) lines.push(`${ind}<desc>${escapeXml(n.meta.desc)}</desc>`); };
+                const track = (n, pts) => {
                     lines.push(`  <trk><name>${escapeXml(n.name)}</name>`);
-                    if (n.meta.desc) lines.push(`    <desc>${escapeXml(n.meta.desc)}</desc>`);
-                    lines.push(`    <trkseg>`);
-                    n.meta.points.forEach(p => lines.push(`      <trkpt lat="${p[0]}" lon="${p[1]}"></trkpt>`));
-                    lines.push(`    </trkseg></trk>`);
-                }
-                function walk(n) {
-                    if (n.type === 'placemark' && n.meta.lat != null) addWaypoint(n);
-                    else if ((n.type === 'path' || n.type === 'measure') && n.meta.points) addTrack(n);
-                    else if ((n.type === 'polygon' || n.type === 'measure-area') && n.meta.points) {
-                        const closed = { ...n, meta: { ...n.meta, points: n.meta.points.concat([n.meta.points[0]]) } };
-                        addTrack(closed);
-                    }
-                    if (n.children) n.children.forEach(walk);
-                }
-                walk(node);
+                    descLine(n, '    ');
+                    lines.push('    <trkseg>');
+                    pts.forEach(p => lines.push(`      <trkpt lat="${p[0]}" lon="${p[1]}"></trkpt>`));
+                    lines.push('    </trkseg></trk>');
+                };
+                (function walk(list) {
+                    list.forEach(n => {
+                        if (isTerrainNode(n)) return;
+                        const m = n.meta || {};
+                        if ((n.type === 'placemark' || n.type === 'los') && m.lat != null) {
+                            lines.push(`  <wpt lat="${m.lat}" lon="${m.lng}">`, `    <name>${escapeXml(n.name)}</name>`);
+                            descLine(n, '    ');
+                            lines.push('  </wpt>');
+                        } else if ((n.type === 'path' || n.type === 'measure') && m.points) track(n, m.points);
+                        else if ((n.type === 'polygon' || n.type === 'measure-area') && m.points && m.points.length) track(n, m.points.concat([m.points[0]]));
+                        if (n.children) walk(n.children);
+                    });
+                })(nodes);
                 lines.push('</gpx>');
-                const safe = node.name.replace(/[^a-z0-9\-_]/gi, '_') || 'export';
-                downloadFile(lines.join('\n'), `${safe}.gpx`, 'application/gpx+xml');
-                showToast('GPX exported', 'fa-file-export');
+                return lines.join('\n');
             }
-            function exportGPXAll() { exportGPX({ name: 'Telco Earth export', type: 'folder', children: treeNodes, meta: {} }); }
+            function parseGPXText(text) {
+                const doc = new DOMParser().parseFromString(text, 'text/xml');
+                if (doc.querySelector('parsererror')) throw new Error('The file has XML errors');
+                const root = doc.documentElement;
+                if (!root || root.localName !== 'gpx') throw new Error('Not a GPX file');
+                const kids = (el) => Array.from(el.children);
+                const txt = (el, n) => { const c = kids(el).find(k => k.localName === n); return c ? c.textContent.trim() : ''; };
+                const out = [];
+                const color = '#4d7c0f';
+                const ptsOf = (el, tag) => kids(el).filter(k => k.localName === tag).map(k => [parseFloat(k.getAttribute('lat')), parseFloat(k.getAttribute('lon'))]).filter(p => isFinite(p[0]) && isFinite(p[1]));
+                const addPath = (name, desc, pts) => { if (pts.length >= 2) out.push(createNode({ type: 'path', name, meta: { desc, points: pts, color, lineThickness: 3, distance: pathDistance(pts.map(p => L.latLng(p[0], p[1]))) } })); };
+                let nW = 0, nR = 0, nT = 0;
+                kids(root).forEach(el => {
+                    if (el.localName === 'wpt') {
+                        const lat = parseFloat(el.getAttribute('lat')), lng = parseFloat(el.getAttribute('lon'));
+                        if (!isFinite(lat) || !isFinite(lng)) return;
+                        nW++;
+                        out.push(createNode({ type: 'placemark', name: txt(el, 'name') || `Waypoint ${nW}`, meta: { desc: txt(el, 'desc') || txt(el, 'cmt'), lat, lng, icon: DEFAULT_ICON, color } }));
+                    } else if (el.localName === 'rte') {
+                        nR++;
+                        addPath(txt(el, 'name') || `Route ${nR}`, txt(el, 'desc') || txt(el, 'cmt'), ptsOf(el, 'rtept'));
+                    } else if (el.localName === 'trk') {
+                        nT++;
+                        const name = txt(el, 'name') || `Track ${nT}`, desc = txt(el, 'desc') || txt(el, 'cmt');
+                        const segs = kids(el).filter(k => k.localName === 'trkseg').map(sg => ptsOf(sg, 'trkpt')).filter(s => s.length >= 2);
+                        segs.forEach((sg, i) => addPath(segs.length > 1 ? `${name} (segment ${i + 1})` : name, desc, sg));
+                    }
+                });
+                return out;
+            }
+
+            // ---- import (all formats) ----
+            const IMPORT_DEFAULTS = { direct: false, targetFolderId: null };
+            let pendingImport = null;   // set by the import dialog just before the file picker opens
+            function countLeaves(nodes) { let n = 0; (function w(l) { l.forEach(x => { if (x.type === 'folder' || x.type === 'kml') { if (x.children) w(x.children); } else n++; }); })(nodes); return n; }
+            function placeImportedNodes(nodes, filename, opts) {
+                const tgtId = opts.targetFolderId != null ? opts.targetFolderId : currentFolderId;
+                const parent = tgtId ? findNode(tgtId) : null;
+                let top;
+                if (opts.direct) top = nodes;   // exactly as exported, straight into the current location
+                else top = [createNode({ type: 'folder', name: filename.replace(/\.[^.]+$/, ''), expanded: true, children: nodes, meta: { color: '#4d7c0f', desc: 'Imported from ' + filename } })];
+                dedupeIds(top);
+                buildLayersFor(top);
+                top.forEach(n => { if (parent) { if (!parent.children) parent.children = []; parent.children.push(n); } else treeNodes.push(n); });
+                rebuildSnapZoneLayer(); updateMinimapDots(); updateMapLabels();
+                renderTree();
+                const bounds = L.latLngBounds([]);
+                (function w(list) { list.forEach(n => {
+                    if (n.layer) { if (n.layer.getBounds) { try { bounds.extend(n.layer.getBounds()); } catch (e) {} } else if (n.layer.getLatLng) bounds.extend(n.layer.getLatLng()); }
+                    if (n.children) w(n.children);
+                }); })(top);
+                if (bounds.isValid()) setTimeout(() => map.flyToBounds(bounds, { ...availableMapPadding(), duration: 1.2, maxZoom: 16 }), 100);
+                return countLeaves(nodes);
+            }
+            async function importFileAs(file, opts) {
+                opts = Object.assign({}, IMPORT_DEFAULTS, opts || {});
+                const ext = (file.name.split('.').pop() || '').toLowerCase();
+                const fmt = ioFormatByExt(ext);
+                if (!fmt) throw new Error('Unsupported file type: .' + ext);
+                let nodes;
+                try { nodes = fmt.parse(await file.text()); }
+                catch (err) { showToast(`${fmt.label} import failed: ${file.name}`, 'fa-times', { error: true, detail: err }); return 0; }
+                if (!nodes.length) { showToast('No importable geometries found in ' + file.name, 'fa-info-circle'); return 0; }
+                const count = placeImportedNodes(nodes, file.name, opts);
+                showToast(`Imported ${count} item(s)` + (fmt.note ? ' — geometry only (GPX has no folders or styles)' : ''), 'fa-file-import');
+                return count;
+            }
+            kmlInput.setAttribute('accept', IO_ACCEPT);
+            kmlInput.addEventListener('change', async (e) => {
+                const files = e.target.files;
+                if (!files || !files.length) return;
+                const opts = pendingImport || IMPORT_DEFAULTS;
+                pendingImport = null;
+                for (const file of files) {
+                    try { await importFileAs(file, opts); }
+                    catch (err) { showToast(`Import error: ${file.name}`, 'fa-times', { error: true, detail: err }); }
+                }
+                await persistTreeNow();
+                kmlInput.value = '';
+                kmlInput.setAttribute('accept', IO_ACCEPT);
+            });
+
             function downloadFile(content, filename, mime) {
                 const blob = new Blob([content], { type: mime });
                 const url = URL.createObjectURL(blob);
@@ -8038,7 +8132,7 @@
                 await persistTreeNow();
 
                 if (editorState && editorState.node === los) renderEditorBody();
-                showToast('Link target set', 'fa-link');
+                showToast('Far end set', 'fa-link');
 
                 if (profileData && profileData.node === los && profilePanel.classList.contains('open')) {
                     profileSubtitle.textContent = 'Link';
@@ -8470,7 +8564,7 @@
                         const keys = Array.from(new Set(Object.keys(ko).concat(Object.keys(kv)))).filter(k => JSON.stringify(ko[k]) !== JSON.stringify(kv[k]));
                         if (keys.every(k => k === 'lat' || k === 'lng')) labels.push('Moved ' + q(edited[0].v) + ' on map');
                         else if (keys.includes('points')) labels.push('Edited shape ' + q(edited[0].v));
-                        else if (keys.includes('persistedP2P') || keys.includes('trackMouse')) labels.push('Set link target on ' + q(edited[0].v));
+                        else if (keys.includes('persistedP2P') || keys.includes('trackMouse')) labels.push('Set far end on ' + q(edited[0].v));
                         else labels.push('Edited ' + q(edited[0].v));
                     } else labels.push(many(edited, 'Edited'));
                 }
@@ -8793,7 +8887,7 @@
                 handle.addEventListener('keydown', (e) => {
                     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
                     e.preventDefault();
-                    const cur = subrail.getBoundingClientRect().width || parseFloat(subrail.style.width) || 320;
+                    const cur = subrail.getBoundingClientRect().width || parseFloat(subrail.style.getPropertyValue('--subrail-w')) || 320;
                     const step = e.shiftKey ? 48 : 16;
                     let w = cur;
                     if (e.key === 'ArrowLeft') w = cur - step;
@@ -8801,7 +8895,7 @@
                     else if (e.key === 'Home') w = 220;
                     else w = 600;
                     w = Math.max(220, Math.min(600, w));
-                    subrail.style.width = w + 'px';
+                    subrail.style.setProperty('--subrail-w', w + 'px');
                     SETTINGS.subrailWidth = w;
                     handle.setAttribute('aria-valuenow', String(Math.round(w)));
                     const railRect = railEl.getBoundingClientRect();
@@ -9149,8 +9243,7 @@
                     const ext = (f.name.split('.').pop() || '').toLowerCase();
                     try {
                         if (ext === 'hgt') hgt.push(f);
-                        else if (ext === 'kml' || ext === 'kmz') { await importKML(await f.text(), f.name); imported++; }
-                        else if (ext === 'geojson' || ext === 'json') { await importGeoJSONText(await f.text(), f.name); imported++; }
+                        else if (ioFormatByExt(ext)) { await importFileAs(f, { direct: false, targetFolderId: currentFolderId }); imported++; }
                         else bad.push(f.name);
                     } catch (err) { showToast('Could not import ' + f.name, 'fa-times', { error: true, detail: err }); }
                 }
@@ -9192,10 +9285,9 @@
                     { title: 'Measure area', icon: 'fa-vector-square', run: clickTool('tool-measure-area') },
                     { title: 'Add link', icon: 'fa-satellite-dish', run: clickTool('tool-los') },
                     { title: 'New folder', icon: 'fa-folder-plus', run: () => promptNewFolder(currentFolderId ? findNode(currentFolderId) : null) },
-                    { title: 'Import KML / GeoJSON…', icon: 'fa-file-import', run: () => openImportScreen(currentFolderId) },
+                    { title: 'Import KML / GeoJSON / GPX…', icon: 'fa-file-import', run: () => openImportScreen(currentFolderId) },
                     { title: 'Load HGT terrain files…', icon: 'fa-mountain', run: () => fileInput.click() },
-                    { title: 'Export all as KML', icon: 'fa-file-code', run: () => exportKMLAll() },
-                    { title: 'Export all as GPX', icon: 'fa-route', run: () => exportGPXAll() },
+                    ...IO_FORMATS.map(f => ({ title: 'Export all as ' + f.label, icon: f.icon, run: () => exportAs(f.key, null) })),
                     { title: 'Export site list as CSV', icon: 'fa-file-csv', run: () => exportSitesCSV() },
                     { title: 'Undo', icon: 'fa-rotate-left', run: () => undoTree() },
                     { title: 'Redo', icon: 'fa-rotate-right', run: () => redoTree() },
@@ -9684,7 +9776,7 @@
                 if (drawnItems.bringToFront) drawnItems.bringToFront();
 
                 if (SETTINGS.subrailWidth && SETTINGS.subrailWidth > 220) {
-                    subrail.style.width = SETTINGS.subrailWidth + 'px';
+                    subrail.style.setProperty('--subrail-w', SETTINGS.subrailWidth + 'px');
                 }
                 renderTree();
                 initMinimap();
