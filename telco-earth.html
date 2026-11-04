@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   ============================================================
-  BUILD: 2026-11-03 11:07:02 (local)
+  BUILD: 2026-11-04 20:49:12 (local)
   ------------------------------------------------------------
   MAINTENANCE RULE — READ BEFORE EDITING THIS FILE:
   Whenever the code in this file is modified in any way,
@@ -850,9 +850,56 @@
     .lk-group-head i:nth-child(2) { color: var(--text-3); font-size: 0.72rem; }
     .lk-group-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .lk-group-count { font-size: 0.68rem; font-weight: 500; color: var(--text-3); }
+
+.rail-btn[hidden]{display:none}
+#boot{position:fixed;inset:0;z-index:30000;background:var(--surface);overflow:hidden}
+#boot.out{opacity:0;transition:opacity .5s ease;pointer-events:none}
+#boot img{position:fixed;left:50%;top:50%;width:180px;height:180px;margin:-90px 0 0 -90px;border-radius:22%;opacity:0;will-change:transform}
+#boot img.pulse{opacity:1;animation:bootPulse 1.6s ease-in-out infinite}
+@keyframes bootPulse{50%{transform:scale(1.08)}}
+.ph-ic{box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;background-color:#64748b}
+.photo-panel{position:absolute;top:0;right:0;bottom:0;width:var(--photo-w,420px);max-width:100%;background:var(--surface);border-left:1px solid var(--border-hi);z-index:1700;display:none;flex-direction:column;box-shadow:-12px 0 40px rgba(0,0,0,.2)}
+.photo-panel.open{display:flex}.photo-panel.full{width:100%!important;border-left:none}
+.photo-resizer{position:absolute;left:-5px;top:0;bottom:0;width:10px;cursor:ew-resize;z-index:3;touch-action:none}
+.photo-resizer:hover,.photo-resizer:focus-visible{background:var(--accent-soft-hi);outline:none}
+.photo-body{flex:1;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;background:#0b0c08}
+.photo-body img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in}
+.photo-body img.zoom{max-width:none;max-height:none;cursor:zoom-out}
+.photo-err{color:#d3d8c8;padding:30px;text-align:center;font-size:.85rem}
+.photo-meta{flex-shrink:0;max-height:34%;overflow:auto;padding:10px 16px;border-top:1px solid var(--border);font-size:.78rem}
+.ph-thumb{width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--surface-3);flex-shrink:0}
+.ph-row{gap:10px;padding:5px 7px}.ph-row.sel{background:var(--accent-soft);border-color:var(--accent-border)}
+.ph-row .fx-label{white-space:normal;word-break:break-word}
 </style>
 </head>
 <body>
+<div id="boot" aria-hidden="true"><img id="boot-img" alt=""></div>
+<script>
+(function(){
+ var boot=document.getElementById('boot'),img=document.getElementById('boot-img');
+ var l=document.querySelector('link[rel="apple-touch-icon"]'); if(l) img.src=l.href;
+ var q=new URLSearchParams(location.search);
+ var skip=q.has('nointro')||q.has('skipintro')||q.get('intro')==='0'||q.get('intro')==='off'||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+ var ready=new Promise(function(r){window.__bootResolve=r;setTimeout(r,20000);});
+ function hide(){boot.classList.add('out');setTimeout(function(){boot.remove();},650);}
+ if(skip||!img.animate){img.classList.add('pulse');ready.then(hide);return;}
+ (async function(){
+  var W=innerWidth,H=innerHeight,full=Math.max(W,H)*1.6/180;
+  var A=function(kf,o){return img.animate(kf,Object.assign({fill:'forwards'},o)).finished;};
+  await A([{transform:'scale(.25)',opacity:0},{transform:'scale(.45)',opacity:1,offset:.15},{transform:'scale('+full+')',opacity:1}],{duration:1500,easing:'cubic-bezier(.5,0,.2,1)'});
+  await A([{transform:'scale('+full+')'},{transform:'scale(1.15)'}],{duration:900,easing:'cubic-bezier(.3,0,.2,1)'});
+  var rx=W*.34,ry=Math.max(40,H*.3),N=48,kf=[{transform:'translate(0px,0px) rotate(0deg) scale(1.15)',offset:0}];
+  for(var k=0;k<=N;k++){var o=.12+.76*k/N,th=Math.PI/2+2*Math.PI*k/N;
+   kf.push({transform:'translate('+(-rx*Math.cos(th)).toFixed(1)+'px,'+(ry*Math.sin(th)).toFixed(1)+'px) rotate('+(900*o).toFixed(0)+'deg) scale(1.15)',offset:o});}
+  kf.push({transform:'translate(0px,0px) rotate(900deg) scale(1.15)',offset:1});
+  await A(kf,{duration:2800,easing:'linear'});
+  await ready;
+  await A([{transform:'translate(0px,0px) rotate(900deg) scale(1.15)',opacity:1},{transform:'translate('+W*.7+'px,'+(-H*.7)+'px) rotate(1440deg) scale(.3)',opacity:0}],{duration:900,easing:'cubic-bezier(.5,0,1,.6)'});
+  hide();
+ })();
+})();
+</script>
+
     <div class="app-progress" id="app-progress"><div id="app-progress-fill"></div></div>
     <div class="busy-overlay" id="busy-overlay" role="status" aria-live="polite" aria-hidden="true"><div class="busy-card"><div class="busy-spinner"></div><div id="busy-text">Working…</div></div></div>
 
@@ -888,7 +935,8 @@
         <div class="rail" id="rail">
             <button class="rail-btn active" data-subrail="places" aria-label="Places" data-tooltip="Places"><i class="fas fa-map-location-dot"></i></button>
             <button class="rail-btn" data-subrail="draw" aria-label="Draw tools" data-tooltip="Draw tools"><i class="fas fa-pen-ruler"></i></button>
-            <button class="rail-btn" data-subrail="links" aria-label="Links" data-tooltip="Links"><i class="fas fa-link"></i></button>
+            <button class="rail-btn" id="rail-links" hidden data-subrail="links" aria-label="Links" data-tooltip="Links"><i class="fas fa-link"></i></button>
+            <button class="rail-btn" id="rail-photos" hidden data-subrail="photos" aria-label="Photos" data-tooltip="Photos"><i class="fas fa-images"></i></button>
             <button class="rail-btn" data-subrail="terrain" aria-label="Terrain (HGT)" data-tooltip="Terrain (HGT)"><i class="fas fa-mountain"></i></button>
             <button class="rail-btn" data-subrail="layers" aria-label="Layers" data-tooltip="Layers"><i class="fas fa-layer-group"></i></button>
             <div class="rail-spacer"></div>
@@ -934,6 +982,8 @@
                 <button class="map-tool" id="tool-measure-area"><i class="fas fa-vector-square"></i> Area</button>
                 <span class="map-tool-sep" role="separator"></span>
                 <button class="map-tool" id="tool-los"><i class="fas fa-satellite-dish"></i> Link</button>
+                <span class="map-tool-sep" role="separator"></span>
+                <button class="map-tool" id="tool-photos"><i class="fas fa-images"></i> Photos</button>
             </div>
             <div class="map-zoom" id="map-zoom">
                 <button id="zoom-in" aria-label="Zoom in" title="Zoom in"><i class="fas fa-plus"></i></button>
@@ -971,6 +1021,18 @@
                 </div>
             </div>
 
+            <div class="photo-panel" id="photo-panel" role="dialog" aria-label="Photo preview">
+                <div class="photo-resizer" id="photo-resizer" role="separator" aria-orientation="vertical" tabindex="0" title="Drag to resize · double-click to cover the map"></div>
+                <div class="editor-panel-header">
+                    <div class="editor-panel-title"><span id="photo-title">Photo</span><small id="photo-sub"></small></div>
+                    <button class="editor-panel-close" id="photo-prev" title="Previous (←)" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
+                    <button class="editor-panel-close" id="photo-next" title="Next (→)" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
+                    <button class="editor-panel-close" id="photo-full" title="Cover the map" aria-label="Expand over the map"><i class="fas fa-expand"></i></button>
+                    <button class="editor-panel-close" id="photo-close" title="Close (Esc)" aria-label="Close preview"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="photo-body" id="photo-body"><img id="photo-img" alt=""><div class="photo-err" id="photo-err" hidden>This browser cannot display this image format.</div></div>
+                <div class="photo-meta" id="photo-meta"></div>
+            </div>
             <div class="editor-panel" id="editor-panel">
                 <div class="editor-panel-header">
                     <div class="editor-panel-title" id="editor-panel-title">
@@ -1013,9 +1075,12 @@
         <span class="sb-seg" id="sb-elev" title="Ground elevation (needs HGT terrain)">Elev —</span>
         <span class="sb-seg" id="sb-zoom" title="Zoom level and approximate scale">z—</span>
         <span class="sb-spacer"></span>
+        <button class="sb-seg" id="sb-minimap" title="Show or hide the minimap"><i class="fas fa-map"></i> Minimap</button>
+        <button class="sb-seg" id="sb-stress" title="Temporary: stress-test the display with generated data"><i class="fas fa-flask"></i> Stress test</button>
+        <button class="sb-seg" id="sb-perf" title="Temporary: map complexity and frame rate. Click to copy diagnostics."><i class="fas fa-gauge-high"></i> <span id="sb-perf-text">…</span></button>
         <span class="sb-seg sb-progress" id="sb-progress" hidden><span id="sb-progress-label"></span><span class="sb-progress-track"><span class="sb-progress-fill" id="sb-progress-fill"></span></span></span>
         <div class="terrain-status" id="terrain-status"><i class="fas fa-circle" style="font-size: 0.5rem; color: var(--text-3);"></i> No terrain loaded</div>
-        <!-- BUILD-FOOTER --><span class="sb-seg sb-build" id="sb-build" title="Build date and time (local)">Build 2026-11-03 11:07:02</span>
+        <!-- BUILD-FOOTER --><span class="sb-seg sb-build" id="sb-build" title="Build date and time (local)">Build 2026-11-04 20:49:12</span>
     </div>
 
     <input type="file" id="file-input" accept=".hgt,.HGT" multiple style="display:none">
@@ -1092,7 +1157,7 @@
 
             const FLAGS = {
                 twoLineRows: false,
-                verticalCrumbs: false,
+                verticalCrumbs: true,
                 minimap: true,
                 hoverPreview: true,
                 liveDraw: true,
@@ -1733,7 +1798,7 @@
                 }
                 updateMinimapScale();
             }
-            // The minimap shows placemarks as grid-clustered dots (one numbered bubble per ~16 px cell) instead of one
+            // The minimap shows placemarks as small borderless dots (v7 style), thinned to a cap instead of one
             // SVG circle each, so thousands of placemarks stay cheap to draw and to re-project when the minimap moves.
             let _mmPts = [], _mmTimer = null;
             function updateMinimapDots() {
@@ -1753,36 +1818,27 @@
                 if (_mmTimer) return;
                 _mmTimer = setTimeout(() => { _mmTimer = null; drawMinimapClusters(); }, 120);
             }
+            function thinPoints(pts, max, z) {
+                // Grow a grid until at most `max` cells are occupied, keeping one point per cell: the closest pairs lose a member first.
+                const proj = pts.map(p => minimap.project([p[0], p[1]], z));
+                let cell = 2;
+                for (let guard = 0; guard < 40; guard++, cell *= 1.25) {
+                    const seen = new Map();
+                    for (let i = 0; i < pts.length; i++) {
+                        const k = Math.floor(proj[i].x / cell) + ':' + Math.floor(proj[i].y / cell);
+                        if (!seen.has(k)) seen.set(k, pts[i]);
+                    }
+                    if (seen.size <= max) return Array.from(seen.values());
+                }
+                return pts.slice(0, max);
+            }
             function drawMinimapClusters() {
                 if (!minimapDots || !minimap) return;
                 minimapDots.clearLayers();
-                if (!_mmPts.length) return;
-                const CELL = 16, z = minimap.getZoom();
-                const b = minimap.getBounds().pad(0.3);
-                const bins = new Map();
-                for (const p of _mmPts) {
-                    if (!b.contains([p[0], p[1]])) continue;
-                    const pt = minimap.project([p[0], p[1]], z);
-                    const key = Math.floor(pt.x / CELL) + ':' + Math.floor(pt.y / CELL);
-                    let c = bins.get(key);
-                    if (!c) { c = { n: 0, lat: 0, lng: 0, color: p[2], mixed: false }; bins.set(key, c); }
-                    c.n++; c.lat += p[0]; c.lng += p[1];
-                    if (c.color !== p[2]) c.mixed = true;
-                }
-                bins.forEach(c => {
-                    const ll = [c.lat / c.n, c.lng / c.n];
-                    if (c.n === 1) {
-                        minimapDots.addLayer(L.circleMarker(ll, { radius: 3, weight: 1, color: '#ffffff', fillColor: c.color, fillOpacity: 1, interactive: false }));
-                    } else {
-                        const d = Math.round(Math.min(26, 12 + Math.log2(c.n) * 2.2));
-                        const bg = c.mixed ? '#4d7c0f' : c.color;
-                        minimapDots.addLayer(L.marker(ll, {
-                            interactive: false, keyboard: false,
-                            icon: L.divIcon({ className: '', iconSize: [d, d], iconAnchor: [d / 2, d / 2],
-                                html: `<div style="width:${d}px;height:${d}px;border-radius:50%;background:${bg};border:1.5px solid #fff;box-shadow:0 0 2px rgba(0,0,0,.4);color:#fff;font:600 ${d > 20 ? 10 : 9}px/${d - 3}px 'IBM Plex Mono',monospace;text-align:center;opacity:.9;">${c.n > 999 ? Math.round(c.n / 1000) + 'k' : c.n}</div>` })
-                        }));
-                    }
-                });
+                const MAX = 300, b = minimap.getBounds().pad(0.1), z = minimap.getZoom();
+                let pts = _mmPts.filter(p => b.contains([p[0], p[1]]));
+                if (pts.length > MAX) pts = thinPoints(pts, MAX, z);
+                pts.forEach(p => minimapDots.addLayer(L.circleMarker([p[0], p[1]], { radius: 2, color: p[2], fillColor: p[2], fillOpacity: 0.9, weight: 0, interactive: false })));
             }
             document.getElementById('minimap-close').addEventListener('click', () => {
                 FLAGS.minimap = false; saveFlags();
@@ -2048,7 +2104,7 @@
                 if (_persistTimer) { clearTimeout(_persistTimer); _persistTimer = null; }
                 return _doPersistTree();
             }
-            async function _doPersistTree() {
+            async function _doPersistTree0() {
                 function toPlain(node) {
                     return {
                         id: node.id, name: node.name, type: node.type,
@@ -2060,7 +2116,7 @@
                 }
                 try {
                     _trackUndo();
-                    await dbPut('places', { id: 'root', tree: treeNodes.map(toPlain), archive: archivedNodes.map(toPlain) });
+                    await dbPut('places', { id: 'root', tree: treeNodes.filter(n => !(n.meta && n.meta.stress)).map(toPlain), archive: archivedNodes.map(toPlain) });
                 } catch (e) { console.warn('persistTree failed', e); }
             }
             async function loadPersistedTree() {
@@ -2288,7 +2344,7 @@
                         if (n.children) buildLayersFor(n.children);
                     }
                 }
-            function rebuildLayers() {
+            function rebuildLayers0() {
                 drawnItems.clearLayers();
                 buildLayersFor(treeNodes);
                 if (drawnItems.bringToFront) drawnItems.bringToFront();
@@ -2421,7 +2477,7 @@
             };
             const SECTIONS = {
                 places: { title: 'Places' }, draw: { title: 'Draw tools' },
-                links: { title: 'Links' }, terrain: { title: 'Terrain (HGT)' }, layers: { title: 'Layers' }, settings: { title: 'Settings' }
+                links: { title: 'Links' }, photos: { title: 'Photos' }, terrain: { title: 'Terrain (HGT)' }, layers: { title: 'Layers' }, settings: { title: 'Settings' }
             };
 
             let activeSection = 'places';
@@ -2431,8 +2487,8 @@
                 return activeSection === 'places' && placesTab === 'places' && placesSearchQuery.trim().length > 0;
             }
 
-            function renderTree() {
-                if (_renderSuspend) { _renderPending = true; return; }
+            function renderTree0() {
+                if (_renderSuspend) { _renderPending = true; return; } updateRailVisibility();
                 updateSubrailChrome();
                 if (activeSection === 'places') renderPlacesSection();
                 else renderStaticSection(activeSection);
@@ -3485,24 +3541,23 @@
                     }
                     if (isDescendant(dragged, node)) { showToast('Cannot drop folder into itself'); return; }
                     if (!target || target.node.id !== node.id) return;
+                    const _ids = (multiSelection.size > 1 && multiSelection.has(draggedId)) ? Array.from(multiSelection) : [draggedId];
+                    const _nodes = _ids.map(i => findNode(i)).filter(n => n && n.id !== node.id && !nodeContains(n, node.id));
+                    if (!_nodes.length) { showToast('Cannot move here'); return; }
+                    _nodes.forEach(n => removeNode(n.id));
                     if (target.type === 'inside') {
-                        removeNode(draggedId);
                         if (!node.children) node.children = [];
-                        node.children.push(dragged);
-                        renderTree();
-                        await persistTreeNow();
-                        showToast(`Moved "${dragged.name}" into ${node.name}`, 'fa-arrows-up-down-left-right');
+                        _nodes.forEach(n => node.children.push(n));
                     } else {
                         const loc = findParent(node.id);
                         if (!loc) { showToast('Cannot move here'); return; }
-                        removeNode(draggedId);
                         const idx = loc.list.findIndex(n => n.id === node.id);
-                        const insertAt = target.type === 'before' ? idx : idx + 1;
-                        loc.list.splice(insertAt, 0, dragged);
-                        renderTree();
-                        await persistTreeNow();
-                        showToast(`Moved "${dragged.name}"`, 'fa-arrows-up-down-left-right');
+                        loc.list.splice(target.type === 'before' ? idx : idx + 1, 0, ..._nodes);
                     }
+                    multiSelection.clear();
+                    renderTree();
+                    await persistTreeNow();
+                    showToast(_nodes.length > 1 ? 'Moved ' + _nodes.length + ' items' : 'Moved "' + _nodes[0].name + '"', 'fa-arrows-up-down-left-right');
                 });
 
                 return row;
@@ -3763,6 +3818,7 @@
                 const ids = Array.from(multiSelection);
                 const items = [
                     { label: `Edit ${ids.length} items…`, icon: 'fa-pen', action: () => openBulkEditorForSelection() },
+                    { label: `Export ${ids.length} items…`, icon: 'fa-file-export', action: () => openExportDialog(ids.map(id => findNode(id)).filter(Boolean)) },
                     { sep: true },
                     { label: `Hide ${ids.length}`, icon: 'fa-eye-slash', action: () => setVisibleMany(ids.map(id => findNode(id)).filter(Boolean), false) },
                     { label: `Show ${ids.length}`, icon: 'fa-eye', action: () => setVisibleMany(ids.map(id => findNode(id)).filter(Boolean), true) },
@@ -3858,6 +3914,8 @@
             document.addEventListener('click', (e) => { if (!ctxMenu.contains(e.target)) hideContextMenu(); });
             document.addEventListener('contextmenu', (e) => { if (e.defaultPrevented) return; if (!ctxMenu.contains(e.target)) hideContextMenu(); });
             document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideContextMenu(); });
+            document.addEventListener('mousedown', (e) => { if (!ctxMenu.contains(e.target)) hideContextMenu(); }, true);
+            map.on('mousedown click dragstart zoomstart', hideContextMenu);
 
             // ==================== PASTE PLACEMARK ====================
             async function pastePlacemarkInto(folder, atLatLng) {
@@ -4206,6 +4264,7 @@
                         { group: 'Measure', icon: 'fa-ruler', label: 'Measure distance', desc: 'Multi-point measure', action: () => beginDraw('measure') },
                         { group: 'Measure', icon: 'fa-vector-square', label: 'Measure area', desc: 'Polygon area', action: () => beginDraw('measure-area') },
                         { group: 'Link', icon: 'fa-satellite-dish', label: 'Add link', desc: 'Line-of-sight analysis from a point', action: () => beginLOS() },
+                        { group: 'Photos', icon: 'fa-images', label: 'Photos', desc: photos.length ? photos.length + ' on the map · click to open the list' : 'Import geotagged photos', action: () => { if (photos.length) { const rb = document.getElementById('rail-photos'); if (rb) rb.click(); } else openPhotoImportDialog(); } },
                         { group: 'Clear', icon: 'fa-eraser', label: 'Clear all drawings', desc: 'Remove all objects', danger: true, action: () => clearAllDrawings() }
                     ];
                     let _lastGroup = null;
@@ -4338,7 +4397,7 @@
                             subrailBody.appendChild(row);
                         });
                     }
-                } else if (section === 'links') {
+                } else if (section === 'photos') { renderPhotosSection(); } else if (section === 'links') {
                     renderLinksSection();
                 } else if (section === 'layers') {
                     const groups = {};
@@ -5219,6 +5278,7 @@
             // ============ PROPERTIES ============
             function renderPropertiesTab() {
                 const node = editorState.node;
+                const _p2pSet = !!(node.meta && node.meta.persistedP2P && node.meta.persistedP2P.lat != null);
                 const rows = [['Type', node.type], ['Visible', node.visible === false ? 'No' : 'Yes']];
                 if (node.type === 'placemark' && node.meta.lat != null) {
                     rows.push(['Latitude', node.meta.lat.toFixed(6) + copyBtnFor(node.meta.lat.toFixed(6))]);
@@ -5299,9 +5359,9 @@
                             <div class="editor-field"><label>Radius (m)</label><input type="number" id="los-radius" value="${node.meta.radius || 10000}" min="100" step="100"></div>
                             <div class="editor-field"><label>Lines</label><input type="number" id="los-lines" value="${node.meta.numLines || 36}" min="4" max="180" step="2"></div>
                         </div>
-                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-boundary" ${node.meta.showBoundary !== false ? 'checked' : ''}> Boundary polygon (where sight is first lost)</label>
-                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-regain" ${node.meta.showRegain !== false ? 'checked' : ''}> Areas where visibility is regained</label>
-                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-radials" ${node.meta.showRadials !== false ? 'checked' : ''}> Radial lines (the sampled bearings)</label>
+                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-boundary" ${_p2pSet ? 'disabled title="Not used while a remote end is set"' : (node.meta.showBoundary !== false ? 'checked' : '')}> Boundary polygon (where sight is first lost)</label>
+                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-regain" ${_p2pSet ? 'disabled title="Not used while a remote end is set"' : (node.meta.showRegain !== false ? 'checked' : '')}> Areas where visibility is regained</label>
+                        <label class="editor-icon-bulk-toggle"><input type="checkbox" id="los-radials" ${_p2pSet ? 'disabled title="Not used while a remote end is set"' : (node.meta.showRadials !== false ? 'checked' : '')}> Radial lines (the sampled bearings)</label>
                         <div style="font-size:0.68rem;color:var(--text-2);line-height:1.45;margin:2px 0 8px;">The solid outline stops at the first point on each bearing where sight is lost. Shaded areas beyond it are places the remote end can see again. Radial lines are the sampled bearings.</div>
 
                         <div class="editor-section-label">Antennas</div>
@@ -5431,11 +5491,11 @@
                     if (clEl) node.meta.clutter = Math.max(0, parseFloat(clEl.value) || 0);
                     const boundaryEl = editorBody.querySelector('#los-boundary');
                     const curvatureEl = editorBody.querySelector('#los-curvature');
-                    if (boundaryEl) node.meta.showBoundary = boundaryEl.checked;
+                    if (boundaryEl && !boundaryEl.disabled) node.meta.showBoundary = boundaryEl.checked;
                     const regainEl = editorBody.querySelector('#los-regain');
                     const radialsEl = editorBody.querySelector('#los-radials');
-                    if (regainEl) node.meta.showRegain = regainEl.checked;
-                    if (radialsEl) node.meta.showRadials = radialsEl.checked;
+                    if (regainEl && !regainEl.disabled) node.meta.showRegain = regainEl.checked;
+                    if (radialsEl && !radialsEl.disabled) node.meta.showRadials = radialsEl.checked;
                     if (curvatureEl) node.meta.earthCurvature = curvatureEl.checked;
                     if (!node.meta.persistedP2P) node.meta.trackMouse = true;
                     rebuildLOSLayer(node);
@@ -6800,6 +6860,7 @@
                 if (p.clearRatio !== undefined && p.clearRatio < 0.6) return '#f59e0b';
                 return '#22c55e';
             }
+            const NO_TERRAIN_LINK = '#64748b';
             function linkEndColor(geo) {
                 if (geo.lostAt !== null) return '#dc2626';
                 if (geo.minClearRatio !== null && geo.minClearRatio < 0.6) return '#f59e0b';
@@ -6850,6 +6911,10 @@
                             radius: 6, color: 'white', weight: 2,
                             fillColor: linkEndColor(link.geo), fillOpacity: 1
                         }));
+                    } else {
+                        // No terrain data under the link: still draw it (grey = not analysed) so the remote end can be placed
+                        layers.push(L.polyline([center, [node.meta.persistedP2P.lat, node.meta.persistedP2P.lng]], { color: NO_TERRAIN_LINK, weight: 3, dashArray: '4 6' }));
+                        layers.push(L.circleMarker([node.meta.persistedP2P.lat, node.meta.persistedP2P.lng], { radius: 6, color: 'white', weight: 2, fillColor: NO_TERRAIN_LINK, fillOpacity: 1 }));
                     }
                 } else {
                     const wantBoundary = node.meta.showBoundary !== false;
@@ -6859,7 +6924,7 @@
                     if (cov && wantRegain) {
                         const rings = buildRegainRings(node, cov);
                         if (rings.length) {
-                            const zone = L.polygon(rings, { stroke: false, fillColor: color, fillOpacity: 0.32, interactive: true });
+                            const zone = L.polygon(rings, { stroke: true, color: color, weight: 1, opacity: 1, fillColor: color, fillOpacity: 1, interactive: true });
                             zone.bindTooltip('Visibility is regained here, beyond an earlier obstruction', { sticky: true });
                             layers.push(zone);
                         }
@@ -6996,10 +7061,10 @@
             function _exportAsCore(fmtKey, node) {
                 const fmt = IO_FORMATS.find(f => f.key === fmtKey);
                 if (!fmt) return;
-                const nodes = node ? [node] : exportableNodes(treeNodes);
-                const docName = node ? node.name : 'Andrew\'s Earth Export';
+                const nodes = Array.isArray(node) ? node.slice() : (node ? [node] : exportableNodes(treeNodes));
+                const docName = Array.isArray(node) ? 'Selection' : node ? node.name : 'Andrew\'s Earth Export';
                 const content = fmt.build(nodes, docName, node ? 'node' : 'all');
-                const base = node ? ioSafeName(node.name) : 'andrews-earth-export';
+                const base = Array.isArray(node) ? 'selection' : node ? ioSafeName(node.name) : 'andrews-earth-export';
                 downloadFile(content, base + '.' + fmt.exts[0], fmt.mime);
                 showToast(fmt.label + ' exported' + (fmt.note ? ' — geometry, names and descriptions only' : ''), 'fa-file-export');
             }
@@ -7018,11 +7083,12 @@
                 const title = document.getElementById('modal-title');
                 const body = document.getElementById('modal-body');
                 const actions = document.getElementById('modal-actions');
-                const isFolderish = !node || node.type === 'folder' || node.type === 'kml';
+                const multi = Array.isArray(node);
+                const isFolderish = multi || !node || node.type === 'folder' || node.type === 'kml';
                 const options = IO_FORMATS.map(f => ({ key: f.key, icon: f.icon, label: f.label, desc: f.shortDesc + (f.key === 'gpx' ? ' — folders, colours and metadata are not kept' : ' — folders, styles and metadata are kept') }));
                 if (isFolderish) options.push({ key: 'csv', icon: 'fa-file-csv', label: 'Site list (CSV)', desc: 'Placemarks and links with elevation and link status' });
                 let chosen = options[0].key;
-                const scopeText = node ? '“' + escapeHtml(node.name) + '”' + (isFolderish ? ' and its contents' : '') : 'all places';
+                const scopeText = multi ? node.length + ' selected items' : node ?  '“' + escapeHtml(node.name) + '”' + (isFolderish ? ' and its contents' : '') : 'all places';
                 title.innerHTML = '<i class="fas fa-file-export"></i> Export';
                 body.innerHTML = `<div style="font-size:0.78rem;color:var(--text-2);margin-bottom:12px;">Exporting ${scopeText}. Choose a format:</div>` +
                     '<div id="exp-opts" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">' +
@@ -8763,6 +8829,9 @@
                         radius: 6, color: 'white', weight: 2,
                         fillColor: linkEndColor(link.geo), fillOpacity: 1
                     }));
+                } else {
+                    losPreviewGroup.addLayer(L.polyline([center, [endpoint.lat, endpoint.lng]], { color: NO_TERRAIN_LINK, weight: 3, dashArray: '4 6' }));
+                    losPreviewGroup.addLayer(L.circleMarker([endpoint.lat, endpoint.lng], { radius: 6, color: 'white', weight: 2, fillColor: NO_TERRAIN_LINK, fillOpacity: 1 }));
                 }
 
                 if (profileData && profileData.node === los && profilePanel.classList.contains('open')) {
@@ -9176,7 +9245,7 @@
             // Loaded HGT tiles live outside the history, so the terrain folder is left out of snapshots.
             function _snapshotTree() {
                 return JSON.stringify({
-                    tree: treeNodes.filter(n => n.name !== 'Terrain (HGT)').map(_plainForUndo),
+                    tree: treeNodes.filter(n => n.name !== 'Terrain (HGT)' && !(n.meta && n.meta.stress)).map(_plainForUndo),
                     archive: archivedNodes.map(_plainForUndo)
                 });
             }
@@ -9433,6 +9502,7 @@
                 return busyIf(rootFolder ? [rootFolder] : treeNodes, 'Building site list…', async () => _exportSitesCSVCore(rootFolder));
             }
             function _exportSitesCSVCore(rootFolder) {
+                if (Array.isArray(rootFolder)) rootFolder = { name: 'Selection', children: rootFolder };
                 const header = ['Name', 'Type', 'Folder', 'Latitude', 'Longitude', 'Ground elevation (m)', 'Antenna height (m)',
                                 'Description', 'Link end lat', 'Link end lng', 'Link distance (m)', 'Link status', 'Min F1 clearance (x)',
                                 'Frequency (GHz)', 'k-factor'];
@@ -9952,7 +10022,7 @@
                     if (!hasFiles(e)) return;
                     e.preventDefault();
                     depth = 0; ov.classList.remove('show');
-                    await importDroppedFiles(Array.from(e.dataTransfer.files));
+                    await importDroppedFilesOrPhotos(e.dataTransfer);
                 });
             })();
 
@@ -9985,6 +10055,10 @@
                     { title: 'Centre on Tasmania', icon: 'fa-map', run: () => { map.flyTo([-42.0, 146.6], 7, { duration: 1.2 }); } },
                     { title: 'Zoom to all places', icon: 'fa-expand', run: () => fitToPlacesExtent() },
                     { title: 'Toggle properties panel', icon: 'fa-table-columns', run: () => toggleInspector() },
+                    { title: 'Import photos…', icon: 'fa-images', run: () => openPhotoImportDialog() },
+                    { title: 'Show / hide minimap', icon: 'fa-map', run: () => setMinimap(!FLAGS.minimap) },
+                    { title: 'Stress test (temporary)', icon: 'fa-flask', run: () => openStressTest() },
+                    { title: 'Copy diagnostics (temporary)', icon: 'fa-gauge-high', run: () => copyDiagnostics() },
                     { title: 'Toggle snap to markers', icon: 'fa-magnet', run: () => { SETTINGS.snapToMarkers = !SETTINGS.snapToMarkers; saveSettings(); showToast('Snap to markers ' + (SETTINGS.snapToMarkers ? 'on' : 'off'), 'fa-magnet'); } },
                     { title: 'Theme: light', icon: 'fa-sun', run: () => setThemePref('light') },
                     { title: 'Theme: dark', icon: 'fa-moon', run: () => setThemePref('dark') },
@@ -10445,6 +10519,397 @@
                 }
             }
 
+            // ==================== ROUND 5 ====================
+            const PD = { photoSize: 56, photoShape: 'square', photoBorder: 3, photoBorderColor: '#ffffff', photoShow: true };
+            for (const k in PD) if (FLAGS[k] === undefined) FLAGS[k] = PD[k];
+            if (!FLAGS._vc2) { FLAGS.verticalCrumbs = true; FLAGS._vc2 = true; saveFlags(); }
+
+            const phPanel = document.getElementById('photo-panel'), phImg = document.getElementById('photo-img'), phErr = document.getElementById('photo-err');
+            const phMeta = document.getElementById('photo-meta'), phTitle = document.getElementById('photo-title'), phSub = document.getElementById('photo-sub');
+
+            // ---- diagnostics (temporary) ----
+            const PERF = { frames: [], long: 0, renderMs: 0, rebuildMs: 0, persistMs: 0, tilesAt: 0, treeAt: 0 };
+            (function () {
+                let last = performance.now();
+                const f = (t) => { PERF.frames.push(t - last); last = t; if (PERF.frames.length > 120) PERF.frames.shift(); requestAnimationFrame(f); };
+                requestAnimationFrame(f);
+                try { new PerformanceObserver(l => { PERF.long += l.getEntries().length; }).observe({ entryTypes: ['longtask'] }); } catch (e) {}
+            })();
+            let _mmT = null;
+            function renderTree() { const t = performance.now(); renderTree0(); PERF.renderMs = Math.round(performance.now() - t); clearTimeout(_mmT); _mmT = setTimeout(updateMinimapDots, 150); }
+            function rebuildLayers() { const t = performance.now(); rebuildLayers0(); PERF.rebuildMs = Math.round(performance.now() - t); }
+            async function _doPersistTree() { const t = performance.now(); const r = await _doPersistTree0(); PERF.persistMs = Math.round(performance.now() - t); return r; }
+            function perfStats() {
+                const s = { objects: 0, placemarks: 0, paths: 0, pathVerts: 0, polygons: 0, polyVerts: 0, links: 0, folders: 0, hidden: 0, maxDepth: 0, largestShapeVerts: 0, largestFolder: 0 };
+                (function w(l, d) {
+                    if (l.length > s.largestFolder) s.largestFolder = l.length;
+                    for (const n of l) {
+                        if (n.name === 'Terrain (HGT)' || n.type === 'terrain') continue;
+                        s.objects++; if (n.visible === false) s.hidden++; if (d > s.maxDepth) s.maxDepth = d;
+                        const t = n.type, k = (n.meta && n.meta.points) ? n.meta.points.length : 0;
+                        if (k > s.largestShapeVerts) s.largestShapeVerts = k;
+                        if (t === 'placemark') s.placemarks++;
+                        else if (t === 'path' || t === 'measure') { s.paths++; s.pathVerts += k; }
+                        else if (t === 'polygon' || t === 'measure-area') { s.polygons++; s.polyVerts += k; }
+                        else if (t === 'los') s.links++;
+                        else if (t === 'folder' || t === 'kml') s.folders++;
+                        if (n.children) w(n.children, d + 1);
+                    }
+                })(treeNodes, 1);
+                const f = PERF.frames.slice(1).sort((a, b) => a - b);
+                const avg = f.length ? f.reduce((a, b) => a + b, 0) / f.length : 0;
+                const dom = document.getElementsByTagName('*').length;
+                s.complexityScore = Math.round(s.placemarks + (s.pathVerts + s.polyVerts) * 0.15 + s.links * 150 + labelCache.size * 2 + dom / 40);
+                s.fps = avg ? Math.round(1000 / avg) : 0;
+                return { s, f, avg, dom };
+            }
+            function perfReport() {
+                const { s, f, avg, dom } = perfStats();
+                const q = (sel) => document.querySelectorAll(sel).length;
+                return {
+                    time: new Date().toISOString(), build: (document.getElementById('sb-build') || {}).textContent,
+                    data: s,
+                    onScreen: { domElements: dom, leafletLayersOnMap: Object.keys(map._layers).length, markerIcons: q('.leaflet-marker-icon'), svgPaths: q('.leaflet-overlay-pane path'), labelsDrawn: labelCache.size, minimapPoints: _mmPts.length, photos: photos.length, zoom: map.getZoom() },
+                    terrain: { tiles: terrainStore.size, visibleTiles: visibleTiles.size },
+                    timingsMs: { loadTilesDoneAt: PERF.tilesAt, loadTreeDoneAt: PERF.treeAt, lastRenderTree: PERF.renderMs, lastRebuildLayers: PERF.rebuildMs, lastPersist: PERF.persistMs },
+                    frames: { avgMs: +avg.toFixed(1), p95Ms: +((f[Math.floor(f.length * 0.95)] || 0)).toFixed(1), maxMs: +((f[f.length - 1] || 0)).toFixed(1), longTasksSinceLoad: PERF.long },
+                    settings: { canvas: FLAGS.perfCanvas, simplify: FLAGS.perfSimplify, vertexCull: FLAGS.perfVertexCull, markerCull: FLAGS.perfMarkerCull, cluster: FLAGS.perfCluster, labels: FLAGS.showMapLabels, labelMax: FLAGS.mapLabelMax, minimap: FLAGS.minimap, basemap: currentProviderKey },
+                    env: { viewport: innerWidth + 'x' + innerHeight, dpr: devicePixelRatio, cores: navigator.hardwareConcurrency, memGB: navigator.deviceMemory, heapMB: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null, ua: navigator.userAgent }
+                };
+            }
+            function copyDiagnostics() { copyToClipboard(JSON.stringify(perfReport(), null, 2), 'Diagnostics'); }
+            const kfmt = (n) => n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + 'k' : String(n);
+            function updatePerfLabel() {
+                if (document.hidden) return;
+                const { s } = perfStats();
+                document.getElementById('sb-perf-text').textContent = kfmt(s.objects) + ' obj · ' + kfmt(s.pathVerts + s.polyVerts) + ' vtx · C' + kfmt(s.complexityScore) + ' · ' + s.fps + ' fps';
+            }
+            setInterval(updatePerfLabel, 3000); setTimeout(updatePerfLabel, 1500);
+            document.getElementById('sb-perf').addEventListener('click', copyDiagnostics);
+
+            // ---- minimap toggle ----
+            function setMinimap(on) {
+                FLAGS.minimap = !!on; saveFlags();
+                document.getElementById('minimap-wrap').classList.toggle('hidden', !on);
+                if (on) { if (!minimap) initMinimap(); else { minimap.invalidateSize(); syncMinimap(); updateMinimapDots(); } }
+            }
+            document.getElementById('sb-minimap').addEventListener('click', () => setMinimap(!FLAGS.minimap));
+
+            // ---- rail buttons that only exist when there is something to show ----
+            function updateRailVisibility() {
+                const hasL = hasNode(n => n.type === 'los');
+                document.getElementById('rail-links').hidden = !hasL;
+                document.getElementById('rail-photos').hidden = !photos.length;
+                if ((activeSection === 'links' && !hasL) || (activeSection === 'photos' && !photos.length)) {
+                    activeSection = 'places';
+                    document.querySelectorAll('.rail-btn[data-subrail]').forEach(b => b.classList.toggle('active', b.dataset.subrail === 'places' && subrail.classList.contains('open')));
+                }
+            }
+
+            // ---- shared modal helper ----
+            function genericModal(title, html, buttons) {
+                const ov = document.getElementById('modal-overlay'), ac = document.getElementById('modal-actions'), bo = document.getElementById('modal-body');
+                document.getElementById('modal-title').innerHTML = title; bo.innerHTML = html; ac.innerHTML = '';
+                const close = () => { ov.classList.remove('open'); bo.innerHTML = ''; ac.innerHTML = '<button class="btn btn-secondary" id="modal-cancel">Cancel</button><button class="btn btn-primary" id="modal-ok">Save</button>'; };
+                buttons.forEach(b => { const e = document.createElement('button'); e.className = 'btn ' + (b.primary ? 'btn-primary' : 'btn-secondary'); e.innerHTML = b.label; e.addEventListener('click', () => b.fn(close)); ac.appendChild(e); });
+                ov.classList.add('open');
+                return close;
+            }
+
+            // ==================== PHOTOS (temporary — never saved, not part of Places) ====================
+            const photos = [];
+            let photoSel = -1, _phSeq = 0, phUrl = null, photoView = 'list';
+            const photoGroup = L.featureGroup();
+            function setPhotoShow(on) { FLAGS.photoShow = !!on; if (on) { if (!map.hasLayer(photoGroup)) photoGroup.addTo(map); } else map.removeLayer(photoGroup); }
+            setPhotoShow(FLAGS.photoShow);
+            const IMG_RX = /\.(jpe?g|png|webp|heic|heif|avif)$/i;
+
+            function exifGps(buf) {
+                try {
+                    const u = new Uint8Array(buf); let p = -1;
+                    for (let i = 0; i < u.length - 8; i++) if (u[i] === 69 && u[i + 1] === 120 && u[i + 2] === 105 && u[i + 3] === 102 && u[i + 4] === 0 && u[i + 5] === 0) { p = i + 6; break; }
+                    if (p < 0) return null;
+                    const dv = new DataView(buf), bo = dv.getUint16(p), le = bo === 0x4949;
+                    if (!le && bo !== 0x4d4d) return null;
+                    const g16 = o => dv.getUint16(p + o, le), g32 = o => dv.getUint32(p + o, le);
+                    const ifd = o => { const n = g16(o), m = {}; for (let i = 0; i < n && i < 200; i++) { const e = o + 2 + i * 12; m[g16(e)] = { c: g32(e + 4), v: e + 8 }; } return m; };
+                    const at = (t, sz) => sz * t.c > 4 ? g32(t.v) : t.v;
+                    const rat = (t, i) => { const o = at(t, 8) + i * 8, d = g32(o + 4); return d ? g32(o) / d : 0; };
+                    const asc = t => { const o = at(t, 1); let s = ''; for (let i = 0; i < t.c && i < 64; i++) { const c = dv.getUint8(p + o + i); if (!c) break; s += String.fromCharCode(c); } return s; };
+                    const i0 = ifd(g32(4)), out = {};
+                    if (i0[0x8769]) { const ex = ifd(g32(i0[0x8769].v)); if (ex[0x9003]) out.date = asc(ex[0x9003]); }
+                    if (!i0[0x8825]) return out;
+                    const gp = ifd(g32(i0[0x8825].v));
+                    if (gp[2] && gp[4]) {
+                        const dms = t => rat(t, 0) + rat(t, 1) / 60 + rat(t, 2) / 3600;
+                        let lat = dms(gp[2]), lng = dms(gp[4]);
+                        if (gp[1] && asc(gp[1])[0] === 'S') lat = -lat;
+                        if (gp[3] && asc(gp[3])[0] === 'W') lng = -lng;
+                        if (isFinite(lat) && isFinite(lng) && (lat || lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+                            out.lat = lat; out.lng = lng;
+                            if (gp[6]) { out.alt = rat(gp[6], 0); if (gp[5] && dv.getUint8(p + gp[5].v) === 1) out.alt = -out.alt; }
+                        }
+                    }
+                    return out;
+                } catch (e) { return null; }
+            }
+            async function makeThumb(f) {
+                try {
+                    const bm = await createImageBitmap(f, { resizeWidth: 260, resizeQuality: 'medium' });
+                    const s = Math.min(bm.width, bm.height), c = document.createElement('canvas'); c.width = c.height = 200;
+                    c.getContext('2d').drawImage(bm, (bm.width - s) / 2, (bm.height - s) / 2, s, s, 0, 0, 200, 200);
+                    if (bm.close) bm.close();
+                    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.8));
+                    return blob ? URL.createObjectURL(blob) : null;
+                } catch (e) { return null; }
+            }
+            function photoIcon(p) {
+                const s = +FLAGS.photoSize || 56, b = +FLAGS.photoBorder || 0;
+                const bg = p.thumb ? `background-image:url('${p.thumb}');background-size:cover;background-position:center;` : '';
+                return L.divIcon({ className: '', iconSize: [s, s], iconAnchor: [s / 2, s / 2],
+                    html: `<div class="ph-ic" style="width:${s}px;height:${s}px;border:${b}px solid ${safeColor(FLAGS.photoBorderColor, '#ffffff')};border-radius:${FLAGS.photoShape === 'circle' ? '50%' : '6px'};${bg}">${p.thumb ? '' : '<i class="fas fa-image" style="color:#fff;font-size:' + Math.round(s / 2.5) + 'px"></i>'}</div>` });
+            }
+            function refreshPhotoMarkers() { photos.forEach(p => p.marker.setIcon(photoIcon(p))); }
+            function addPhoto(p) {
+                photos.push(p);
+                p.marker = L.marker([p.lat, p.lng], { icon: photoIcon(p), zIndexOffset: 300 });
+                p.marker.on('click', () => openPhoto(p.id));
+                p.marker.bindTooltip(p.name, { direction: 'top', offset: [0, -(+FLAGS.photoSize || 56) / 2] });
+                photoGroup.addLayer(p.marker);
+            }
+            async function importPhotos(files) {
+                files = files.filter(f => IMG_RX.test(f.name));
+                if (!files.length) { showToast('No images found', 'fa-image'); return; }
+                const seen = new Set(photos.map(p => p.key)), noGps = [], fresh = [];
+                let dup = 0;
+                progressStart('Reading photos', files.length);
+                for (let i = 0; i < files.length; i++) {
+                    const f = files[i], key = f.name + '|' + f.size + '|' + f.lastModified;
+                    progressStep(i, f.name);
+                    if (i % 6 === 0) await new Promise(r => setTimeout(r, 0));
+                    if (seen.has(key)) { dup++; continue; }
+                    seen.add(key);
+                    let ex = null;
+                    try { ex = exifGps(await f.slice(0, /\.hei[cf]$/i.test(f.name) ? f.size : 262144).arrayBuffer()); } catch (e) {}
+                    if (!ex || ex.lat == null) { noGps.push(f.webkitRelativePath || f.name); continue; }
+                    fresh.push({ id: 'ph' + (++_phSeq), key, name: f.name, path: f.webkitRelativePath || f.name, file: f, lat: ex.lat, lng: ex.lng, alt: ex.alt, date: ex.date, size: f.size, thumb: await makeThumb(f) });
+                }
+                progressDone();
+                fresh.forEach(addPhoto);
+                updateRailVisibility();
+                if (activeSection === 'photos') renderPhotosSection();
+                photoReport(files.length - dup, fresh.length, noGps, dup);
+                if (fresh.length) {
+                    const b = L.latLngBounds(photos.map(p => [p.lat, p.lng]));
+                    map.flyToBounds(b, Object.assign({ maxZoom: 17, duration: 1.2 }, availableMapPadding()));
+                    const rb = document.getElementById('rail-photos'); if (activeSection !== 'photos' && rb) rb.click();
+                }
+            }
+            function photoReport(total, added, noGps, dup) {
+                const li = noGps.slice(0, 60).map(n => '<div style="padding:2px 0;font-family:\'IBM Plex Mono\',monospace;font-size:.7rem;">' + escapeHtml(n) + '</div>').join('');
+                genericModal('<i class="fas fa-images"></i> Photo import',
+                    `<div style="font-size:.85rem;line-height:1.7;margin-bottom:10px;"><b>${total}</b> image${total === 1 ? '' : 's'} checked<br><i class="fas fa-location-dot" style="color:var(--accent)"></i> <b>${added}</b> with GPS data — shown on the map<br><i class="fas fa-ban" style="color:var(--text-3)"></i> <b>${noGps.length}</b> without GPS data${dup ? '<br>' + dup + ' duplicate(s) skipped' : ''}</div>` +
+                    (noGps.length ? `<label>Without GPS${noGps.length > 60 ? ' (first 60)' : ''}</label><div style="max-height:180px;overflow:auto;border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface-soft);margin-bottom:10px;">${li}</div>` : '') +
+                    '<div class="editor-hint">Photos are kept in memory only: they disappear when the page is reloaded and are never saved.</div>',
+                    [{ label: 'OK', primary: true, fn: c => c() }]);
+            }
+            function pickPhotoFiles(folder) {
+                const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true; inp.style.display = 'none';
+                if (folder) inp.webkitdirectory = true; else inp.accept = 'image/*,.heic,.heif';
+                inp.addEventListener('change', () => { const fs = Array.from(inp.files || []); inp.remove(); importPhotos(fs); });
+                document.body.appendChild(inp); inp.click();
+            }
+            function openPhotoImportDialog() {
+                cancelActiveDraw();
+                genericModal('<i class="fas fa-images"></i> Import photos',
+                    '<div style="font-size:.8rem;color:var(--text-2);margin-bottom:12px;">Photos with GPS data are placed on the map. Nothing is saved — they are gone when you reload.</div>',
+                    [{ label: '<i class="fas fa-image"></i> Image files…', primary: true, fn: c => { c(); pickPhotoFiles(false); } },
+                     { label: '<i class="fas fa-folder-open"></i> Folder…', fn: c => { c(); pickPhotoFiles(true); } },
+                     { label: 'Cancel', fn: c => c() }]);
+                const b = document.getElementById('modal-body');
+                b.insertAdjacentHTML('beforeend', '<div class="editor-hint">A folder is searched including its sub-folders. Repeat to add more folders, or drag several files and folders onto the map at once.</div>');
+            }
+            document.getElementById('tool-photos').addEventListener('click', openPhotoImportDialog);
+
+            function readDirEntries(d) { return new Promise((res, rej) => { const r = d.createReader(), all = []; const go = () => r.readEntries(es => { if (!es.length) res(all); else { all.push(...es); go(); } }, rej); go(); }); }
+            async function walkEntry(en, out) {
+                if (!en) return;
+                if (en.isFile) await new Promise(r => en.file(f => { out.push(f); r(); }, r));
+                else if (en.isDirectory) for (const c of await readDirEntries(en)) await walkEntry(c, out);
+            }
+            async function importDroppedFilesOrPhotos(dt) {
+                const entries = Array.from(dt.items || []).map(i => (i.kind === 'file' && i.webkitGetAsEntry) ? i.webkitGetAsEntry() : null);   // must be read before any await
+                const plain = Array.from(dt.files || []);
+                const hasDir = entries.some(e => e && e.isDirectory);
+                if (!hasDir && !plain.some(f => IMG_RX.test(f.name))) return importDroppedFiles(plain);
+                let all = plain;
+                if (hasDir) { all = []; for (const e of entries) await walkEntry(e, all); }
+                const others = all.filter(f => /\.(kml|geojson|json|gpx|hgt)$/i.test(f.name));
+                if (others.length) await importDroppedFiles(others);
+                await importPhotos(all.filter(f => IMG_RX.test(f.name)));
+            }
+
+            function clearPhotos() {
+                photoGroup.clearLayers();
+                photos.forEach(p => { if (p.thumb) URL.revokeObjectURL(p.thumb); });
+                photos.length = 0; closePhoto(); updateRailVisibility();
+                if (activeSection === 'photos') renderPhotosSection();
+            }
+            function renderPhotosSection() {
+                const b = subrailBody; b.innerHTML = ''; b.onscroll = null; b.oncontextmenu = null;
+                if (!photos.length) {
+                    b.innerHTML = '<div class="fx-empty"><div style="font-weight:600;color:var(--text);margin-bottom:6px;">No photos loaded</div><div>Photos are temporary — they are not saved.</div><div class="empty-actions"><button class="btn btn-primary" id="ph-add0"><i class="fas fa-images"></i> Import photos</button></div></div>';
+                    b.querySelector('#ph-add0').addEventListener('click', openPhotoImportDialog); return;
+                }
+                const w = document.createElement('div');
+                const isSet = photoView === 'settings';
+                const tabs = `<div class="seg ph-viewseg" style="margin-bottom:10px;"><button class="seg-btn ${!isSet ? 'on' : ''}" data-view="list"><i class="fas fa-list"></i> Photos</button><button class="seg-btn ${isSet ? 'on' : ''}" data-view="settings"><i class="fas fa-gear"></i> Settings</button></div>`;
+                const settingsHTML = `
+                    <div class="static-heading">Display on map</div>
+                    <div class="toggle-row ${FLAGS.photoShow ? 'active' : ''}" id="ph-show"><div class="toggle-switch"></div><div class="toggle-label"><div class="toggle-label-main">Show photos on map</div></div></div>
+                    <div class="editor-field"><label>Size</label><div class="editor-value-row"><input type="range" id="ph-size" min="24" max="160" step="2" value="${FLAGS.photoSize}"><span class="val" id="ph-size-v">${FLAGS.photoSize}px</span></div></div>
+                    <div class="editor-field"><label>Shape</label><div class="seg"><button class="seg-btn ${FLAGS.photoShape !== 'circle' ? 'on' : ''}" data-shape="square"><i class="fas fa-square"></i> Square</button><button class="seg-btn ${FLAGS.photoShape === 'circle' ? 'on' : ''}" data-shape="circle"><i class="fas fa-circle"></i> Circle</button></div></div>
+                    <div class="editor-field-row"><div class="editor-field"><label>Border (px)</label><input type="number" id="ph-bw" min="0" max="12" value="${FLAGS.photoBorder}"></div><div class="editor-field"><label>Border colour</label><input type="color" id="ph-bc" value="${safeColor(FLAGS.photoBorderColor, '#ffffff')}"></div></div>`;
+                const listHTML = `
+                    <div style="display:flex;gap:8px;margin:0 0 8px;"><button class="btn btn-secondary" id="ph-add" style="flex:1"><i class="fas fa-plus"></i> Add more…</button><button class="btn btn-danger" id="ph-clear" style="flex:1"><i class="fas fa-trash"></i> Clear all</button></div>
+                    <div class="static-heading">${photos.length} photo${photos.length === 1 ? '' : 's'} with GPS</div><div id="ph-list"></div>`;
+                w.innerHTML = tabs + (isSet ? settingsHTML : listHTML);
+                b.appendChild(w);
+                w.querySelectorAll('[data-view]').forEach(x => x.addEventListener('click', () => { photoView = x.dataset.view; renderPhotosSection(); }));
+                if (isSet) {
+                    const upd = () => { saveFlags(); refreshPhotoMarkers(); };
+                    w.querySelector('#ph-show').addEventListener('click', () => { setPhotoShow(!FLAGS.photoShow); saveFlags(); renderPhotosSection(); });
+                    w.querySelector('#ph-size').addEventListener('input', (e) => { FLAGS.photoSize = +e.target.value; w.querySelector('#ph-size-v').textContent = FLAGS.photoSize + 'px'; upd(); });
+                    w.querySelectorAll('[data-shape]').forEach(x => x.addEventListener('click', () => { FLAGS.photoShape = x.dataset.shape; upd(); renderPhotosSection(); }));
+                    w.querySelector('#ph-bw').addEventListener('input', (e) => { FLAGS.photoBorder = Math.max(0, Math.min(12, +e.target.value || 0)); upd(); });
+                    w.querySelector('#ph-bc').addEventListener('input', (e) => { FLAGS.photoBorderColor = e.target.value; upd(); });
+                    return;
+                }
+                w.querySelector('#ph-add').addEventListener('click', openPhotoImportDialog);
+                w.querySelector('#ph-clear').addEventListener('click', () => { if (confirm('Remove all ' + photos.length + ' photos from the map?')) clearPhotos(); });
+                const list = w.querySelector('#ph-list'), CAP = 400;
+                photos.slice(0, CAP).forEach(p => {
+                    const r = document.createElement('div'); r.className = 'fx-row ph-row' + (photos[photoSel] === p ? ' sel' : ''); r.tabIndex = 0;
+                    const im = document.createElement('img'); im.className = 'ph-thumb'; im.alt = ''; if (p.thumb) im.src = p.thumb;
+                    const lb = document.createElement('div'); lb.className = 'fx-label'; lb.textContent = p.name; lb.title = p.path;
+                    r.appendChild(im); r.appendChild(lb);
+                    r.addEventListener('click', () => { openPhoto(p.id); map.panTo([p.lat, p.lng]); });
+                    r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); r.click(); } });
+                    list.appendChild(r);
+                });
+                if (photos.length > CAP) list.insertAdjacentHTML('beforeend', '<div class="fx-empty">Showing the first ' + CAP + ' — all ' + photos.length + ' are on the map.</div>');
+            }
+
+            // ---- preview panel ----
+            function openPhoto(id) {
+                const i = photos.findIndex(p => p.id === id); if (i < 0) return;
+                photoSel = i; const p = photos[i];
+                if (phUrl) URL.revokeObjectURL(phUrl);
+                phUrl = URL.createObjectURL(p.file);
+                phErr.hidden = true; phImg.hidden = false; phImg.classList.remove('zoom'); phImg.src = phUrl;
+                phTitle.textContent = p.name; phSub.textContent = (i + 1) + ' of ' + photos.length;
+                const row = (k, v) => '<tr><td>' + k + '</td><td>' + v + '</td></tr>';
+                phMeta.innerHTML = '<table class="props-table">' + row('Latitude', p.lat.toFixed(6)) + row('Longitude', p.lng.toFixed(6)) + (p.alt != null ? row('Altitude', Math.round(p.alt) + ' m') : '') +
+                    (p.date ? row('Taken', escapeHtml(p.date)) : '') + row('Size', (p.size / 1048576).toFixed(2) + ' MB') + row('Path', escapeHtml(p.path)) + '</table>';
+                phPanel.classList.add('open');
+                map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 15), { duration: 0.8 });
+            }
+            function closePhoto() { phPanel.classList.remove('open', 'full'); photoSel = -1; if (phUrl) { URL.revokeObjectURL(phUrl); phUrl = null; } phImg.removeAttribute('src'); }
+            function stepPhoto(d) { if (photoSel < 0 || !photos.length) return; openPhoto(photos[(photoSel + d + photos.length) % photos.length].id); }
+            phImg.addEventListener('error', () => { if (phImg.getAttribute('src')) { phImg.hidden = true; phErr.hidden = false; } });
+            phImg.addEventListener('click', () => phImg.classList.toggle('zoom'));
+            document.getElementById('photo-close').addEventListener('click', closePhoto);
+            document.getElementById('photo-prev').addEventListener('click', () => stepPhoto(-1));
+            document.getElementById('photo-next').addEventListener('click', () => stepPhoto(1));
+            document.getElementById('photo-full').addEventListener('click', () => phPanel.classList.toggle('full'));
+            document.addEventListener('keydown', (e) => {
+                if (!phPanel.classList.contains('open') || (e.target.closest && e.target.closest('input, textarea, select'))) return;
+                if (e.key === 'Escape') closePhoto(); else if (e.key === 'ArrowLeft') stepPhoto(-1); else if (e.key === 'ArrowRight') stepPhoto(1);
+            });
+            (function () {
+                const h = document.getElementById('photo-resizer'), area = document.querySelector('.map-area');
+                if (FLAGS.photoW) phPanel.style.setProperty('--photo-w', FLAGS.photoW + 'px');
+                let drag = false;
+                h.addEventListener('pointerdown', (e) => { drag = true; phPanel.classList.remove('full'); try { h.setPointerCapture(e.pointerId); } catch (x) {} e.preventDefault(); });
+                h.addEventListener('pointermove', (e) => { if (!drag) return; const r = area.getBoundingClientRect(); const w = Math.max(280, Math.min(r.width, r.right - e.clientX)); phPanel.style.setProperty('--photo-w', Math.round(w) + 'px'); FLAGS.photoW = Math.round(w); });
+                h.addEventListener('pointerup', () => { if (drag) { drag = false; saveFlags(); } });
+                h.addEventListener('dblclick', () => phPanel.classList.toggle('full'));
+                h.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); const w = Math.max(280, phPanel.offsetWidth + (e.key === 'ArrowLeft' ? 24 : -24)); phPanel.style.setProperty('--photo-w', w + 'px'); FLAGS.photoW = w; saveFlags(); } });
+            })();
+
+            // ==================== STRESS TEST (temporary) ====================
+            function stressRemove() {
+                const f = treeNodes.find(n => n.meta && n.meta.stress);
+                if (!f) return Promise.resolve(false);
+                return withBusy('Removing test data…', async () => { await deleteNodeWithChildren(f); renderTree(); return true; });
+            }
+            function frameTest(n, dz) {
+                return new Promise(res => {
+                    const c0 = map.getCenter(), z0 = map.getZoom(), sz = map.getSize(), z = Math.max(map.getMinZoom(), z0 + dz), ds = [];
+                    const p0 = map.project(c0, z);
+                    let i = 0, last = performance.now();
+                    const step = (t) => {
+                        ds.push(t - last); last = t;
+                        if (i >= n) {
+                            map.setView(c0, z0, { animate: false });
+                            const a = ds.slice(2).sort((x, y) => x - y), avg = a.reduce((x, y) => x + y, 0) / (a.length || 1);
+                            return res({ frames: a.length, avgMs: +avg.toFixed(1), p95Ms: +((a[Math.floor(a.length * 0.95)] || 0)).toFixed(1), maxMs: +((a[a.length - 1] || 0)).toFixed(1), fps: +(1000 / (avg || 1)).toFixed(1) });
+                        }
+                        const ang = i / n * Math.PI * 2;
+                        map.setView(map.unproject(p0.add([Math.sin(ang) * sz.x * 0.5, (1 - Math.cos(ang)) * sz.y * 0.25]), z), z, { animate: false });
+                        i++; requestAnimationFrame(step);
+                    };
+                    requestAnimationFrame(step);
+                });
+            }
+            async function stressRun(c) {
+                await stressRemove();
+                const out = { requested: c }, b = map.getBounds(), rnd = (a, z) => a + Math.random() * (z - a);
+                const S = b.getSouth(), N = b.getNorth(), W = b.getWest(), E = b.getEast(), dLat = N - S, dLng = E - W, cols = COLOR_PRESETS;
+                busyShow('Generating test data…'); await nextPaint();
+                let t = performance.now();
+                const folder = createNode({ type: 'folder', name: '⚠ Stress test (not saved)', meta: { color: '#dc2626', stress: true, desc: 'Temporary — never saved' } });
+                for (let i = 0; i < c.pm; i++) folder.children.push(createNode({ type: 'placemark', name: 'Stress ' + (i + 1), meta: { lat: rnd(S, N), lng: rnd(W, E), icon: DEFAULT_ICON, color: cols[i % cols.length], desc: '' } }));
+                for (let i = 0; i < c.pa; i++) {
+                    let la = rnd(S, N), ln = rnd(W, E); const pts = [];
+                    for (let k = 0; k < c.ve; k++) { la = Math.max(S, Math.min(N, la + rnd(-1, 1) * dLat / 120)); ln = Math.max(W, Math.min(E, ln + rnd(-1, 1) * dLng / 120)); pts.push([la, ln]); }
+                    folder.children.push(createNode({ type: 'path', name: 'Stress path ' + (i + 1), meta: { points: pts, color: cols[i % cols.length], lineThickness: 2, desc: '', distance: pathDistance(pts.map(p => L.latLng(p[0], p[1]))) } }));
+                }
+                for (let i = 0; i < c.po; i++) {
+                    const la = rnd(S, N), ln = rnd(W, E), r = dLat * rnd(0.01, 0.04), pts = [];
+                    for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; pts.push([la + Math.sin(a) * r * rnd(0.6, 1), ln + Math.cos(a) * r * rnd(0.6, 1)]); }
+                    folder.children.push(createNode({ type: 'polygon', name: 'Stress polygon ' + (i + 1), meta: { points: pts, color: cols[(i + 3) % cols.length], lineThickness: 2, desc: '', area: 0 } }));
+                }
+                out.generateMs = Math.round(performance.now() - t); t = performance.now();
+                treeNodes.push(folder); buildLayersFor([folder]);
+                out.buildMapLayersMs = Math.round(performance.now() - t); t = performance.now();
+                updateMinimapDots(); updateMapLabels(); renderTree();
+                out.renderPanelMs = Math.round(performance.now() - t);
+                busyHide(); await nextPaint(); await new Promise(r => setTimeout(r, 500));
+                showToast('Running pan / zoom test…', 'fa-flask');
+                out.panTest = await frameTest(90, 0);
+                out.zoomOutPanTest = await frameTest(60, -1);
+                out.diagnostics = perfReport();
+                const txt = JSON.stringify(out, null, 2);
+                genericModal('<i class="fas fa-flask"></i> Stress test results',
+                    `<div style="font-size:.85rem;line-height:1.7;margin-bottom:8px;">Pan: <b>${out.panTest.fps} fps</b> (worst frame ${out.panTest.maxMs} ms)<br>Zoomed out: <b>${out.zoomOutPanTest.fps} fps</b> (worst ${out.zoomOutPanTest.maxMs} ms)<br>Build on map: ${out.buildMapLayersMs} ms · list render: ${out.renderPanelMs} ms</div><pre style="max-height:220px;overflow:auto;font-size:.66rem;background:var(--surface-soft);border:1px solid var(--border);border-radius:8px;padding:8px;">${escapeHtml(txt)}</pre><div class="editor-hint">The test data is in the folder "Stress test" and is never saved. Remove it when finished.</div>`,
+                    [{ label: '<i class="fas fa-copy"></i> Copy results', primary: true, fn: () => copyToClipboard(txt, 'Stress results') },
+                     { label: 'Remove test data', fn: async (cl) => { cl(); await stressRemove(); } },
+                     { label: 'Close', fn: cl => cl() }]);
+            }
+            function openStressTest() {
+                const num = (id, label, v) => `<div class="editor-field"><label>${label}</label><input type="number" id="${id}" value="${v}" min="0" step="100"></div>`;
+                genericModal('<i class="fas fa-flask"></i> Stress test',
+                    '<div style="font-size:.8rem;color:var(--text-2);margin-bottom:10px;">Generates random objects inside the current map view, then pans and zooms while measuring frame times. Nothing is saved.</div>' +
+                    '<div class="editor-field-row">' + num('st-pm', 'Placemarks', 5000) + num('st-pa', 'Paths', 300) + '</div><div class="editor-field-row">' + num('st-ve', 'Vertices per path', 60) + num('st-po', 'Polygons (8 vertices)', 100) + '</div>',
+                    [{ label: '<i class="fas fa-play"></i> Run', primary: true, fn: (cl) => {
+                        const g = (id) => Math.max(0, Math.min(200000, parseInt(document.getElementById(id).value, 10) || 0));
+                        const cfg = { pm: g('st-pm'), pa: g('st-pa'), ve: Math.max(2, g('st-ve')), po: g('st-po') };
+                        cl(); stressRun(cfg).catch(err => { busyHide(); showToast('Stress test failed', 'fa-times', { error: true, detail: err }); });
+                    } }, { label: 'Remove test data', fn: async (cl) => { cl(); await stressRemove(); } }, { label: 'Cancel', fn: cl => cl() }]);
+            }
+            document.getElementById('sb-stress').addEventListener('click', openStressTest);
+
             // ==================== INIT ====================
             (async function init() {
                 await loadSettings();
@@ -10471,14 +10936,14 @@
                 renderTree();
                 initMinimap();
                 updateTerrainVisibility();
-                await loadPersistedTiles();
-                const restored = await loadPersistedTree();
+                await loadPersistedTiles(); PERF.tilesAt = Math.round(performance.now());
+                const restored = await loadPersistedTree(); PERF.treeAt = Math.round(performance.now());
                 resetHistory(true);
                 if (restored && hasAnyPlaces()) setTimeout(fitToPlacesExtent, 200);
                 updateMapToolsVisibility();
                 syncProfilePanelLeft();
                 updateMapLabels();
-                setTimeout(() => showToast('Andrew\'s Earth ready', 'fa-tower-broadcast'), 700);
+                setTimeout(() => { if (window.__bootResolve) window.__bootResolve(); }, (restored && hasAnyPlaces()) ? 400 : 60); setTimeout(() => showToast('Andrew\'s Earth ready', 'fa-tower-broadcast'), 700);
             })();
         })();
     </script>
