@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   ============================================================
-  BUILD: 2026-11-10 22:41:00 (local)
+  BUILD: 2026-11-11 09:35:39 (local)
   ------------------------------------------------------------
   MAINTENANCE RULE — READ BEFORE EDITING THIS FILE:
   Whenever the code in this file is modified in any way,
@@ -383,6 +383,38 @@ document.head.appendChild(s);})();</script>
     .icon-choice.selected { background: var(--accent-soft); }
     .icon-choice.selected i { font-weight: 900; }
     .icon-cat-title { grid-column: 1 / -1; font-family: inherit; font-weight: 600; font-size: 0.55rem; text-transform: none; letter-spacing: 0.01em; color: var(--text-3); font-weight: 500; padding: 6px 2px 2px; }
+    /* storage warning + storage group */
+    .rail-btn { position: relative; }
+    .rail-btn.has-alert::after { content: ''; position: absolute; top: 6px; right: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--danger); border: 2px solid var(--surface); }
+    .settings-alert { display: flex; align-items: center; gap: 10px; padding: 10px 18px; background: var(--danger-soft); border-bottom: 1px solid var(--danger-border); color: var(--danger); font-size: 0.78rem; line-height: 1.4; flex-shrink: 0; }
+    .settings-alert[hidden] { display: none; }
+    .settings-alert span { flex: 1; min-width: 0; font-weight: 500; }
+    .settings-alert button { flex-shrink: 0; font: inherit; font-size: 0.74rem; font-weight: 600; color: var(--danger); background: transparent; border: 1px solid var(--danger-border); border-radius: 7px; padding: 5px 10px; cursor: pointer; }
+    .settings-alert button:hover { background: var(--surface); }
+    .settings-nav-btn.alert::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); margin-left: auto; flex-shrink: 0; }
+    .st-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; background: var(--surface); }
+    .st-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    .st-head b { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+    .st-head .btn { padding: 4px 10px; font-size: 0.72rem; }
+    .st-big { font-size: 1.3rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .st-big span { font-size: 0.82rem; font-weight: 500; color: var(--text-2); }
+    .st-meter { height: 10px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+    .st-meter i { display: block; height: 100%; background: var(--accent-fill); border-radius: 6px; transition: width 0.3s; }
+    .st-meter i.warn { background: #d97706; }
+    .st-meter i.crit { background: var(--danger); }
+    .st-note { font-size: 0.72rem; color: var(--text-3); line-height: 1.5; margin-top: 8px; }
+    .st-rows { font-size: 0.78rem; color: var(--text-2); }
+    .st-row { padding: 6px 0; }
+    .st-row + .st-row { border-top: 1px solid var(--border); }
+    .st-row.sub { padding-left: 16px; }
+    .st-row-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .st-row-top span { color: var(--text); min-width: 0; }
+    .st-row-top small { display: block; color: var(--text-3); font-size: 0.68rem; }
+    .st-row-top b { font-weight: 600; color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .st-bar { height: 5px; border-radius: 3px; background: var(--surface-2); margin-top: 5px; overflow: hidden; }
+    .st-bar i { display: block; height: 100%; background: var(--accent-fill); opacity: 0.75; }
+    .st-links { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    .st-links button { font: inherit; font-size: 0.78rem; color: var(--accent); background: none; border: 0; padding: 2px 0; cursor: pointer; text-decoration: underline; text-align: left; }
     #icn-ctx { display: none; position: fixed; z-index: 7000; min-width: 200px; max-width: 290px; max-height: 60vh; overflow: auto; background: var(--surface); border: 1px solid var(--border-hi); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.22); padding: 4px; }
     #icn-ctx button { display: flex; width: 100%; gap: 8px; align-items: center; justify-content: space-between; background: none; border: 0; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 0.78rem; color: var(--text); cursor: pointer; text-align: left; }
     #icn-ctx button:hover, #icn-ctx button:focus { background: var(--accent-soft); outline: none; }
@@ -1208,7 +1240,7 @@ document.head.appendChild(s);})();</script>
         <button class="sb-seg" id="sb-perf" title="Temporary: map complexity and frame rate. Click to copy diagnostics."><i class="fas fa-gauge-high"></i> <span id="sb-perf-text">…</span></button>
         <span class="sb-seg sb-progress" id="sb-progress" hidden><span id="sb-progress-label"></span><span class="sb-progress-track"><span class="sb-progress-fill" id="sb-progress-fill"></span></span></span>
         <div class="terrain-status" id="terrain-status"><i class="fas fa-circle" style="font-size: 0.5rem; color: var(--text-3);"></i> No terrain loaded</div>
-        <!-- BUILD-FOOTER --><span class="sb-seg sb-build" id="sb-build" title="Build date and time (local)">Build 2026-11-10 22:41:00</span>
+        <!-- BUILD-FOOTER --><span class="sb-seg sb-build" id="sb-build" title="Build date and time (local)">Build 2026-11-11 09:35:39</span>
     </div>
 
     <input type="file" id="file-input" accept=".hgt,.HGT" multiple style="display:none">
@@ -1237,6 +1269,11 @@ document.head.appendChild(s);})();</script>
             <div class="settings-head">
                 <h3 id="settings-title"><i class="fas fa-gear"></i> Settings</h3>
                 <button class="settings-x" id="settings-close" type="button" aria-label="Close settings"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="settings-alert" id="settings-alert" role="alert" hidden>
+                <i class="fas fa-triangle-exclamation"></i>
+                <span></span>
+                <button type="button" id="settings-alert-go">Manage storage</button>
             </div>
             <div class="settings-main">
                 <nav class="settings-nav" id="settings-nav" aria-label="Settings groups"></nav>
@@ -2444,6 +2481,7 @@ document.head.appendChild(s);})();</script>
                 try {
                     _trackUndo();
                     await dbPut('places', { id: 'root', tree: treeNodes.filter(n => !(n.meta && n.meta.stress)).map(toPlain), archive: archivedNodes.map(toPlain) });
+                    try { scheduleStorageCheck(); } catch (e) {}
                 } catch (e) { console.warn('persistTree failed', e); }
             }
             async function loadPersistedTree() {
@@ -4766,7 +4804,8 @@ document.head.appendChild(s);})();</script>
                 { key: 'display',     label: 'Map display',  icon: 'fa-map-pin',             sub: 'How placemarks and labels are drawn when there are a lot of them.' },
                 { key: 'performance', label: 'Performance',  icon: 'fa-gauge-high',          sub: 'Options for very large datasets.' },
                 { key: 'saved',       label: 'Saved images', icon: 'fa-images',              sub: 'Icons and pictures you gave to markers. They are kept inside the markers themselves, in this browser, so this list only ever shows the ones a marker still uses.' },
-                { key: 'data',        label: 'Data & export', icon: 'fa-file-export',        sub: 'Export your places and check browser storage.' },
+                { key: 'storage',     label: 'Storage',      icon: 'fa-database',            sub: 'How much of this browser\'s storage the app uses, and the map tile cache.' },
+                { key: 'data',        label: 'Data & export', icon: 'fa-file-export',        sub: 'Export your places and sites.' },
                 { key: 'danger',      label: 'Clear data',   icon: 'fa-triangle-exclamation', sub: 'These actions delete data from this browser. Most of them cannot be undone.', danger: true }
             ];
             const settingsOverlay = document.getElementById('settings-overlay');
@@ -4775,6 +4814,150 @@ document.head.appendChild(s);})();</script>
             const settingsBox = document.getElementById('settings-box');
             const railSettingsBtn = document.getElementById('rail-settings');
             let settingsGroup = 'appearance';
+
+            // ---- storage: quota check (banner at 90 %), what is using it, persistence, tile cache ----
+            const STORAGE_WARN_PCT = 90;
+            var _stTimer = null, _stTok = 0, _stToastShown = false;     // var: persistTree may call scheduleStorageCheck() very early
+            let storageState = { ok: false, usage: 0, quota: 0, pct: 0, persisted: null };
+            const stFmt = (b) => {
+                b = +b || 0;
+                if (b >= 1073741824) return (b / 1073741824).toFixed(2) + ' GB';
+                if (b >= 1048576) return (b / 1048576).toFixed(1) + ' MB';
+                if (b >= 1024) return Math.round(b / 1024) + ' KB';
+                return Math.round(b) + ' B';
+            };
+            async function refreshStorageState() {
+                try {
+                    if (navigator.storage && navigator.storage.estimate) {
+                        const est = await navigator.storage.estimate();
+                        if (est && est.quota) storageState = Object.assign(storageState, { ok: true, usage: est.usage || 0, quota: est.quota, pct: (est.usage || 0) / est.quota * 100 });
+                    }
+                    if (navigator.storage && navigator.storage.persisted) storageState.persisted = await navigator.storage.persisted();
+                } catch (e) { /* estimate unavailable: no banner */ }
+                updateStorageAlertUI();
+                return storageState;
+            }
+            function scheduleStorageCheck() { clearTimeout(_stTimer); _stTimer = setTimeout(refreshStorageState, 4000); }
+            function updateStorageAlertUI() {
+                const warn = storageState.ok && storageState.pct >= STORAGE_WARN_PCT;
+                railSettingsBtn.classList.toggle('has-alert', warn);
+                const nav = settingsNav.querySelector('[data-group="storage"]');
+                if (nav) nav.classList.toggle('alert', warn);
+                const bar = document.getElementById('settings-alert');
+                if (bar) {
+                    bar.hidden = !warn;
+                    if (warn) {
+                        bar.querySelector('span').textContent = 'Browser storage is ' + Math.min(100, Math.floor(storageState.pct)) + '% full (' + stFmt(storageState.usage) + ' of ' + stFmt(storageState.quota) + '). Once it is full, new terrain tiles and places may fail to save.';
+                        document.getElementById('settings-alert-go').style.display = settingsGroup === 'storage' ? 'none' : '';
+                    }
+                }
+                if (warn && !_stToastShown) { _stToastShown = true; showToast('Browser storage is ' + Math.floor(storageState.pct) + '% full – see Settings → Storage', 'fa-triangle-exclamation'); }
+            }
+
+            function buildStorageGroup(box) {
+                const tok = ++_stTok;
+                const live = () => tok === _stTok && box.isConnected && settingsGroup === 'storage';
+                const wrap = document.createElement('div');
+                wrap.innerHTML = `
+                    <div class="st-card">
+                        <div class="st-head"><b>Browser storage</b><button class="btn btn-secondary" id="st-refresh" type="button">Refresh</button></div>
+                        <div class="st-big" id="st-big">Measuring…</div>
+                        <div class="st-meter" aria-hidden="true"><i id="st-fill" style="width:0%"></i></div>
+                        <div class="st-note" id="st-quota-note"></div>
+                    </div>
+                    <div class="st-card">
+                        <div class="st-head"><b>What is using it</b></div>
+                        <div id="st-rows" class="st-rows">Measuring…</div>
+                    </div>
+                    <div class="st-card">
+                        <div class="st-head"><b>Persistent storage</b></div>
+                        <div id="st-persist" class="st-note">Checking…</div>
+                    </div>
+                    <div class="st-card">
+                        <div class="st-head"><b>Map tile cache</b><button class="btn btn-secondary" id="st-clear-tiles" type="button">Clear tile cache</button></div>
+                        <div id="st-tiles" class="st-rows"></div>
+                        <div class="st-note">Kept in memory only, so it empties when you close or reload the page. It makes panning back over places you have already seen instant and does not count towards browser storage.</div>
+                    </div>
+                    <div class="st-card">
+                        <div class="st-head"><b>Free up space</b></div>
+                        <div class="st-links">
+                            <button type="button" data-go="saved">Review saved images</button>
+                            <button type="button" data-go="danger">Clear HGT data, places or the tile cache…</button>
+                        </div>
+                    </div>`;
+                box.appendChild(wrap);
+                const $ = (id) => wrap.querySelector('#' + id);
+                const row = (label, detail, bytes, total, sub) => `<div class="st-row${sub ? ' sub' : ''}"><div class="st-row-top"><span>${label}<small>${detail || ''}</small></span><b>${stFmt(bytes)}</b></div>${total ? `<div class="st-bar"><i style="width:${Math.min(100, Math.max(bytes > 0 ? 1 : 0, bytes / total * 100)).toFixed(1)}%"></i></div>` : ''}</div>`;
+
+                const fillUsage = () => {
+                    const s = storageState;
+                    if (!s.ok) { $('st-big').textContent = 'Your browser does not report storage usage.'; $('st-quota-note').textContent = ''; return; }
+                    const pct = Math.min(100, s.pct);
+                    $('st-big').innerHTML = stFmt(s.usage) + ' <span>of ' + stFmt(s.quota) + ' · ' + (pct < 10 ? pct.toFixed(1) : Math.round(pct)) + '%</span>';
+                    const fill = $('st-fill'); fill.style.width = pct.toFixed(1) + '%';
+                    fill.className = pct >= STORAGE_WARN_PCT ? 'crit' : pct >= 75 ? 'warn' : '';
+                    $('st-quota-note').textContent = 'The limit is set by your browser for this site and depends on free disk space, so it can change. The warning banner appears at ' + STORAGE_WARN_PCT + '%.';
+                };
+                const fillTiles = () => {
+                    let bytes = 0, oldest = 0;
+                    tileCache.forEach(e => { bytes += (e.blob && e.blob.size) || 0; if (e.ts && (!oldest || e.ts < oldest)) oldest = e.ts; });
+                    const reqs = cacheHits + cacheMisses, rate = reqs ? Math.round(cacheHits / reqs * 100) : 0;
+                    const age = oldest ? Math.max(1, Math.round((Date.now() - oldest) / 60000)) : 0;
+                    $('st-tiles').innerHTML =
+                        row('Tiles cached', 'limit ' + TILE_CACHE_MAX.toLocaleString(), 0, 0).replace(/<b>[^<]*<\/b>/, '<b>' + tileCache.size.toLocaleString() + '</b>') +
+                        row('Memory used', 'approximate', bytes, 0) +
+                        row('Served from cache', cacheHits.toLocaleString() + ' hits · ' + cacheMisses.toLocaleString() + ' misses', 0, 0).replace(/<b>[^<]*<\/b>/, '<b>' + (reqs ? rate + '%' : '—') + '</b>') +
+                        (oldest ? row('Oldest tile', 'least recently used goes first', 0, 0).replace(/<b>[^<]*<\/b>/, '<b>' + (age >= 120 ? Math.round(age / 60) + ' h' : age + ' min') + '</b>') : '');
+                };
+                const fillPersist = () => {
+                    const el = $('st-persist'); el.textContent = '';
+                    if (!(navigator.storage && navigator.storage.persist)) { el.textContent = 'Your browser does not offer persistent storage.'; return; }
+                    const p = document.createElement('div');
+                    p.textContent = storageState.persisted
+                        ? 'Granted – the browser will not clear this site’s data on its own, even when the device is low on disk space.'
+                        : 'Not granted – the browser may delete this site’s data (terrain tiles and places) without asking if the device runs low on disk space.';
+                    el.appendChild(p);
+                    if (!storageState.persisted) {
+                        const b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-secondary'; b.style.marginTop = '8px'; b.textContent = 'Request persistent storage';
+                        b.addEventListener('click', async () => {
+                            let ok = false;
+                            try { ok = await navigator.storage.persist(); } catch (e) {}
+                            showToast(ok ? 'Persistent storage granted' : 'The browser did not grant persistent storage', ok ? 'fa-check' : 'fa-info-circle');
+                            await refreshStorageState();
+                            if (live()) fillPersist();
+                        });
+                        el.appendChild(b);
+                    }
+                };
+                const fillBreakdown = async () => {
+                    let terrainBytes = 0;
+                    terrainStore.forEach(t => { terrainBytes += (t.data && t.data.byteLength) || 0; });
+                    let placesBytes = 0;
+                    try { const rec = await dbGet('places', 'root'); placesBytes = rec ? JSON.stringify(rec).length : 0; } catch (e) {}
+                    if (!live()) return;
+                    const icons = collectCustomIcons();
+                    const iconBytes = icons.reduce((a, e) => a + e.icon.length * e.count, 0);
+                    const used = storageState.ok ? storageState.usage : terrainBytes + placesBytes;
+                    const other = Math.max(0, used - terrainBytes - placesBytes);
+                    const total = Math.max(used, terrainBytes + placesBytes, 1);
+                    $('st-rows').innerHTML =
+                        row('Terrain (HGT) tiles', terrainStore.size.toLocaleString() + ' tile' + (terrainStore.size === 1 ? '' : 's'), terrainBytes, total) +
+                        row('Places and archive', 'markers, links, paths, folders', placesBytes, total) +
+                        (iconBytes ? row('of which saved images', icons.length + ' image' + (icons.length === 1 ? '' : 's') + ' on ' + icons.reduce((a, e) => a + e.count, 0) + ' marker(s)', Math.min(iconBytes, placesBytes || iconBytes), total, true) : '') +
+                        (storageState.ok ? row('Everything else', 'settings, browser caches, other site data', other, total) : '');
+                };
+
+                fillUsage(); fillTiles(); fillPersist();
+                refreshStorageState().then(() => { if (!live()) return; fillUsage(); fillPersist(); fillBreakdown(); });
+                $('st-refresh').addEventListener('click', async () => { $('st-big').textContent = 'Measuring…'; await refreshStorageState(); if (!live()) return; fillUsage(); fillTiles(); fillPersist(); fillBreakdown(); });
+                $('st-clear-tiles').addEventListener('click', () => {
+                    tileCache.forEach(e => e.url && URL.revokeObjectURL(e.url));
+                    tileCache.clear(); cacheHits = 0; cacheMisses = 0;
+                    fillTiles();
+                    showToast('Map tile cache cleared', 'fa-database');
+                });
+                wrap.querySelectorAll('.st-links button').forEach(b => b.addEventListener('click', () => { settingsGroup = b.dataset.go; renderSettingsGroup(false); }));
+            }
 
             function buildSettingsGroup(group, box) {
                 const snapToggle = document.createElement('div');
@@ -4834,17 +5017,6 @@ document.head.appendChild(s);})();</script>
                     { title: 'Export', items: [
                         ...IO_FORMATS.map(f => ({ icon: f.icon, label: 'Export all as ' + f.label, desc: f.key === 'gpx' ? 'Geometry, names and descriptions only' : 'Full round-trip: folders, styles and metadata', action: () => exportAs(f.key, null) })),
                         { icon: 'fa-file-csv', label: 'Export site list as CSV', desc: 'Placemarks and links with elevation and link status', action: () => exportSitesCSV() }
-                    ]},
-                    { title: 'Storage', items: [
-                        { icon: 'fa-database', label: 'Storage info', desc: 'IndexedDB usage estimate', action: async () => {
-                            if (navigator.storage && navigator.storage.estimate) {
-                                const est = await navigator.storage.estimate();
-                                showToast(`Used ${(est.usage / 1048576).toFixed(1)} MB of ${(est.quota / 1048576).toFixed(0)} MB`, 'fa-database');
-                            } else showToast('Storage estimate unavailable', 'fa-info-circle');
-                        }},
-                        { icon: 'fa-database', label: 'Tile cache', desc: 'Show in-memory tile cache stats', action: () => {
-                            showToast(`Cache: ${tileCache.size} tiles · ${cacheHits} hits / ${cacheMisses} misses`, 'fa-database');
-                        }}
                     ]}
                 ];
                 const perfToggleRow = (label, sub, key, onChange) => {
@@ -4916,6 +5088,8 @@ document.head.appendChild(s);})();</script>
                     box.appendChild(perfToggleRow('Simplify paths when zoomed out', 'Skip vertices that fall closer together than the tolerance below, so long paths draw quickly. Shape and data are unchanged.', 'perfSimplify', async () => { applySimplify(); rebuildAll(); scheduleStats(); }));
                     if (FLAGS.perfSimplify) box.appendChild(perfNumberRow('Simplify tolerance (px)', 'Strongest simplification, used only when the view is busy; with fewer vertices in view paths are drawn almost exactly (default 3)', 'perfSimplifyPx', 1, 20, async () => { applySimplify(); rebuildAll(); scheduleStats(); }));
                     if (FLAGS.perfSimplify) box.appendChild(perfNumberRow('Vertex budget', 'Vertices in view at which simplification reaches full strength. Below a quarter of this nothing visible is simplified (default 15000)', 'perfVertexBudget', 1000, 500000, async () => { scheduleStats(); }));
+                } else if (group === 'storage') {
+                    buildStorageGroup(box);
                 } else if (group === 'saved') {
                     const list = collectCustomIcons();
                     const total = list.reduce((a, e) => a + e.count, 0);
@@ -5045,6 +5219,7 @@ document.head.appendChild(s);})();</script>
                 settingsBox.innerHTML = '';
                 buildSettingsGroup(g.key, settingsBox);
                 settingsPane.scrollTop = top;
+                updateStorageAlertUI();
             }
             function rerenderSettings() {
                 if (settingsOverlay && settingsOverlay.classList.contains('open')) renderSettingsGroup(true);
@@ -5055,6 +5230,7 @@ document.head.appendChild(s);})();</script>
                 settingsOverlay.classList.add('open');
                 railSettingsBtn.classList.add('active');
                 railSettingsBtn.setAttribute('aria-expanded', 'true');
+                refreshStorageState();
                 const cur = settingsNav.querySelector('.settings-nav-btn.on');
                 if (cur) cur.focus();
             }
@@ -5080,6 +5256,9 @@ document.head.appendChild(s);})();</script>
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && settingsOverlay.classList.contains('open')) { e.preventDefault(); closeSettingsOverlay(); }
             });
+            document.getElementById('settings-alert-go').addEventListener('click', () => { settingsGroup = 'storage'; renderSettingsGroup(false); });
+            setTimeout(refreshStorageState, 2500);                 // warn at start-up if the browser's storage is nearly full…
+            setInterval(refreshStorageState, 120000);              // …and keep an eye on it (also re-checked after saves)
 
             // ==================== MOVE ====================
             function moveLayerBy(node, dLat, dLng) {
@@ -5437,7 +5616,11 @@ document.head.appendChild(s);})();</script>
             }
             function renderEditorBody() {
                 if (!editorState) return;
-                if (editorState.isBulkSelection) { editorTabsEl.style.display = ''; renderBulkSelectionStyleTab(); return; }
+                if (editorState.isBulkSelection) {
+                    editorTabsEl.style.display = editorState._iconPicker ? 'none' : '';
+                    if (editorState._iconPicker) renderIconPicker(); else renderBulkSelectionStyleTab();
+                    return;
+                }
                 if (editorState.activeTab !== 'style') editorState._iconPicker = null;
                 editorTabsEl.style.display = (editorState._iconPicker && editorState.isPlacemark) ? 'none' : '';   // the icon picker has its own Back button
                 if (editorState.activeTab === 'properties') renderPropertiesTab();
@@ -5490,11 +5673,14 @@ document.head.appendChild(s);})();</script>
                 });
 
                 const content = editorBody.querySelector('#bulk-tab-content');
-                let bulkIcon = null;
-                let bulkRingRadius = ringRadius;
-                let bulkRingThickness = ringThickness;
-                let bulkLineThickness = lineThickness;
-                let bulkColor = color;
+                // coming back from the icon picker: carry on with what was already chosen
+                const keep = editorState._bulkKeep || null;
+                editorState._bulkKeep = null;
+                let bulkIcon = keep ? keep.icon : null;
+                let bulkRingRadius = keep ? keep.ringRadius : ringRadius;
+                let bulkRingThickness = keep ? keep.ringThickness : ringThickness;
+                let bulkLineThickness = keep ? keep.lineThickness : lineThickness;
+                let bulkColor = keep ? keep.color : color;
 
                 function renderMarkerPreview() {
                     const iconFa = bulkIcon || (first.meta && first.meta.icon) || DEFAULT_ICON;
@@ -5519,13 +5705,8 @@ document.head.appendChild(s);})();</script>
 
                 function refreshContent() {
                     if (tab === 'marker') {
+                        const curIcon = bulkIcon || (first.meta && first.meta.icon) || DEFAULT_ICON;
                         content.innerHTML = `
-                            <div class="bulk-preview">
-                                <div class="bulk-preview-inner">
-                                    <div id="bulk-marker-preview">${renderMarkerPreview()}</div>
-                                    <div class="bulk-preview-label">Marker preview</div>
-                                </div>
-                            </div>
                             <div class="editor-section-label">Colour</div>
                             <div class="editor-field">
                                 <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
@@ -5534,8 +5715,13 @@ document.head.appendChild(s);})();</script>
                                 </div>
                                 <div class="swatch-grid" id="bulk-swatch-grid">${swatches}</div>
                             </div>
-                            <div class="editor-section-label">Marker icon</div>
-                            <div class="icon-grid" id="bulk-icon-grid" style="max-height:130px;">
+                            <div class="editor-section-label">Icon</div>
+                            <div class="icon-src-row">
+                                <div class="icon-current" id="bulk-icon-current" title="Current icon">${iconGlyphHTML(curIcon, bulkColor)}</div>
+                                <button class="btn btn-secondary" id="bulk-icon-services" type="button"><i class="fas fa-icons"></i> More icons…</button>
+                            </div>
+                            <div class="editor-hint" id="bulk-icon-hint" style="margin:-2px 0 8px;${bulkIcon ? 'display:none;' : ''}">Pick an icon to give it to every marker. Until you do, each marker keeps its own.</div>
+                            <div class="icon-grid" id="bulk-icon-grid" style="max-height:180px;">
                                 ${Object.keys(ICON_LIBRARY).map(cat => {
                                     let out = `<div class="icon-cat-title">${cat}</div>`;
                                     ICON_LIBRARY[cat].forEach(icon => {
@@ -5545,11 +5731,12 @@ document.head.appendChild(s);})();</script>
                                     return out;
                                 }).join('')}
                             </div>
-                            <div class="editor-section-label">Ring</div>
+                            <div class="editor-section-label">Ring (bounding circle)</div>
                             <div class="editor-field-row">
                                 <div class="editor-field"><label>Radius (px)</label><input type="number" id="bulk-ring-radius" value="${bulkRingRadius}" min="0" step="1"></div>
                                 <div class="editor-field"><label>Thickness (px)</label><input type="number" id="bulk-ring-thickness" value="${bulkRingThickness}" min="0" step="1"></div>
                             </div>
+                            <div class="editor-hint">Set radius to 0 to hide the ring.</div>
                         `;
                         wireMarker();
                     } else if (tab === 'path') {
@@ -5594,6 +5781,10 @@ document.head.appendChild(s);})();</script>
                 function updatePreviews() {
                     const mp = document.getElementById('bulk-marker-preview');
                     if (mp) mp.innerHTML = renderMarkerPreview();
+                    const ic = document.getElementById('bulk-icon-current');
+                    if (ic) ic.innerHTML = iconGlyphHTML(bulkIcon || (first.meta && first.meta.icon) || DEFAULT_ICON, bulkColor);
+                    const ih = document.getElementById('bulk-icon-hint');
+                    if (ih) ih.style.display = bulkIcon ? 'none' : '';
                     const pp = document.getElementById('bulk-polyline-preview');
                     if (pp) pp.innerHTML = renderPolylinePreview();
                 }
@@ -5634,6 +5825,8 @@ document.head.appendChild(s);})();</script>
                             });
                         });
                     }
+                    const moreBtn = document.getElementById('bulk-icon-services');
+                    if (moreBtn) moreBtn.addEventListener('click', () => openIconPicker('services'));
                     const rr = document.getElementById('bulk-ring-radius');
                     const rt = document.getElementById('bulk-ring-thickness');
                     if (rr) rr.addEventListener('input', () => { bulkRingRadius = parseFloat(rr.value) || 0; updatePreviews(); });
@@ -6250,9 +6443,15 @@ document.head.appendChild(s);})();</script>
                 await persistTreeNow();
             }
             function openIconPicker(tab) {
-                if (!editorState || !editorState.isPlacemark) return;
-                clearTimeout(_liveStyleTimer);
-                saveEditorStyle({ silent: true });            // keep any colour / ring edits that are still waiting, so the Style tab shows them on return
+                if (!editorState || (!editorState.isPlacemark && !editorState.isBulkSelection)) return;
+                if (editorState.isBulkSelection) {
+                    const b = editorState._bulk;               // folder contents / multi-selection: nothing is applied until Apply, so remember the draft
+                    if (!b) return;
+                    editorState._bulkKeep = { icon: b.icon(), color: b.color(), ringRadius: b.ringRadius(), ringThickness: b.ringThickness(), lineThickness: b.lineThickness() };
+                } else {
+                    clearTimeout(_liveStyleTimer);
+                    saveEditorStyle({ silent: true });        // keep any colour / ring edits that are still waiting, so the Style tab shows them on return
+                }
                 editorState._iconPicker = { tab: tab === 'upload' ? 'upload' : 'services', q: '', lib: '', cat: '', pending: null };
                 renderEditorBody();
             }
@@ -6260,15 +6459,15 @@ document.head.appendChild(s);})();</script>
                 if (!editorState) return;
                 editorState._iconPicker = null;
                 if (newIcon) {
-                    editorState._newIcon = newIcon;
-                    scheduleLiveStyleApply();
+                    if (editorState.isBulkSelection) { if (editorState._bulkKeep) editorState._bulkKeep.icon = newIcon; }
+                    else { editorState._newIcon = newIcon; scheduleLiveStyleApply(); }
                 }
                 renderEditorBody();
             }
 
             function renderIconPicker() {
-                const st = editorState._iconPicker, node = editorState.node;
-                const color = node.meta.color || '#4d7c0f';
+                const st = editorState._iconPicker;
+                const color = (editorState.isBulkSelection ? (editorState._bulkKeep && editorState._bulkKeep.color) : editorState.node.meta.color) || '#4d7c0f';
                 const recent = collectCustomIcons().slice(0, 24).map(e => e.icon);
                 editorBody.innerHTML = `
                     <div class="icp-head">
@@ -8523,7 +8722,7 @@ document.head.appendChild(s);})();</script>
             }
             fileInput.addEventListener('change', (event) => loadHgtFiles(event.target.files));
             function persistTile(key, arrayBuffer, width, height) {
-                return dbPut('terrain', { key, buffer: arrayBuffer, width, height, ts: Date.now() }).catch(() => {});
+                return dbPut('terrain', { key, buffer: arrayBuffer, width, height, ts: Date.now() }).catch(() => {}).then(() => { try { scheduleStorageCheck(); } catch (e) {} });
             }
             async function loadPersistedTiles() {
                 try {
